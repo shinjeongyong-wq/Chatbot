@@ -21,19 +21,19 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'userQuery is required' });
     }
 
-    // 무료 모델 목록 (Claude → Gemini → GPT → 기타 순서)
+    // 무료 모델 목록 (OpenRouter 2026년 1월 기준)
+    // ⚠️ Claude/GPT는 OpenRouter에서 무료 버전 없음!
     const freeModels = [
-        // Claude (무료)
-        { id: 'anthropic/claude-3-haiku:free', name: 'Claude 3 Haiku' },
-        { id: 'anthropic/claude-3.5-haiku:free', name: 'Claude 3.5 Haiku' },
-        // Gemini (무료)
+        // Gemini (Google) - 무료
         { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0 Flash' },
-        { id: 'google/gemini-flash-1.5-8b:free', name: 'Gemini Flash 1.5' },
-        // GPT 계열 (무료 대안 - Llama)
+        // DeepSeek - 무료, 고성능 추론
+        { id: 'deepseek/deepseek-r1:free', name: 'DeepSeek R1' },
+        // Llama (Meta) - 무료
         { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B' },
         { id: 'meta-llama/llama-4-maverick:free', name: 'Llama 4 Maverick' },
-        // 기타
-        { id: 'qwen/qwen-2.5-72b-instruct:free', name: 'Qwen 2.5 72B' },
+        // Qwen (Alibaba) - 무료
+        { id: 'qwen/qwen3-4b:free', name: 'Qwen 3 4B' },
+        // Mistral - 무료
         { id: 'mistralai/mistral-7b-instruct:free', name: 'Mistral 7B' }
     ];
 
