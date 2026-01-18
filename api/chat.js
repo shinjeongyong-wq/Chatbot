@@ -21,18 +21,26 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'userQuery is required' });
     }
 
-    // 무료 모델 목록
+    // 무료 모델 목록 (Claude → Gemini → GPT → 기타 순서)
     const freeModels = [
-        'meta-llama/llama-3.3-70b-instruct:free',
-        'google/gemini-2.0-flash-exp:free',
-        'meta-llama/llama-4-maverick:free',
-        'qwen/qwen-2.5-72b-instruct:free'
+        // Claude (무료)
+        { id: 'anthropic/claude-3-haiku:free', name: 'Claude 3 Haiku' },
+        { id: 'anthropic/claude-3.5-haiku:free', name: 'Claude 3.5 Haiku' },
+        // Gemini (무료)
+        { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0 Flash' },
+        { id: 'google/gemini-flash-1.5-8b:free', name: 'Gemini Flash 1.5' },
+        // GPT 계열 (무료 대안 - Llama)
+        { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B' },
+        { id: 'meta-llama/llama-4-maverick:free', name: 'Llama 4 Maverick' },
+        // 기타
+        { id: 'qwen/qwen-2.5-72b-instruct:free', name: 'Qwen 2.5 72B' },
+        { id: 'mistralai/mistral-7b-instruct:free', name: 'Mistral 7B' }
     ];
 
     // 모델 순서대로 시도 (Fallback)
-    for (const modelId of freeModels) {
+    for (const model of freeModels) {
         try {
-            console.log(`Trying model: ${modelId}`);
+            console.log(`Trying model: ${model.name}`);
 
             const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
@@ -41,7 +49,7 @@ export default async function handler(req, res) {
                     'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
                 },
                 body: JSON.stringify({
-                    model: modelId,
+                    model: model.id,
                     messages: [
                         { role: 'system', content: systemPrompt || '' },
                         { role: 'user', content: userQuery }
@@ -52,23 +60,21 @@ export default async function handler(req, res) {
             });
 
             if (!response.ok) {
-                console.log(`Model ${modelId} failed with status ${response.status}`);
+                console.log(`Model ${model.name} failed with status ${response.status}`);
                 continue;
             }
 
             const data = await response.json();
 
             if (data.choices && data.choices[0] && data.choices[0].message) {
-                // 사용된 모델명 추출
-                const modelName = modelId.split('/')[1].split(':')[0];
                 return res.json({
                     success: true,
                     text: data.choices[0].message.content,
-                    modelName: modelName
+                    modelName: model.name
                 });
             }
         } catch (error) {
-            console.error(`Error with model ${modelId}:`, error.message);
+            console.error(`Error with model ${model.name}:`, error.message);
             continue;
         }
     }
