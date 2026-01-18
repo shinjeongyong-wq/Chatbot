@@ -3,17 +3,8 @@ const CONFIG = {
     SPREADSHEET_ID: '1-YZhxai1zHQOBspas4ivKBiNf8cFnq-JC7IXgFB0to4',
     USE_MOCK_DATA: false,
 
-    // OpenRouter API 설정
-    OPENROUTER_API_KEY: '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',
-    OPENROUTER_ENDPOINT: 'https://openrouter.ai/api/v1/chat/completions',
-
-    // 무료 모델 순서 (정확한 OpenRouter 모델 ID)
-    FREE_MODELS: [
-        { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B' },
-        { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0 Flash' },
-        { id: 'meta-llama/llama-4-maverick:free', name: 'Llama 4 Maverick' },
-        { id: 'qwen/qwen-2.5-72b-instruct:free', name: 'Qwen 2.5 72B' }
-    ]
+    // API 엔드포인트 (Vercel Serverless Function)
+    CHAT_ENDPOINT: '/api/chat'
 };
 
 let sheetsLoader = null;
@@ -193,50 +184,34 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 - 참고문서에 없는 내용 금지
 - 답변 끝에 참고자료 목록 금지`;
 
-    // 무료 모델들을 순서대로 시도 (fallback chain)
-    for (const model of CONFIG.FREE_MODELS) {
-        try {
-            console.log(`🤖 ${model.name} 시도 중...`);
+    try {
+        console.log('🤖 AI 서버 호출 중...');
 
-            const payload = {
-                model: model.id,
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: `질문: ${userQuery}` }
-                ],
-                temperature: 0.2,
-                max_tokens: 4096
-            };
+        const response = await fetch(CONFIG.CHAT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userQuery: `질문: ${userQuery}`,
+                systemPrompt: systemPrompt
+            })
+        });
 
-            const response = await fetch(CONFIG.OPENROUTER_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${CONFIG.OPENROUTER_API_KEY}`
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                console.warn(`⚠️ ${model.name} 실패 (${response.status})`);
-                continue; // 다음 모델 시도
-            }
-
-            const data = await response.json();
-
-            if (data.choices && data.choices[0] && data.choices[0].message) {
-                const answer = data.choices[0].message.content;
-                // 답변 끝에 사용한 모델 표시
-                return { text: answer, modelName: model.name };
-            }
-        } catch (e) {
-            console.warn(`⚠️ ${model.name} 에러:`, e.message);
-            continue; // 다음 모델 시도
+        if (!response.ok) {
+            console.error(`API 에러: ${response.status}`);
+            return { text: '죄송합니다. AI 서버 연결에 문제가 발생했습니다.', modelName: null };
         }
-    }
 
-    // 모든 모델 실패
-    return { text: '죄송합니다. 현재 AI 서비스를 이용할 수 없습니다. 잠시 후 다시 시도해주세요.', modelName: null };
+        const data = await response.json();
+
+        if (data.success && data.text) {
+            return { text: data.text, modelName: data.modelName };
+        } else {
+            return { text: data.error || '응답을 받지 못했습니다.', modelName: null };
+        }
+    } catch (e) {
+        console.error('API 호출 에러:', e.message);
+        return { text: '죄송합니다. 현재 AI 서비스를 이용할 수 없습니다. 잠시 후 다시 시도해주세요.', modelName: null };
+    }
 }
 
 // ==========================
