@@ -1,0 +1,236 @@
+// sheets-loader.js
+// Hybrid Loader: LocalStorage(우선) > 로컬파일 > Google API(최초 1회)
+
+// API 설정 (최초 1회 다운로드용)
+const SHEETS_CONFIG = {
+    SPREADSHEET_ID: '1-YZhxai1zHQOBspas4ivKBiNf8cFnq-JC7IXgFB0to4',
+    API_KEY: 'AIzaSyACzOZzF6Wb2ZUYGEf_7GDa96dJKJSZdP4',
+    RANGES: { QA: 'Q&A!A:M', FAQ: '생성형 FAQ!A:F' },
+    QA_COLUMNS: { QUESTION: 2, ANSWER: 3, FIELD: 7, CATEGORY: 8 },
+    faq_columns: { TOPIC_PATH: 1, QUESTION: 2, ANSWER: 3 }
+};
+
+class GoogleSheetsLoader {
+    constructor() {
+        this.cache = null;
+        this.faqHierarchy = null;
+    }
+
+    async loadData() {
+        // 1. 브라우저 내부 사본(LocalStorage) 확인 - 네트워크 통신 0
+        const savedData = localStorage.getItem('CRYSTAL_HORIZON_DB_V1');
+        if (savedData) {
+            console.log('📦 로컬 사본(LocalStorage)에서 데이터를 불러옵니다. (통신 X)');
+            this.cache = JSON.parse(savedData);
+            this.initData();
+            return this.cache;
+        }
+
+        // 2. 로컬 파일(qaData.js) 확인 - 100개 이상일 때만 사용 (샘플 데이터 무시)
+        if (typeof QA_DATA !== 'undefined' && QA_DATA.length > 100) {
+            console.log('📂 로컬 파일(qaData.js)에서 데이터를 불러옵니다.');
+            this.cache = QA_DATA;
+            localStorage.setItem('CRYSTAL_HORIZON_DB_V1', JSON.stringify(this.cache));
+            this.initData();
+            return this.cache;
+        }
+
+        // 3. 없으면 API로 최초 1회 다운로드 (사본 생성 과정)
+        console.log('🌐 사본이 없습니다. Google Sheets에서 전체 데이터를 내려받아 사본을 생성합니다...');
+        try {
+            await this.fetchAndSaveAllData();
+            console.log('✅ 사본 생성 완료! 이제부터는 통신 없이 이 사본을 사용합니다.');
+            return this.cache;
+        } catch (e) {
+            console.error('데이터 다운로드 실패:', e);
+            return [];
+        }
+    }
+
+    initData() {
+        const faqData = this.cache.filter(item => item.source === 'faq');
+        this.buildFAQHierarchy(faqData);
+    }
+
+    async fetchAndSaveAllData() {
+        const qaRows = await this.fetchRange(SHEETS_CONFIG.RANGES.QA);
+        const faqRows = await this.fetchRange(SHEETS_CONFIG.RANGES.FAQ);
+
+        const parsedQA = this.parseQAData(qaRows);
+        const parsedFAQ = this.parseFAQData(faqRows);
+
+        this.cache = [...parsedQA, ...parsedFAQ];
+
+        // **핵심**: 내려받은 데이터를 로컬 사본으로 영구 저장
+        localStorage.setItem('CRYSTAL_HORIZON_DB_V1', JSON.stringify(this.cache));
+        this.initData();
+    }
+
+    async fetchRange(range) {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEETS_CONFIG.SPREADSHEET_ID}/values/${range}?key=${SHEETS_CONFIG.API_KEY}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`API Error ${response.status}`);
+        const data = await response.json();
+        return data.values || [];
+    }
+
+    parseQAData(rows) {
+        if (!rows || rows.length < 2) return [];
+        rows.shift();
+        return rows.map((row, idx) => ({
+            source: 'qa', id: `qa-${idx}`,
+            question: row[SHEETS_CONFIG.QA_COLUMNS.QUESTION] || '',
+            answer: row[SHEETS_CONFIG.QA_COLUMNS.ANSWER] || '',
+            metadata: { field: row[SHEETS_CONFIG.QA_COLUMNS.FIELD] || '기타', category: row[SHEETS_CONFIG.QA_COLUMNS.CATEGORY] || '일반' }
+        })).filter(i => i.question);
+    }
+
+    parseFAQData(rows) {
+        if (!rows || rows.length < 2) return [];
+        rows.shift();
+        return rows.map((row, idx) => ({
+            source: 'faq', id: `faq-${idx}`,
+            question: row[SHEETS_CONFIG.faq_columns.QUESTION] || '',
+            answer: row[SHEETS_CONFIG.faq_columns.ANSWER] || '',
+            metadata: { path: row[SHEETS_CONFIG.faq_columns.TOPIC_PATH] || '', field: (row[SHEETS_CONFIG.faq_columns.TOPIC_PATH] || '').split('>')[0] || '기타' }
+        })).filter(i => i.question);
+    }
+
+    buildFAQHierarchy(faqData) {
+        this.faqHierarchy = {};
+        faqData.forEach(item => {
+            const path = item.metadata.path;
+            if (!path) return;
+            const parts = path.split('>');
+            const field = parts[0]?.trim() || '기타';
+            const topic = parts[1]?.trim() || '일반';
+            if (!this.faqHierarchy[field]) this.faqHierarchy[field] = new Set();
+            this.faqHierarchy[field].add(topic);
+        });
+        Object.keys(this.faqHierarchy).forEach(k => this.faqHierarchy[k] = Array.from(this.faqHierarchy[k]).sort());
+    }
+
+    getFields() { return this.faqHierarchy ? Object.keys(this.faqHierarchy).sort() : []; }
+    getTopics(field) { return this.faqHierarchy && this.faqHierarchy[field] ? this.faqHierarchy[field] : []; }
+    getFAQList(field, topic) {
+        if (!this.cache) return [];
+        return this.cache.filter(item => item.source === 'faq' && item.metadata.path.includes(`${field}>${topic}`));
+    }
+    // [동의어 사전] - 유사한 의미의 단어들을 그룹화
+    synonyms = {
+        // 시간 관련
+        '밤': ['야간', '심야', '저녁'],
+        '야간': ['밤', '심야', '저녁'],
+        '낮': ['주간', '오전', '오후'],
+        '주간': ['낮', '오전', '오후'],
+        // 비용 관련
+        '비용': ['가격', '요금', '금액', '돈', '예산'],
+        '가격': ['비용', '요금', '금액'],
+        '예산': ['비용', '가격', '금액'],
+        // 장소/시설 관련
+        '의원': ['병원', '클리닉', '진료소'],
+        '병원': ['의원', '클리닉', '진료소'],
+        // 인테리어 관련
+        '벽': ['벽면', '벽체', '내벽'],
+        '바닥': ['바닥재', '플로어'],
+        '마감재': ['마감', '자재', '소재'],
+        '인테리어': ['실내', '내부'],
+        // 기타
+        '개원': ['오픈', '창업', '개업'],
+        '간판': ['사인', '싸인', '현판'],
+        '환자': ['고객', '내원객'],
+        '진료': ['치료', '시술'],
+    };
+
+    // [한국어 조사 제거] - "밤에" → "밤", "진료를" → "진료"
+    normalizeWord(word) {
+        // 주요 조사 및 어미 제거
+        return word.replace(/[은는이가을를에에서으로로의와과도만?!\.]/g, '').trim();
+    }
+
+    // [쿼리 확장] - 조사 제거 + 동의어 + 부분 매칭
+    expandQueryWithSynonyms(query) {
+        let expandedWords = [];
+        const words = query.split(/\s+/);
+
+        words.forEach(word => {
+            // 원본 단어 추가
+            expandedWords.push(word);
+
+            // 조사 제거한 단어도 추가
+            const cleanWord = this.normalizeWord(word);
+            if (cleanWord.length >= 2) {
+                expandedWords.push(cleanWord);
+            }
+
+            // 동의어 찾기 (정확히 일치하거나 포함하는 경우)
+            Object.keys(this.synonyms).forEach(key => {
+                // "밤에"가 "밤"을 포함하는지, 또는 클린 단어가 키와 일치하는지
+                if (word.includes(key) || cleanWord === key) {
+                    expandedWords = expandedWords.concat(this.synonyms[key]);
+                    expandedWords.push(key); // 원래 키도 추가
+                }
+            });
+        });
+
+        return [...new Set(expandedWords)].filter(w => w.length >= 2);
+    }
+
+    // [RAG 검색 엔진] - 강화된 검색
+    async searchRelatedContext(query, maxResults = 10) {
+        if (!this.cache) await this.loadData();
+
+        // 동의어 확장된 키워드 추출
+        const expandedWords = this.expandQueryWithSynonyms(query);
+        const keywords = expandedWords.filter(w => w.length >= 2);
+
+        console.log('🔍 검색 키워드 (강화):', keywords);
+
+        // 전수조사 후 관련도 순 정렬
+        const results = this.cache.map(item => {
+            const score = this.calculateSimilarity(query, keywords, item.question, item.answer, item.metadata.field);
+            return { ...item, score };
+        })
+            .filter(r => r.score > 0.35)  // 문턱값
+            .sort((a, b) => b.score - a.score);
+
+        return results.slice(0, maxResults);
+    }
+
+    calculateSimilarity(query, keywords, question, answer, field) {
+        if (!question) return 0;
+
+        const questionLower = question.toLowerCase();
+        const answerLower = (answer || '').toLowerCase();
+        const target = questionLower + ' ' + answerLower;
+
+        // 원본 쿼리 단어 (조사 제거)
+        const originalWords = query.split(/\s+/).map(w => this.normalizeWord(w)).filter(w => w.length >= 2);
+
+        let score = 0;
+
+        // 1. 원본 단어 매칭 (가장 중요 - 각 0.4점)
+        let originalHits = 0;
+        originalWords.forEach(word => {
+            if (target.includes(word.toLowerCase())) originalHits++;
+        });
+        score += originalWords.length ? (originalHits / originalWords.length) * 0.5 : 0;
+
+        // 2. 동의어 매칭 보너스 (추가 점수 - 최대 0.3점)
+        let synonymHits = 0;
+        keywords.forEach(kw => {
+            // 원본 단어가 아닌 동의어가 매칭되면 보너스
+            if (!originalWords.includes(kw) && target.includes(kw.toLowerCase())) {
+                synonymHits++;
+            }
+        });
+        score += Math.min(synonymHits * 0.1, 0.3);  // 최대 0.3점
+
+        // 3. 필드(분야) 매칭 보너스 (20%)
+        if (field && query.toLowerCase().includes(field.toLowerCase())) {
+            score += 0.2;
+        }
+
+        return score;
+    }
+}
