@@ -59,7 +59,29 @@ class GoogleSheetsLoader {
         const parsedQA = this.parseQAData(qaRows);
         const parsedFAQ = this.parseFAQData(faqRows);
 
-        this.cache = [...parsedQA, ...parsedFAQ];
+        // 📘 Notion 데이터도 함께 가져오기
+        let notionData = [];
+        try {
+            console.log('📘 Notion 데이터 로드 중...');
+            const notionRes = await fetch('/api/notion');
+            if (notionRes.ok) {
+                const notionJson = await notionRes.json();
+                if (notionJson.success && notionJson.data) {
+                    notionData = notionJson.data.map((item, idx) => ({
+                        source: 'notion',
+                        id: `notion-${idx}`,
+                        question: item.question || '',
+                        answer: item.answer || '',
+                        metadata: item.metadata || { field: '노션', topic: '노션' }
+                    }));
+                    console.log(`✅ Notion 데이터 로드 완료: ${notionData.length}개`);
+                }
+            }
+        } catch (e) {
+            console.warn('Notion 데이터 로드 실패 (무시):', e.message);
+        }
+
+        this.cache = [...parsedQA, ...parsedFAQ, ...notionData];
 
         // **핵심**: 내려받은 데이터를 로컬 사본으로 영구 저장
         localStorage.setItem('CRYSTAL_HORIZON_DB_V1', JSON.stringify(this.cache));
