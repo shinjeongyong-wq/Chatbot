@@ -256,14 +256,15 @@ class GoogleSheetsLoader {
         console.log('   제외 키워드:', excludeKeywords);
         console.log('   검색 전략:', searchStrategy);
 
-        // 1. 제외 키워드 필터링
+        // 1. 제외 키워드 필터링 (질문 필드에만 적용, 너무 공격적이지 않게)
         let candidates = this.cache.filter(item => {
             if (!excludeKeywords || excludeKeywords.length === 0) return true;
 
-            const text = `${item.question || ''} ${item.answer || ''}`.toLowerCase();
-            // 제외 키워드가 포함되어 있으면 제외
+            // 질문 필드에만 적용 (답변 전체에 적용하면 너무 많이 제외됨)
+            const questionText = (item.question || '').toLowerCase();
             for (const excludeWord of excludeKeywords) {
-                if (excludeWord && text.includes(excludeWord.toLowerCase())) {
+                // 2글자 이상 & 질문에 포함된 경우만 제외
+                if (excludeWord && excludeWord.length >= 2 && questionText.includes(excludeWord.toLowerCase())) {
                     return false;
                 }
             }
@@ -277,7 +278,7 @@ class GoogleSheetsLoader {
             const score = this.calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
             return { ...item, score };
         })
-            .filter(r => r.score > 0.3)  // Smart Search는 임계값 낮춤 (더 정밀한 키워드 사용)
+            .filter(r => r.score > 0.15)  // 임계값 낮춤 - 더 많은 관련 문서 포함
             .sort((a, b) => b.score - a.score);
 
         console.log(`   최종 결과: ${Math.min(results.length, maxResults)}개`);
