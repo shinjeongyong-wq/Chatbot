@@ -136,26 +136,25 @@ async function getBotResponse(userMessage) {
         // RAG 전수조사
         const relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, 10);
 
-        // 관련 데이터가 없으면 플래너 연락 안내
-        if (!relatedContexts || relatedContexts.length === 0) {
-            hideTypingIndicator();
-            addNoDataMessage();
-            return;
-        }
+        // 검색 결과가 없어도 AI에게 판단하도록 전달 (OFF_TOPIC vs NO_DATA)
+        // AI가 질문의 관련성을 판단하여 적절한 태그로 응답함
 
         // OpenRouter API 호출 (유료 모델 순차 시도)
         const result = await callOpenRouterAPI(userMessage, relatedContexts);
 
         hideTypingIndicator();
 
-        // AI가 "정보 없다"고 답변한 경우 플래너 연락 버튼 추가
-        const noDataPhrases = ['정보가 준비되어 있지 않습니다', '정보가 없습니다', '답변을 드리기 어렵습니다', '관련 정보가 없습니다'];
-        const isNoDataResponse = noDataPhrases.some(phrase => result.text.includes(phrase));
-
-        if (isNoDataResponse) {
-            addNoDataMessage();
+        // AI 응답 태그 감지
+        if (result.text.includes('[OFF_TOPIC]')) {
+            // 병원 개원 무관 질문 - 플래너 버튼 없음
+            const cleanText = result.text.replace('[OFF_TOPIC]', '');
+            addOffTopicMessage(cleanText);
+        } else if (result.text.includes('[NO_DATA]')) {
+            // 병원 개원 관련이지만 데이터 없음 - 플래너 버튼 있음
+            const cleanText = result.text.replace('[NO_DATA]', '');
+            addNoDataMessage(cleanText);
         } else {
-            // 마크다운 형식의 답변을 HTML로 변환하여 렌더링 (모델명 포함)
+            // 정상 답변
             addFormattedMessage(result.text, relatedContexts, result.modelName);
         }
 
@@ -181,12 +180,22 @@ async function callOpenRouterAPI(userQuery, contexts) {
 ${contextText ? contextText : '(관련 데이터 없음)'}
 
 # 가장 중요한 규칙 ⚠️
-**참고문서에 "${userQuery}"와 직접적으로 관련된 내용이 없으면, 반드시 다음과 같이만 답변하세요:**
-"죄송합니다. 현재 해당 질문에 대한 정보가 준비되어 있지 않습니다."
+
+## 1. 질문이 병원 개원과 **전혀 무관**한 경우
+예: "날씨 어때?", "100평 규모로 개원하려는데 인테리어 적정 금액", "파이썬 코딩 방법"
+→ 반드시 다음과 같이만 답변:
+"[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
+
+## 2. 질문이 병원 개원 **관련**이지만 참고문서에 정보가 없는 경우
+예: "야간 진료 시 추가 인력 필요한가요?", "특정 장비 구매처는?"
+→ 반드시 다음과 같이만 답변:
+"[NO_DATA]죄송합니다. 현재 해당 질문에 대한 답변을 드리기 어렵습니다. 빠른 시일 내에 답변할 수 있도록 업데이트하겠습니다."
+
+**중요: [OFF_TOPIC] 또는 [NO_DATA] 태그를 반드시 포함하세요!**
 
 **절대로 참고문서에 없는 내용을 지어내지 마세요. 할루시네이션은 금지입니다.**
 
-# 답변 스타일 규칙
+# 답변 스타일 규칙 (참고문서에 관련 내용이 있을 때만)
 
 ## 1. 말투
 - 모든 문장은 정중한 "~요", "~습니다", "~해요" 체로 작성
@@ -217,6 +226,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 - 딱딱한 명사형 종결 금지
 - 어색한 도입부 금지
 - 주제 번호 라벨링 누락 금지`;
+
 
     try {
         console.log('🤖 AI 서버 호출 중...');
@@ -467,13 +477,28 @@ function renderFeedbackList() {
 }
 
 // ========== 데이터 없음 + 플래너 연락 ==========
-function addNoDataMessage() {
+// 병원 개원 무관 질문 - 플래너 버튼 없음
+function addOffTopicMessage(text) {
     const div = document.createElement('div');
     div.className = 'message bot';
     div.innerHTML = `
         <div class="message-avatar">AI</div>
         <div class="message-content formatted-response">
-            <p>죄송합니다. 현재 해당 질문에 대한 답변을 드리기 어렵습니다.</p>
+            <p>${text || '죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다.'}</p>
+        </div>
+    `;
+    chatContainer.appendChild(div);
+    scrollToBottom();
+}
+
+// 병원 개원 관련이지만 데이터 없음 - 플래너 버튼 있음
+function addNoDataMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'message bot';
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">
+            <p>${text || '죄송합니다. 현재 해당 질문에 대한 답변을 드리기 어렵습니다. 빠른 시일 내에 답변할 수 있도록 업데이트하겠습니다.'}</p>
             <p style="margin-top: 12px;">더 자세한 상담이 필요하시면 <strong>전문 플래너</strong>에게 문의해 주세요.</p>
             <div style="margin-top: 16px;">
                 <button onclick="openContactModal()" 
