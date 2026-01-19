@@ -42,31 +42,37 @@ async function handleQueryPlanning(req, res, userQuery) {
   "coreKeywords": ["핵심 키워드 1-3개 - 문서 제목/질문에 있을 법한 단어"],
   "expandedKeywords": ["확장/관련 키워드 - 동의어나 관련 표현"],
   "excludeKeywords": ["제외할 키워드 - 이 단어가 포함된 문서는 제외"],
-  "searchStrategy": "exact|semantic|broad"
+  "searchStrategy": "semantic|broad|exact"
 }
+
+[검색 전략 선택 기준]
+- semantic (기본값, 대부분 사용): 의미와 맥락을 이해해서 관련 문서 검색. 동의어, 관련 개념 포함.
+- broad: 넓은 범위로 검색. 주제가 모호하거나 여러 분야에 걸친 질문일 때.
+- exact: 특정 업체명, 제품명, 고유명사를 정확히 찾을 때만 사용.
 
 [핵심 규칙]
 1. coreKeywords는 문서 제목이나 질문에 직접 나올 표현 사용
-2. excludeKeywords로 무관한 문서 필터링 (예: 파트너사 질문시 "자격", "면허" 제외)
+2. excludeKeywords는 최소한으로 - 너무 많으면 관련 문서까지 제외됨
 3. 병원 개원과 무관한 질문이면 intent를 "off_topic"으로
+4. **searchStrategy는 거의 항상 "semantic"을 사용** - exact는 고유명사 검색 시에만
 
 [예시]
 질문: "인테리어 파트너사 뭐 있어?"
 {
   "intent": "파트너사",
   "topic": "인테리어",
-  "coreKeywords": ["인테리어 파트너사", "파트너사 안내", "인테리어 업체"],
-  "expandedKeywords": ["오픈닥터 인테리어", "시공업체"],
-  "excludeKeywords": ["자격", "면허", "시공능력", "필수", "확인"],
-  "searchStrategy": "exact"
+  "coreKeywords": ["인테리어 파트너사", "파트너사"],
+  "expandedKeywords": ["오픈닥터 인테리어", "시공업체", "인테리어 업체"],
+  "excludeKeywords": [],
+  "searchStrategy": "semantic"
 }
 
 질문: "100평 개원하는데 얼마정도 들어?"
 {
   "intent": "비용",
   "topic": "개원비용",
-  "coreKeywords": ["개원 비용", "예산", "100평"],
-  "expandedKeywords": ["의료기기 예산", "인테리어 비용", "총 비용"],
+  "coreKeywords": ["개원 비용", "예산"],
+  "expandedKeywords": ["의료기기 예산", "인테리어 비용", "총 비용", "100평"],
   "excludeKeywords": [],
   "searchStrategy": "semantic"
 }`;
