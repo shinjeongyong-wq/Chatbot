@@ -242,4 +242,102 @@ class GoogleSheetsLoader {
 
         return score;
     }
+
+    // [Smart Search] - Query Plan 기반 지능형 검색
+    async smartSearch(queryPlan, maxResults = 10) {
+        if (!this.cache) await this.loadData();
+
+        const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic } = queryPlan;
+        const allKeywords = [...(coreKeywords || []), ...(expandedKeywords || [])];
+
+        console.log('🧠 Smart Search 시작');
+        console.log('   핵심 키워드:', coreKeywords);
+        console.log('   확장 키워드:', expandedKeywords);
+        console.log('   제외 키워드:', excludeKeywords);
+        console.log('   검색 전략:', searchStrategy);
+
+        // 1. 제외 키워드 필터링
+        let candidates = this.cache.filter(item => {
+            if (!excludeKeywords || excludeKeywords.length === 0) return true;
+
+            const text = `${item.question || ''} ${item.answer || ''}`.toLowerCase();
+            // 제외 키워드가 포함되어 있으면 제외
+            for (const excludeWord of excludeKeywords) {
+                if (excludeWord && text.includes(excludeWord.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        console.log(`   제외 필터링 후: ${candidates.length}개 (원본 ${this.cache.length}개)`);
+
+        // 2. 검색 전략에 따른 스코어링
+        const results = candidates.map(item => {
+            const score = this.calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
+            return { ...item, score };
+        })
+            .filter(r => r.score > 0.3)  // Smart Search는 임계값 낮춤 (더 정밀한 키워드 사용)
+            .sort((a, b) => b.score - a.score);
+
+        console.log(`   최종 결과: ${Math.min(results.length, maxResults)}개`);
+
+        return results.slice(0, maxResults);
+    }
+
+    // Smart Score 계산 - Plan 기반
+    calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strategy) {
+        const question = (item.question || '').toLowerCase();
+        const answer = (item.answer || '').toLowerCase();
+        const field = (item.metadata?.field || '').toLowerCase();
+        const text = question + ' ' + answer + ' ' + field;
+
+        let score = 0;
+
+        // 1. 핵심 키워드 매칭 (가장 중요 - 최대 0.6점)
+        if (coreKeywords && coreKeywords.length > 0) {
+            let coreHits = 0;
+            for (const keyword of coreKeywords) {
+                if (keyword && text.includes(keyword.toLowerCase())) {
+                    coreHits++;
+                    // 질문/제목에 있으면 추가 보너스
+                    if (question.includes(keyword.toLowerCase())) {
+                        coreHits += 0.5;
+                    }
+                }
+            }
+            score += Math.min((coreHits / coreKeywords.length) * 0.6, 0.6);
+        }
+
+        // 2. 확장 키워드 매칭 (보조 - 최대 0.25점)
+        if (expandedKeywords && expandedKeywords.length > 0) {
+            let expandHits = 0;
+            for (const keyword of expandedKeywords) {
+                if (keyword && text.includes(keyword.toLowerCase())) {
+                    expandHits++;
+                }
+            }
+            score += Math.min((expandHits / expandedKeywords.length) * 0.25, 0.25);
+        }
+
+        // 3. 토픽 매칭 보너스 (최대 0.15점)
+        if (topic && topic !== '기타') {
+            if (field.includes(topic.toLowerCase()) || question.includes(topic.toLowerCase())) {
+                score += 0.15;
+            }
+        }
+
+        // 4. 검색 전략별 조정
+        if (strategy === 'exact') {
+            // exact 전략: 핵심 키워드 미매칭시 점수 대폭 감소
+            if (coreKeywords && coreKeywords.length > 0) {
+                let hasCorMatch = coreKeywords.some(kw => kw && text.includes(kw.toLowerCase()));
+                if (!hasCorMatch) {
+                    score *= 0.3;
+                }
+            }
+        }
+
+        return score;
+    }
 }

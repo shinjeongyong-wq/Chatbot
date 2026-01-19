@@ -137,13 +137,56 @@ async function getBotResponse(userMessage) {
     window.currentQuestion = userMessage;
 
     try {
-        // RAG 전수조사
-        const relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, 10);
+        // ========== Stage 1: Query Planning ==========
+        console.log('🧠 Stage 1: Query Planning 시작...');
+        let queryPlan = null;
+        let relatedContexts = [];
 
-        // 검색 결과가 없어도 AI에게 판단하도록 전달 (OFF_TOPIC vs NO_DATA)
-        // AI가 질문의 관련성을 판단하여 적절한 태그로 응답함
+        try {
+            const planResponse = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userQuery: userMessage,
+                    mode: 'plan'
+                })
+            });
 
-        // OpenRouter API 호출 (유료 모델 순차 시도)
+            if (planResponse.ok) {
+                const planResult = await planResponse.json();
+                if (planResult.success && planResult.plan) {
+                    queryPlan = planResult.plan;
+                    console.log('✅ Query Plan 수신:', queryPlan);
+                    console.log('   Intent:', queryPlan.intent);
+                    console.log('   Planner:', planResult.modelName);
+
+                    // Off-topic 체크
+                    if (queryPlan.intent === 'off_topic') {
+                        hideTypingIndicator();
+                        addOffTopicMessage('죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다.');
+                        return;
+                    }
+                }
+            }
+        } catch (planError) {
+            console.warn('Query Planning 실패, 기본 검색으로 fallback:', planError);
+        }
+
+        // ========== Stage 2: Smart Search ==========
+        console.log('🔍 Stage 2: Smart Search 시작...');
+
+        if (queryPlan) {
+            // Query Plan 기반 스마트 검색
+            relatedContexts = await sheetsLoader.smartSearch(queryPlan, 10);
+        } else {
+            // Fallback: 기존 키워드 검색
+            relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, 10);
+        }
+
+        console.log(`📚 검색 결과: ${relatedContexts.length}개 문서`);
+
+        // ========== Stage 3: Answer Generation ==========
+        console.log('💬 Stage 3: 답변 생성 시작...');
         const result = await callOpenRouterAPI(userMessage, relatedContexts);
 
         hideTypingIndicator();
@@ -152,26 +195,22 @@ async function getBotResponse(userMessage) {
         let responseText = result.text;
 
         if (result.text.includes('[OFF_TOPIC]')) {
-            // 병원 개원 무관 질문 - 플래너 버튼 없음
             const cleanText = result.text.replace('[OFF_TOPIC]', '');
             addOffTopicMessage(cleanText);
             responseText = cleanText;
         } else if (result.text.includes('[NO_DATA]')) {
-            // 병원 개원 관련이지만 데이터 없음 - 플래너 버튼 있음
             const cleanText = result.text.replace('[NO_DATA]', '');
             addNoDataMessage(cleanText);
             responseText = cleanText;
         } else {
-            // 정상 답변
             addFormattedMessage(result.text, relatedContexts, result.modelName);
         }
 
         // 대화 히스토리에 저장 (맥락 유지)
         conversationHistory.push({
             user: userMessage,
-            assistant: responseText.substring(0, 500) // 토큰 절약을 위해 500자까지만
+            assistant: responseText.substring(0, 500)
         });
-        // 최대 개수 초과 시 오래된 것 제거
         if (conversationHistory.length > MAX_HISTORY) {
             conversationHistory.shift();
         }
