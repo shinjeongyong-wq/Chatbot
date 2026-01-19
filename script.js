@@ -506,9 +506,32 @@ async function submitContact() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(contactData)
         });
-        alert('연락 요청이 접수되었습니다. 플래너가 곧 연락드리겠습니다!');
+
+        // 채팅창에 확인 메시지 표시
+        const confirmDiv = document.createElement('div');
+        confirmDiv.className = 'message bot';
+        confirmDiv.innerHTML = `
+            <div class="message-avatar">✅</div>
+            <div class="message-content" style="background: #dcfce7; border: 1px solid #22c55e;">
+                <p style="font-weight: 600; color: #166534;">📞 플래너에게 전달되었습니다!</p>
+                <p style="margin-top: 8px; color: #166534;">입력하신 연락처(${phone})로 곧 연락드리겠습니다.</p>
+            </div>
+        `;
+        chatContainer.appendChild(confirmDiv);
+        scrollToBottom();
+
     } catch (error) {
         console.error('연락 요청 저장 오류:', error);
         alert('요청 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
 }
+
+// 엔터 키로 연락 요청 제출
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && document.getElementById('contactModal')?.classList.contains('active')) {
+        if (e.target.id === 'contactName' || e.target.id === 'contactPhone') {
+            e.preventDefault();
+            submitContact();
+        }
+    }
+});
