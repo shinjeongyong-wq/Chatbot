@@ -351,8 +351,10 @@ class GoogleSheetsLoader {
         console.log('   검색 전략:', searchStrategy);
         console.log('   타겟 카테고리:', targetCategory);
 
-        // 0. 타겟 카테고리 필터링 (Notion 데이터만 해당)
+        // 0. 카테고리 필터링 (임시 비활성화 - 폴더 구조 미완성으로 Notion 데이터 제외됨)
+        // TODO: 폴더 구조 완성 시 활성화
         let candidates = this.cache;
+        /*
         if (targetCategory && targetCategory !== 'all') {
             const beforeCount = candidates.length;
             candidates = candidates.filter(item => {
@@ -365,6 +367,7 @@ class GoogleSheetsLoader {
             });
             console.log(`   ✅ 카테고리 필터링: ${candidates.length}개 (${beforeCount}개 중 ${targetCategory} 대상)`);
         }
+        */
 
         // 1. 제외 키워드 필터링 (질문 필드에만 적용, 너무 공격적이지 않게)
         candidates = candidates.filter(item => {
