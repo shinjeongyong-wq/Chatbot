@@ -364,7 +364,7 @@
             background: var(--surface-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 8px 12px;
+            padding: 12px 12px;
             transition: border-color 0.2s;
         }
 
@@ -807,11 +807,8 @@
                     <h2>무엇을 도와드릴까요?</h2>
                     <p>빅데이터 기반의 AI 컨설턴트가 병원 개원의 모든 것을 답변해 드립니다.<br>좌측 메뉴에서 자주 묻는 질문을 확인하거나, 직접 물어보세요.</p>
 
-                    <div class="suggested-questions">
-                        <button class="suggestion-chip" data-question="개원 준비는 언제부터 시작해야 하나요?">💼 개원 시기/일정 문의</button>
-                        <button class="suggestion-chip" data-question="개원 비용은 얼마나 드나요?">💰 예상 소요 비용</button>
-                        <button class="suggestion-chip" data-question="입지 선정 시 주의할 점은?">📍 입지 분석/선정</button>
-                        <button class="suggestion-chip" data-question="인허가 절차를 알려주세요">📋 행정/인허가 절차</button>
+                    <div class="suggested-questions" style="display: none;">
+                        <!-- 버튼 제거됨 -->
                     </div>
                 </div>
             </div>
