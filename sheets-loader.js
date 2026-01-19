@@ -59,26 +59,13 @@ class GoogleSheetsLoader {
         const parsedQA = this.parseQAData(qaRows);
         const parsedFAQ = this.parseFAQData(faqRows);
 
-        // 📘 Notion 데이터도 함께 가져오기
+        // 📘 로컬 Notion 데이터 사용 (notionData.js에서 로드)
         let notionData = [];
-        try {
-            console.log('📘 Notion 데이터 로드 중...');
-            const notionRes = await fetch('/api/notion');
-            if (notionRes.ok) {
-                const notionJson = await notionRes.json();
-                if (notionJson.success && notionJson.data) {
-                    notionData = notionJson.data.map((item, idx) => ({
-                        source: 'notion',
-                        id: `notion-${idx}`,
-                        question: item.question || '',
-                        answer: item.answer || '',
-                        metadata: item.metadata || { field: '노션', topic: '노션' }
-                    }));
-                    console.log(`✅ Notion 데이터 로드 완료: ${notionData.length}개`);
-                }
-            }
-        } catch (e) {
-            console.warn('Notion 데이터 로드 실패 (무시):', e.message);
+        if (typeof NOTION_DATA !== 'undefined' && NOTION_DATA.length > 0) {
+            console.log(`📘 로컬 Notion 데이터 로드: ${NOTION_DATA.length}개 항목`);
+            notionData = NOTION_DATA;
+        } else {
+            console.warn('⚠️ NOTION_DATA를 찾을 수 없습니다. notionData.js가 로드되었는지 확인하세요.');
         }
 
         this.cache = [...parsedQA, ...parsedFAQ, ...notionData];
