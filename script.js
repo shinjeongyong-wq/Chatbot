@@ -10,6 +10,10 @@ const CONFIG = {
 let sheetsLoader = null;
 let faqNavigationStack = [];
 
+// 대화 맥락 유지를 위한 히스토리 (최근 10개 메시지)
+let conversationHistory = [];
+const MAX_HISTORY = 10;
+
 const chatContainer = document.getElementById('chatContainer');
 const userInput = document.getElementById('userInput');
 const sendButton = document.getElementById('sendButton');
@@ -145,17 +149,31 @@ async function getBotResponse(userMessage) {
         hideTypingIndicator();
 
         // AI 응답 태그 감지
+        let responseText = result.text;
+
         if (result.text.includes('[OFF_TOPIC]')) {
             // 병원 개원 무관 질문 - 플래너 버튼 없음
             const cleanText = result.text.replace('[OFF_TOPIC]', '');
             addOffTopicMessage(cleanText);
+            responseText = cleanText;
         } else if (result.text.includes('[NO_DATA]')) {
             // 병원 개원 관련이지만 데이터 없음 - 플래너 버튼 있음
             const cleanText = result.text.replace('[NO_DATA]', '');
             addNoDataMessage(cleanText);
+            responseText = cleanText;
         } else {
             // 정상 답변
             addFormattedMessage(result.text, relatedContexts, result.modelName);
+        }
+
+        // 대화 히스토리에 저장 (맥락 유지)
+        conversationHistory.push({
+            user: userMessage,
+            assistant: responseText.substring(0, 500) // 토큰 절약을 위해 500자까지만
+        });
+        // 최대 개수 초과 시 오래된 것 제거
+        if (conversationHistory.length > MAX_HISTORY) {
+            conversationHistory.shift();
         }
 
     } catch (error) {
@@ -174,7 +192,18 @@ async function callOpenRouterAPI(userQuery, contexts) {
         }).join('\n\n');
     }
 
+    // 대화 히스토리 구성 (최근 대화 맥락)
+    let historyText = '';
+    if (conversationHistory.length > 0) {
+        historyText = conversationHistory.map(h =>
+            `사용자: ${h.user}\n어시스턴트: ${h.assistant}`
+        ).join('\n\n');
+    }
+
     const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변해주세요.
+
+# 이전 대화 내역 (맥락 참고용)
+${historyText ? historyText : '(첫 대화입니다)'}
 
 # 참고문서
 ${contextText ? contextText : '(관련 데이터 없음)'}
