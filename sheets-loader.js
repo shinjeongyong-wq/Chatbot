@@ -191,7 +191,7 @@ class GoogleSheetsLoader {
             const score = this.calculateSimilarity(query, keywords, item.question, item.answer, item.metadata.field);
             return { ...item, score };
         })
-            .filter(r => r.score > 0.35)  // 문턱값
+            .filter(r => r.score > 0.45)  // 문턱값 강화 (할루시네이션 방지)
             .sort((a, b) => b.score - a.score);
 
         return results.slice(0, maxResults);
