@@ -148,8 +148,16 @@ async function getBotResponse(userMessage) {
 
         hideTypingIndicator();
 
-        // 마크다운 형식의 답변을 HTML로 변환하여 렌더링 (모델명 포함)
-        addFormattedMessage(result.text, relatedContexts, result.modelName);
+        // AI가 "정보 없다"고 답변한 경우 플래너 연락 버튼 추가
+        const noDataPhrases = ['정보가 준비되어 있지 않습니다', '정보가 없습니다', '답변을 드리기 어렵습니다', '관련 정보가 없습니다'];
+        const isNoDataResponse = noDataPhrases.some(phrase => result.text.includes(phrase));
+
+        if (isNoDataResponse) {
+            addNoDataMessage();
+        } else {
+            // 마크다운 형식의 답변을 HTML로 변환하여 렌더링 (모델명 포함)
+            addFormattedMessage(result.text, relatedContexts, result.modelName);
+        }
 
     } catch (error) {
         console.error('Bot Response Error:', error);
@@ -187,13 +195,18 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 
 ## 2. 첫 문장 (도입부)
 - 질문 주제를 자연스럽게 요약하며 시작
-- 예시: "[주제]에 대해 여러 요소를 종합적으로 고려해야 해요. 참고문서를 바탕으로 주요 내용을 안내해 드릴게요."
+- 예시: "[주제]에 대해 여러 요소를 종합적으로 고려해야 해요. 주요 내용을 안내해 드릴게요."
 - "참고문서에서 찾아보면:" 같은 어색한 표현 금지
 
-## 3. 본문 구조
-**[주요 주제]**
+## 3. 본문 구조 (반드시 번호 라벨링!)
+**1. 첫 번째 주제**
 - **세부항목**: 상세 설명이에요.[1]
+
+**2. 두 번째 주제**
 - **세부항목**: 상세 설명이에요.[2]
+
+**3. 세 번째 주제**
+- **세부항목**: 상세 설명이에요.[3]
 
 ## 4. 출처 표기
 - 참고문서 번호 [1], [2], [3] 그대로 사용
@@ -202,7 +215,8 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 ## 5. 금지 사항
 - 참고문서에 없는 내용 창작 금지
 - 딱딱한 명사형 종결 금지
-- 어색한 도입부 금지`;
+- 어색한 도입부 금지
+- 주제 번호 라벨링 누락 금지`;
 
     try {
         console.log('🤖 AI 서버 호출 중...');
