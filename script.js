@@ -404,24 +404,14 @@ function submitFeedback() {
     alert('피드백이 제출되었습니다. 감사합니다!');
 }
 
-function showFeedbackList() {
-    const faqContent = document.getElementById('faqContent');
-    const feedbackListView = document.getElementById('feedbackListView');
-    const faqNav = document.getElementById('faqNav');
-
-    faqContent.style.display = 'none';
-    faqNav.classList.remove('active');
-    feedbackListView.classList.add('active');
-
+function showFeedbackListModal() {
+    const modal = document.getElementById('feedbackListModal');
+    modal.classList.add('active');
     renderFeedbackList();
 }
 
-function showFaqContent() {
-    const faqContent = document.getElementById('faqContent');
-    const feedbackListView = document.getElementById('feedbackListView');
-
-    feedbackListView.classList.remove('active');
-    faqContent.style.display = 'block';
+function closeFeedbackListModal() {
+    document.getElementById('feedbackListModal').classList.remove('active');
 }
 
 function renderFeedbackList() {

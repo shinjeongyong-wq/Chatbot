@@ -896,16 +896,55 @@
             background: #f1f5f9;
         }
 
-        /* 피드백 목록 뷰 */
-        .feedback-list-view {
+        /* 피드백 목록 모달 */
+        .feedback-list-modal {
             display: none;
-            padding: 16px;
-            overflow-y: auto;
-            flex: 1;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
 
-        .feedback-list-view.active {
-            display: block;
+        .feedback-list-modal.active {
+            display: flex;
+        }
+
+        .feedback-list-modal-content {
+            background: #fff;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-list-modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .feedback-list-modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feedback-list-modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
         }
 
         .feedback-item {
@@ -1001,6 +1040,19 @@
         </div>
     </div>
 
+    <!-- Feedback List Modal -->
+    <div id="feedbackListModal" class="feedback-list-modal">
+        <div class="feedback-list-modal-content">
+            <div class="feedback-list-modal-header">
+                <h3>📋 피드백 목록</h3>
+                <button class="feedback-modal-close" onclick="closeFeedbackListModal()">&times;</button>
+            </div>
+            <div class="feedback-list-modal-body" id="feedbackListContent">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- FAQ Side Bar -->
         <aside class="faq-sidebar" id="faqSidebar">
@@ -1033,19 +1085,8 @@
             </div>
 
             <!-- Feedback List View -->
-            <div class="feedback-list-view" id="feedbackListView">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <h4 style="font-weight: 600;">📋 피드백 목록</h4>
-                    <button onclick="showFaqContent()"
-                        style="background: none; border: none; color: #64748b; cursor: pointer;">← FAQ로 돌아가기</button>
-                </div>
-                <div id="feedbackListContent">
-                    <!-- Dynamically populated -->
-                </div>
-            </div>
-
             <!-- Feedback Tab -->
-            <div class="feedback-tab" onclick="showFeedbackList()">
+            <div class="feedback-tab" onclick="showFeedbackListModal()">
                 📋 피드백 목록
             </div>
         </aside>
