@@ -9,6 +9,10 @@
         "api/chat.js": {
             "memory": 1024,
             "maxDuration": 30
+        },
+        "api/notion.js": {
+            "memory": 1024,
+            "maxDuration": 60
         }
     }
 }
