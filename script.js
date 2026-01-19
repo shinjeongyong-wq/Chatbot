@@ -382,26 +382,33 @@ function closeFeedbackModal() {
     currentFeedbackMessageId = null;
 }
 
-function submitFeedback() {
+async function submitFeedback() {
     const content = document.getElementById('feedbackTextarea').value.trim();
     const messageData = window.lastMessages?.[currentFeedbackMessageId] || {};
 
     const feedback = {
-        id: Date.now().toString(),
-        type: currentFeedbackType,
-        content: content || '(내용 없음)',
+        type: currentFeedbackType === 'good' ? 'Good' : 'Bad',
         question: messageData.question || '',
         answer: messageData.answer || '',
-        timestamp: new Date().toISOString()
+        content: content || '(내용 없음)',
+        timestamp: new Date().toLocaleString('ko-KR')
     };
 
-    // localStorage에 저장
-    const feedbacks = JSON.parse(localStorage.getItem('chatbot_feedbacks') || '[]');
-    feedbacks.unshift(feedback);
-    localStorage.setItem('chatbot_feedbacks', JSON.stringify(feedbacks));
-
     closeFeedbackModal();
-    alert('피드백이 제출되었습니다. 감사합니다!');
+
+    // Google Sheets에 저장
+    try {
+        await fetch('https://script.google.com/a/macros/opndoctor.com/s/AKfycbx3sQr5_t3D-GgIUxJTtckxoxIDPtrvfUrpFmv1K1fZQ0ilyiAe9t-cvcdCT6BTMwT0/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(feedback)
+        });
+        alert('피드백이 제출되었습니다. 감사합니다!');
+    } catch (error) {
+        console.error('피드백 저장 오류:', error);
+        alert('피드백 제출 중 오류가 발생했습니다.');
+    }
 }
 
 function showFeedbackListModal() {
@@ -416,29 +423,18 @@ function closeFeedbackListModal() {
 
 function renderFeedbackList() {
     const container = document.getElementById('feedbackListContent');
-    const feedbacks = JSON.parse(localStorage.getItem('chatbot_feedbacks') || '[]');
-
-    if (feedbacks.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:40px;">아직 피드백이 없습니다.</div>';
-        return;
-    }
-
-    container.innerHTML = feedbacks.map(fb => {
-        const date = new Date(fb.timestamp);
-        const timeStr = date.toLocaleDateString('ko-KR') + ' ' + date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-
-        return `
-            <div class="feedback-item">
-                <div class="feedback-item-header">
-                    <span class="feedback-type-badge ${fb.type}">${fb.type === 'good' ? '👍 Good' : '👎 Bad'}</span>
-                    <span class="feedback-time">${timeStr}</span>
-                </div>
-                <div class="feedback-content">${escapeHtml(fb.content)}</div>
-                <div class="feedback-qa">
-                    <div class="feedback-qa-item"><span class="feedback-qa-label">질문:</span> ${escapeHtml(fb.question || '(없음)')}</div>
-                    <div class="feedback-qa-item"><span class="feedback-qa-label">답변:</span> ${escapeHtml((fb.answer || '').substring(0, 150))}${fb.answer?.length > 150 ? '...' : ''}</div>
-                </div>
-            </div>
-        `;
-    }).join('');
+    container.innerHTML = `
+        <div style="text-align:center; padding:40px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+            <h4 style="margin-bottom: 12px; color: #334155;">피드백은 Google Sheets에서 확인하세요</h4>
+            <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;">
+                모든 사용자의 피드백은 Google Sheets "Feedback" 시트에 저장됩니다.
+            </p>
+            <a href="https://docs.google.com/spreadsheets/d/1Ai-3VqDn98aN0XG-FhRHBIFQ-LqqEHbcqUdvF1nWDVs/edit#gid=0" 
+               target="_blank"
+               style="display: inline-block; padding: 12px 24px; background: #536db1; color: white; text-decoration: none; border-radius: 8px; font-weight: 500;">
+                Google Sheets 열기 →
+            </a>
+        </div>
+    `;
 }
