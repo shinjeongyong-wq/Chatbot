@@ -14,6 +14,7 @@ export default async function handler(req, res) {
 
     try {
         console.log('📘 Notion 데이터 로드 중...');
+        console.log('API Key exists:', !!NOTION_API_KEY);
 
         // 1. 메인 페이지의 하위 페이지 목록 가져오기
         const pagesRes = await fetch(`https://api.notion.com/v1/blocks/${MAIN_PAGE_ID}/children?page_size=100`, {
@@ -24,7 +25,22 @@ export default async function handler(req, res) {
         });
 
         const pagesData = await pagesRes.json();
+
+        // 디버그: API 응답 확인
+        if (pagesData.object === 'error') {
+            return res.status(200).json({
+                success: false,
+                error: pagesData.message,
+                code: pagesData.code,
+                debug: {
+                    apiKeyExists: !!NOTION_API_KEY,
+                    pageId: MAIN_PAGE_ID
+                }
+            });
+        }
+
         const childPages = pagesData.results?.filter(b => b.type === 'child_page') || [];
+        console.log('Child pages found:', childPages.length);
 
         // 2. 각 하위 페이지의 내용 가져오기
         const allQA = [];
@@ -49,7 +65,11 @@ export default async function handler(req, res) {
         return res.status(200).json({
             success: true,
             data: allQA,
-            count: allQA.length
+            count: allQA.length,
+            debug: {
+                childPagesCount: childPages.length,
+                pageId: MAIN_PAGE_ID
+            }
         });
 
     } catch (error) {
