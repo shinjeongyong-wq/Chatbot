@@ -477,8 +477,8 @@ function addNoDataMessage() {
             <p style="margin-top: 12px;">더 자세한 상담이 필요하시면 <strong>전문 플래너</strong>에게 문의해 주세요.</p>
             <div style="margin-top: 16px;">
                 <button onclick="openContactModal()" 
-                    style="padding: 12px 24px; background: #536db1; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">
-                    📞 플래너에게 연락하기
+                    style="padding: 12px 24px; background: #22c55e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                    ☎️ 플래너에게 연락하기
                 </button>
             </div>
         </div>
