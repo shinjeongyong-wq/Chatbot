@@ -21,22 +21,22 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'userQuery is required' });
     }
 
-    // 무료 모델 목록 (Claude → Gemini → GPT → 기타 순서)
-    // ⚠️ Claude 무료 모델은 OpenRouter에 없음! Gemini부터 시작
-    const freeModels = [
-        // 1. Gemini (Google) - 무료 ✅
-        { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0 Flash' },
-        // 2. GPT (OpenAI) - 무료 ✅
-        { id: 'openai/gpt-oss-120b:free', name: 'GPT-OSS 120B' },
-        // 3. 기타 - Llama, DeepSeek 등 무료
-        { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B' },
-        { id: 'deepseek/deepseek-r1:free', name: 'DeepSeek R1' },
-        { id: 'meta-llama/llama-4-maverick:free', name: 'Llama 4 Maverick' },
-        { id: 'qwen/qwen3-4b:free', name: 'Qwen 3 4B' }
+    // 유료 모델 목록 (Gemini → Claude → GPT 순서)
+    // $15 결제 완료 - 약 1,000~1,400회 답변 가능
+    const paidModels = [
+        // 1. Gemini (Google) - 가장 경제적
+        { id: 'google/gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+        { id: 'google/gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+        // 2. Claude (Anthropic) - 고품질
+        { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' },
+        { id: 'anthropic/claude-3-haiku', name: 'Claude 3 Haiku' },
+        // 3. GPT (OpenAI) - 범용
+        { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini' },
+        { id: 'openai/gpt-4o', name: 'GPT-4o' }
     ];
 
     // 모델 순서대로 시도 (Fallback)
-    for (const model of freeModels) {
+    for (const model of paidModels) {
         try {
             console.log(`Trying model: ${model.name}`);
 

@@ -1053,6 +1053,33 @@
         </div>
     </div>
 
+    <!-- Contact Planner Modal -->
+    <div id="contactModal" class="feedback-modal">
+        <div class="feedback-modal-content">
+            <div class="feedback-modal-header">
+                <h3>📞 플래너에게 연락하기</h3>
+                <button class="feedback-modal-close" onclick="closeContactModal()">&times;</button>
+            </div>
+            <div class="feedback-modal-body">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #334155;">이름</label>
+                    <input type="text" id="contactName" placeholder="이름을 입력해주세요"
+                        style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #334155;">전화번호</label>
+                    <input type="tel" id="contactPhone" placeholder="010-0000-0000"
+                        style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none;">
+                </div>
+                <p style="font-size: 12px; color: #64748b;">입력하신 정보로 플래너가 연락드립니다.</p>
+            </div>
+            <div class="feedback-modal-footer">
+                <button class="feedback-cancel-btn" onclick="closeContactModal()">취소</button>
+                <button class="feedback-submit-btn" onclick="submitContact()">연락 요청</button>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- FAQ Side Bar -->
         <aside class="faq-sidebar" id="faqSidebar">

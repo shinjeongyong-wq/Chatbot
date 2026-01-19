@@ -136,7 +136,14 @@ async function getBotResponse(userMessage) {
         // RAG 전수조사
         const relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, 10);
 
-        // OpenRouter API 호출 (무료 모델 순차 시도)
+        // 관련 데이터가 없으면 플래너 연락 안내
+        if (!relatedContexts || relatedContexts.length === 0) {
+            hideTypingIndicator();
+            addNoDataMessage();
+            return;
+        }
+
+        // OpenRouter API 호출 (유료 모델 순차 시도)
         const result = await callOpenRouterAPI(userMessage, relatedContexts);
 
         hideTypingIndicator();
@@ -437,4 +444,74 @@ function renderFeedbackList() {
             </a>
         </div>
     `;
+}
+
+// ========== 데이터 없음 + 플래너 연락 ==========
+function addNoDataMessage() {
+    const div = document.createElement('div');
+    div.className = 'message bot';
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">
+            <p>죄송합니다. 현재 해당 질문에 대한 답변을 드리기 어렵습니다.</p>
+            <p style="margin-top: 12px;">더 자세한 상담이 필요하시면 <strong>전문 플래너</strong>에게 문의해 주세요.</p>
+            <div style="margin-top: 16px;">
+                <button onclick="openContactModal()" 
+                    style="padding: 12px 24px; background: #536db1; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                    📞 플래너에게 연락하기
+                </button>
+            </div>
+        </div>
+    `;
+    chatContainer.appendChild(div);
+    scrollToBottom();
+}
+
+function openContactModal() {
+    const modal = document.getElementById('contactModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+function closeContactModal() {
+    const modal = document.getElementById('contactModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.getElementById('contactName').value = '';
+        document.getElementById('contactPhone').value = '';
+    }
+}
+
+async function submitContact() {
+    const name = document.getElementById('contactName').value.trim();
+    const phone = document.getElementById('contactPhone').value.trim();
+
+    if (!name || !phone) {
+        alert('이름과 전화번호를 모두 입력해주세요.');
+        return;
+    }
+
+    const contactData = {
+        name: name,
+        phone: phone,
+        question: window.currentQuestion || '',
+        timestamp: new Date().toLocaleString('ko-KR'),
+        sheetName: 'ContactRequests'
+    };
+
+    closeContactModal();
+
+    try {
+        await fetch('https://script.google.com/macros/s/AKfycbx3sQr5_t3D-GgIUxJTtckxoxIDPtrvfUrpFmv1K1fZQ0ilyiAe9t-cvcdCT6BTMwT0/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(contactData)
+        });
+        alert('연락 요청이 접수되었습니다. 플래너가 곧 연락드리겠습니다!');
+    } catch (error) {
+        console.error('연락 요청 저장 오류:', error);
+        alert('요청 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
 }
