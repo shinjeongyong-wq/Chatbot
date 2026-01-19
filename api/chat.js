@@ -35,44 +35,78 @@ async function handleQueryPlanning(req, res, userQuery) {
     const plannerPrompt = `당신은 병원 개원 상담 챗봇의 Query Planner입니다.
 사용자 질문을 분석하여 검색 전략을 JSON으로 출력하세요.
 
+[데이터 구조 - 반드시 이해하고 활용]
+우리 시스템은 다음과 같은 폴더 구조로 데이터가 저장되어 있습니다:
+
+1. **partners/** - 파트너사 명단 및 상세 정보
+   - partners/interior - 인테리어 파트너사 업체 명단
+   - partners/signage - 간판 파트너사 업체 명단
+   - partners/furniture - 가구 파트너사 명단
+   - partners/bank - 은행 파트너사 명단
+   - partners/crm-emr - CRM/EMR 파트너사 명단
+   - partners/website - 홈페이지 파트너사 명단
+
+2. **process/** - 개원 프로세스 및 절차 설명
+   - process/pre-construction/ - 착공 이전 단계 (세무, 대출, 인테리어 절차, 간판 절차 등)
+   - process/during-construction/ - 시공 중 단계 (가구, 섬유류, 인프라 등)
+   - process/post-registration/ - 개설신고 이후 (행정, 보험, EMR, 의약품 등)
+
+3. **advanced/** - 심화 콘텐츠 (상세 가이드)
+4. **checklists/** - 체크리스트 (소방점검, 부동산, 행정업무)
+5. **db-records/** - 파트너사별 상세 정보, 포트폴리오, 실제 시공 사례
+
+[중요한 의도 구분]
+- "파트너사 알려줘/뭐있어/추천해줘/명단" → targetCategory를 "partners/*"로 설정
+- "어떻게 해/절차/과정/방법" → targetCategory를 "process/*"로 설정
+- "체크리스트/점검/확인사항" → targetCategory를 "checklists/*"로 설정
+- "포트폴리오/시공사례/실제사례" → targetCategory를 "db-records"로 설정
+
 [출력 형식 - 반드시 JSON만 출력]
 {
-  "intent": "정보요청|비교|절차|비용|파트너사",
+  "intent": "파트너사목록|절차안내|비용|비교|체크리스트|심화|기타",
   "topic": "인테리어|간판|의료기기|세무|마케팅|개원비용|파트너사|기타",
-  "coreKeywords": ["핵심 키워드 1-3개 - 문서 제목/질문에 있을 법한 단어"],
-  "expandedKeywords": ["확장/관련 키워드 - 동의어나 관련 표현"],
-  "excludeKeywords": ["제외할 키워드 - 이 단어가 포함된 문서는 제외"],
+  "targetCategory": "partners|process|advanced|checklists|db-records|all",
+  "coreKeywords": ["핵심 키워드 1-3개"],
+  "expandedKeywords": ["확장 키워드"],
+  "excludeKeywords": [],
   "searchStrategy": "semantic|broad|exact"
 }
 
-[검색 전략 선택 기준]
-- semantic (기본값, 대부분 사용): 의미와 맥락을 이해해서 관련 문서 검색. 동의어, 관련 개념 포함.
-- broad: 넓은 범위로 검색. 주제가 모호하거나 여러 분야에 걸친 질문일 때.
-- exact: 특정 업체명, 제품명, 고유명사를 정확히 찾을 때만 사용.
-
 [핵심 규칙]
-1. coreKeywords는 문서 제목이나 질문에 직접 나올 표현 사용
-2. excludeKeywords는 최소한으로 - 너무 많으면 관련 문서까지 제외됨
-3. 병원 개원과 무관한 질문이면 intent를 "off_topic"으로
-4. **searchStrategy는 거의 항상 "semantic"을 사용** - exact는 고유명사 검색 시에만
+1. 파트너사 명단을 원하면 반드시 targetCategory를 "partners"로
+2. 절차/과정을 원하면 targetCategory를 "process"로
+3. 포트폴리오/사례를 원하면 targetCategory를 "db-records"로
 
 [예시]
 질문: "인테리어 파트너사 뭐 있어?"
 {
-  "intent": "파트너사",
+  "intent": "파트너사목록",
   "topic": "인테리어",
-  "coreKeywords": ["인테리어 파트너사", "파트너사"],
-  "expandedKeywords": ["오픈닥터 인테리어", "시공업체", "인테리어 업체"],
+  "targetCategory": "partners",
+  "coreKeywords": ["인테리어 파트너사", "인테리어 업체"],
+  "expandedKeywords": ["시공업체"],
   "excludeKeywords": [],
   "searchStrategy": "semantic"
 }
 
-질문: "100평 개원하는데 얼마정도 들어?"
+질문: "인테리어 어떻게 진행해?"
 {
-  "intent": "비용",
-  "topic": "개원비용",
-  "coreKeywords": ["개원 비용", "예산"],
-  "expandedKeywords": ["의료기기 예산", "인테리어 비용", "총 비용", "100평"],
+  "intent": "절차안내",
+  "topic": "인테리어",
+  "targetCategory": "process",
+  "coreKeywords": ["인테리어 절차", "인테리어 진행"],
+  "expandedKeywords": ["시공 과정", "인테리어 단계"],
+  "excludeKeywords": [],
+  "searchStrategy": "semantic"
+}
+
+질문: "인테리어 시공 사례 보여줘"
+{
+  "intent": "심화",
+  "topic": "인테리어",
+  "targetCategory": "db-records",
+  "coreKeywords": ["시공 사례", "포트폴리오"],
+  "expandedKeywords": ["인테리어 사례"],
   "excludeKeywords": [],
   "searchStrategy": "semantic"
 }`;

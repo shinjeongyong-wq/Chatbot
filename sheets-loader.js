@@ -59,13 +59,18 @@ class GoogleSheetsLoader {
         const parsedQA = this.parseQAData(qaRows);
         const parsedFAQ = this.parseFAQData(faqRows);
 
-        // 📘 로컬 Notion 데이터 사용 (notionData.js에서 로드)
+        // 📘 Notion 데이터 로드 (폴더 구조에서)
         let notionData = [];
-        if (typeof NOTION_DATA !== 'undefined' && NOTION_DATA.length > 0) {
-            console.log(`📘 로컬 Notion 데이터 로드: ${NOTION_DATA.length}개 항목`);
-            notionData = NOTION_DATA;
-        } else {
-            console.warn('⚠️ NOTION_DATA를 찾을 수 없습니다. notionData.js가 로드되었는지 확인하세요.');
+        try {
+            notionData = await this.loadNotionData();
+            console.log(`📘 Notion 데이터 로드 완료: ${notionData.length}개 항목`);
+        } catch (e) {
+            console.warn('⚠️ Notion 폴더 데이터 로드 실패, notionData.js 폴백 시도');
+            // 폴백: 기존 notionData.js 사용
+            if (typeof NOTION_DATA !== 'undefined' && NOTION_DATA.length > 0) {
+                console.log(`📘 notionData.js 폴백: ${NOTION_DATA.length}개 항목`);
+                notionData = NOTION_DATA;
+            }
         }
 
         this.cache = [...parsedQA, ...parsedFAQ, ...notionData];
@@ -73,6 +78,95 @@ class GoogleSheetsLoader {
         // **핵심**: 내려받은 데이터를 로컬 사본으로 영구 저장
         localStorage.setItem('CRYSTAL_HORIZON_DB_V1', JSON.stringify(this.cache));
         this.initData();
+    }
+
+    // 📂 Notion 폴더 구조에서 데이터 로드
+    async loadNotionData() {
+        const BASE_PATH = 'data/notion';
+        const notionItems = [];
+
+        // 인덱스 파일 로드
+        const indexRes = await fetch(`${BASE_PATH}/index.json`);
+        if (!indexRes.ok) throw new Error('index.json 로드 실패');
+
+        const index = await indexRes.json();
+        const categories = Object.keys(index.categories);
+
+        console.log(`📂 ${categories.length}개 카테고리 로드 중...`);
+
+        // 각 카테고리 JSON 파일 로드
+        for (const categoryPath of categories) {
+            try {
+                const filePath = `${BASE_PATH}/${categoryPath}.json`;
+                const res = await fetch(filePath);
+                if (!res.ok) continue;
+
+                const data = await res.json();
+
+                // 각 항목을 검색용 포맷으로 변환
+                for (const item of data.items || []) {
+                    notionItems.push({
+                        id: `notion-${item.id.replace(/-/g, '').slice(0, 12)}`,
+                        source: 'notion',
+                        question: item.title,
+                        answer: item.content,
+                        metadata: {
+                            field: this.getCategoryField(categoryPath),
+                            topic: this.getCategoryTopic(categoryPath),
+                            category: categoryPath,
+                            icon: item.icon,
+                            notionUrl: item.notionUrl,
+                            lastUpdated: item.lastUpdated
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn(`  ⚠️ ${categoryPath} 로드 실패`);
+            }
+        }
+
+        return notionItems;
+    }
+
+    // 카테고리 경로에서 필드(대분류) 추출
+    getCategoryField(categoryPath) {
+        const parts = categoryPath.split('/');
+        const fieldMap = {
+            'partners': '파트너사',
+            'process': '개원 프로세스',
+            'advanced': '심화 콘텐츠',
+            'checklists': '체크리스트',
+            'db-records': '파트너사 상세',
+            'uncategorized': '기타'
+        };
+        return fieldMap[parts[0]] || parts[0];
+    }
+
+    // 카테고리 경로에서 토픽(소분류) 추출
+    getCategoryTopic(categoryPath) {
+        const parts = categoryPath.split('/');
+        const topicMap = {
+            'pre-construction': '착공 이전',
+            'during-construction': '시공 중',
+            'post-registration': '개설신고 이후',
+            'interior': '인테리어',
+            'signage': '간판',
+            'furniture': '가구',
+            'bank': '은행',
+            'website': '홈페이지',
+            'it': 'IT/네트워크',
+            'tax': '세무',
+            'loan': '대출',
+            'medical-device': '의료기기',
+            'marketing': '마케팅',
+            'admin': '행정',
+            'insurance': '보험',
+            'emr-crm': 'EMR/CRM'
+        };
+
+        // 마지막 부분 번역
+        const lastPart = parts[parts.length - 1];
+        return topicMap[lastPart] || lastPart;
     }
 
     async fetchRange(range) {
@@ -247,7 +341,7 @@ class GoogleSheetsLoader {
     async smartSearch(queryPlan, maxResults = 10) {
         if (!this.cache) await this.loadData();
 
-        const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic } = queryPlan;
+        const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory } = queryPlan;
         const allKeywords = [...(coreKeywords || []), ...(expandedKeywords || [])];
 
         console.log('🧠 Smart Search 시작');
@@ -255,9 +349,25 @@ class GoogleSheetsLoader {
         console.log('   확장 키워드:', expandedKeywords);
         console.log('   제외 키워드:', excludeKeywords);
         console.log('   검색 전략:', searchStrategy);
+        console.log('   타겟 카테고리:', targetCategory);
+
+        // 0. 타겟 카테고리 필터링 (Notion 데이터만 해당)
+        let candidates = this.cache;
+        if (targetCategory && targetCategory !== 'all') {
+            const beforeCount = candidates.length;
+            candidates = candidates.filter(item => {
+                // Notion 데이터가 아니면 통과 (Google Sheets 데이터는 유지)
+                if (item.source !== 'notion') return true;
+
+                // Notion 데이터는 카테고리 매칭
+                const itemCategory = item.metadata?.category || '';
+                return itemCategory.startsWith(targetCategory);
+            });
+            console.log(`   ✅ 카테고리 필터링: ${candidates.length}개 (${beforeCount}개 중 ${targetCategory} 대상)`);
+        }
 
         // 1. 제외 키워드 필터링 (질문 필드에만 적용, 너무 공격적이지 않게)
-        let candidates = this.cache.filter(item => {
+        candidates = candidates.filter(item => {
             if (!excludeKeywords || excludeKeywords.length === 0) return true;
 
             // 질문 필드에만 적용 (답변 전체에 적용하면 너무 많이 제외됨)
@@ -276,6 +386,12 @@ class GoogleSheetsLoader {
         // 2. 검색 전략에 따른 스코어링
         const results = candidates.map(item => {
             const score = this.calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
+
+            // 타겟 카테고리 매칭 시 보너스 점수
+            if (targetCategory && item.source === 'notion' && item.metadata?.category?.startsWith(targetCategory)) {
+                return { ...item, score: score * 1.5 }; // 50% 보너스
+            }
+
             return { ...item, score };
         })
             .filter(r => r.score > 0.15)  // 임계값 낮춤 - 더 많은 관련 문서 포함
