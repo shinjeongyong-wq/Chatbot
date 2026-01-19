@@ -398,7 +398,7 @@ async function submitFeedback() {
 
     // Google Sheets에 저장
     try {
-        await fetch('https://script.google.com/a/macros/opndoctor.com/s/AKfycbx3sQr5_t3D-GgIUxJTtckxoxIDPtrvfUrpFmv1K1fZQ0ilyiAe9t-cvcdCT6BTMwT0/exec', {
+        await fetch('https://script.google.com/macros/s/AKfycbx3sQr5_t3D-GgIUxJTtckxoxIDPtrvfUrpFmv1K1fZQ0ilyiAe9t-cvcdCT6BTMwT0/exec', {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
