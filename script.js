@@ -405,7 +405,7 @@ async function submitFeedback() {
 
     // Google Sheets에 저장
     try {
-        await fetch('https://script.google.com/macros/s/AKfycbx3sQr5_t3D-GgIUxJTtckxoxIDPtrvfUrpFmv1K1fZQ0ilyiAe9t-cvcdCT6BTMwT0/exec', {
+        await fetch('https://script.google.com/macros/s/AKfycbzCPbV3COpzi0_8Ss2aqeAmx-KvkZHhaPjssLQ37I8ygpT-wiELLlfsTx5JRrPVvWt3/exec', {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
@@ -503,7 +503,7 @@ async function submitContact() {
     closeContactModal();
 
     try {
-        await fetch('https://script.google.com/macros/s/AKfycbx3sQr5_t3D-GgIUxJTtckxoxIDPtrvfUrpFmv1K1fZQ0ilyiAe9t-cvcdCT6BTMwT0/exec', {
+        await fetch('https://script.google.com/macros/s/AKfycbzCPbV3COpzi0_8Ss2aqeAmx-KvkZHhaPjssLQ37I8ygpT-wiELLlfsTx5JRrPVvWt3/exec', {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
