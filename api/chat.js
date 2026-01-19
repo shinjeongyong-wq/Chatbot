@@ -71,10 +71,10 @@ async function handleQueryPlanning(req, res, userQuery) {
   "searchStrategy": "semantic"
 }`;
 
-    // 빠른 모델만 사용 (Gemini Flash)
+    // Query Planner용 빠른 모델 (Claude 사용)
     const fastModels = [
-        { id: 'google/gemini-1.5-flash', name: 'Gemini Flash' },
-        { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini' }
+        { id: 'anthropic/claude-3-haiku', name: 'Claude 3 Haiku' },
+        { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' }
     ];
 
     for (const model of fastModels) {
