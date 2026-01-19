@@ -731,6 +731,241 @@
             color: #94a3b8;
             text-align: right;
         }
+
+        /* 피드백 버튼 */
+        .feedback-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+
+        .feedback-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            background: #fff;
+            color: #64748b;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .feedback-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .feedback-btn.good:hover {
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .feedback-btn.bad:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .feedback-btn.selected.good {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .feedback-btn.selected.bad {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        /* 피드백 팝업 모달 */
+        .feedback-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .feedback-modal.active {
+            display: flex;
+        }
+
+        .feedback-modal-content {
+            background: #fff;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .feedback-modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feedback-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        .feedback-modal-body {
+            padding: 24px;
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+        }
+
+        .feedback-textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        .feedback-modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .feedback-submit-btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .feedback-cancel-btn {
+            padding: 10px 20px;
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* 피드백 목록 탭 */
+        .feedback-tab {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .feedback-tab:hover {
+            background: #f1f5f9;
+        }
+
+        /* 피드백 목록 뷰 */
+        .feedback-list-view {
+            display: none;
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .feedback-list-view.active {
+            display: block;
+        }
+
+        .feedback-item {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .feedback-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .feedback-type-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .feedback-type-badge.good {
+            background: #dcfce7;
+            color: #22c55e;
+        }
+
+        .feedback-type-badge.bad {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .feedback-time {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .feedback-content {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .feedback-qa {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .feedback-qa-item {
+            margin-bottom: 8px;
+        }
+
+        .feedback-qa-label {
+            font-weight: 600;
+            color: #475569;
+        }
     </style>
 </head>
 
@@ -744,6 +979,24 @@
             </div>
             <div class="modal-body" id="citationModalBody">
                 <!-- Data will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="feedback-modal">
+        <div class="feedback-modal-content">
+            <div class="feedback-modal-header">
+                <h3 id="feedbackModalTitle">👍 긍정적 피드백</h3>
+                <button class="feedback-modal-close" onclick="closeFeedbackModal()">&times;</button>
+            </div>
+            <div class="feedback-modal-body">
+                <textarea id="feedbackTextarea" class="feedback-textarea"
+                    placeholder="피드백 내용을 입력해주세요... (선택사항)"></textarea>
+            </div>
+            <div class="feedback-modal-footer">
+                <button class="feedback-cancel-btn" onclick="closeFeedbackModal()">취소</button>
+                <button class="feedback-submit-btn" onclick="submitFeedback()">제출</button>
             </div>
         </div>
     </div>
@@ -777,6 +1030,23 @@
                 <div style="text-align: center; margin-top: 40px; color: #94a3b8;">
                     데이터 로딩 중...
                 </div>
+            </div>
+
+            <!-- Feedback List View -->
+            <div class="feedback-list-view" id="feedbackListView">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h4 style="font-weight: 600;">📋 피드백 목록</h4>
+                    <button onclick="showFaqContent()"
+                        style="background: none; border: none; color: #64748b; cursor: pointer;">← FAQ로 돌아가기</button>
+                </div>
+                <div id="feedbackListContent">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Feedback Tab -->
+            <div class="feedback-tab" onclick="showFeedbackList()">
+                📋 피드백 목록
             </div>
         </aside>
 

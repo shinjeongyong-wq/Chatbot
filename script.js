@@ -129,6 +129,9 @@ function sendUserMessage(message) {
 }
 
 async function getBotResponse(userMessage) {
+    // 피드백용으로 현재 질문 저장
+    window.currentQuestion = userMessage;
+
     try {
         // RAG 전수조사
         const relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, 10);
@@ -294,9 +297,25 @@ function addFormattedMessage(text, contexts, modelName = null) {
     // 4. 사용한 모델명 표시
     const modelInfo = modelName ? `<div class="model-info">🤖 ${modelName}</div>` : '';
 
+    // 5. 피드백 버튼 추가
+    const messageId = Date.now();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+        </div>
+    `;
+
+    // 질문/답변 저장 (피드백용)
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: window.currentQuestion || '',
+        answer: text.substring(0, 500)
+    };
+
     div.innerHTML = `
         <div class="message-avatar">AI</div>
-        <div class="message-content formatted-response">${html}${modelInfo}</div>
+        <div class="message-content formatted-response">${html}${modelInfo}${feedbackButtons}</div>
     `;
 
     chatContainer.appendChild(div);
@@ -331,4 +350,105 @@ function hideTypingIndicator() {
 
 function scrollToBottom() {
     chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// ========== 피드백 시스템 ==========
+let currentFeedbackType = null;
+let currentFeedbackMessageId = null;
+
+function openFeedbackModal(type, messageId) {
+    currentFeedbackType = type;
+    currentFeedbackMessageId = messageId;
+
+    const modal = document.getElementById('feedbackModal');
+    const title = document.getElementById('feedbackModalTitle');
+    const textarea = document.getElementById('feedbackTextarea');
+
+    title.textContent = type === 'good' ? '👍 긍정적 피드백' : '👎 부정적 피드백';
+    textarea.value = '';
+    modal.classList.add('active');
+
+    // 버튼 선택 표시
+    const buttons = document.querySelector(`[data-message-id="${messageId}"]`);
+    if (buttons) {
+        buttons.querySelectorAll('.feedback-btn').forEach(btn => btn.classList.remove('selected'));
+        buttons.querySelector(`.feedback-btn.${type}`).classList.add('selected');
+    }
+}
+
+function closeFeedbackModal() {
+    document.getElementById('feedbackModal').classList.remove('active');
+    currentFeedbackType = null;
+    currentFeedbackMessageId = null;
+}
+
+function submitFeedback() {
+    const content = document.getElementById('feedbackTextarea').value.trim();
+    const messageData = window.lastMessages?.[currentFeedbackMessageId] || {};
+
+    const feedback = {
+        id: Date.now().toString(),
+        type: currentFeedbackType,
+        content: content || '(내용 없음)',
+        question: messageData.question || '',
+        answer: messageData.answer || '',
+        timestamp: new Date().toISOString()
+    };
+
+    // localStorage에 저장
+    const feedbacks = JSON.parse(localStorage.getItem('chatbot_feedbacks') || '[]');
+    feedbacks.unshift(feedback);
+    localStorage.setItem('chatbot_feedbacks', JSON.stringify(feedbacks));
+
+    closeFeedbackModal();
+    alert('피드백이 제출되었습니다. 감사합니다!');
+}
+
+function showFeedbackList() {
+    const faqContent = document.getElementById('faqContent');
+    const feedbackListView = document.getElementById('feedbackListView');
+    const faqNav = document.getElementById('faqNav');
+
+    faqContent.style.display = 'none';
+    faqNav.classList.remove('active');
+    feedbackListView.classList.add('active');
+
+    renderFeedbackList();
+}
+
+function showFaqContent() {
+    const faqContent = document.getElementById('faqContent');
+    const feedbackListView = document.getElementById('feedbackListView');
+
+    feedbackListView.classList.remove('active');
+    faqContent.style.display = 'block';
+}
+
+function renderFeedbackList() {
+    const container = document.getElementById('feedbackListContent');
+    const feedbacks = JSON.parse(localStorage.getItem('chatbot_feedbacks') || '[]');
+
+    if (feedbacks.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:40px;">아직 피드백이 없습니다.</div>';
+        return;
+    }
+
+    container.innerHTML = feedbacks.map(fb => {
+        const date = new Date(fb.timestamp);
+        const timeStr = date.toLocaleDateString('ko-KR') + ' ' + date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+        return `
+            <div class="feedback-item">
+                <div class="feedback-item-header">
+                    <span class="feedback-type-badge ${fb.type}">${fb.type === 'good' ? '👍 Good' : '👎 Bad'}</span>
+                    <span class="feedback-time">${timeStr}</span>
+                </div>
+                <div class="feedback-content">${escapeHtml(fb.content)}</div>
+                <div class="feedback-qa">
+                    <div class="feedback-qa-item"><span class="feedback-qa-label">질문:</span> ${escapeHtml(fb.question || '(없음)')}</div>
+                    <div class="feedback-qa-item"><span class="feedback-qa-label">답변:</span> ${escapeHtml((fb.answer || '').substring(0, 150))}${fb.answer?.length > 150 ? '...' : ''}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
