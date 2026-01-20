@@ -436,7 +436,7 @@ class GoogleSheetsLoader {
 
             return { ...item, score };
         })
-            .filter(r => r.score > 0.15)  // 임계값 - 관련 문서 포함
+            .filter(r => r.score > 0.25)  // 임계값 - 관련 문서 포함
             .sort((a, b) => b.score - a.score);
 
         // 결과 소스별 현황
