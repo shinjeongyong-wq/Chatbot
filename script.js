@@ -136,6 +136,46 @@ async function getBotResponse(userMessage) {
     // 피드백용으로 현재 질문 저장
     window.currentQuestion = userMessage;
 
+    // 사용자 질문을 Google Sheets에 수집 (비동기, 에러 무시)
+    try {
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7eDD0j0ZSr27GKiAZVh3vs_DJuz4Z4CIFDUmtCsahRK50YOSYe4SIqrV86jXCZYLa/exec';
+        const questionData = {
+            sheetName: 'UserQuestions',
+            question: userMessage,
+            timestamp: new Date().toLocaleString('ko-KR')
+        };
+
+        // 숨겨진 iframe으로 form 전송
+        let iframe = document.getElementById('question-collect-iframe');
+        if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.id = 'question-collect-iframe';
+            iframe.name = 'question-collect-iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = SCRIPT_URL;
+        form.target = 'question-collect-iframe';
+        form.style.display = 'none';
+
+        Object.keys(questionData).forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = questionData[key];
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+    } catch (e) {
+        console.log('질문 수집 오류 (무시됨):', e);
+    }
+
     try {
         // ========== Stage 1: Query Planning ==========
         console.log('🧠 Stage 1: Query Planning 시작...');
@@ -528,7 +568,7 @@ async function submitFeedback() {
 
     // Google Sheets에 저장 (숨겨진 form + iframe 방식)
     try {
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxcdw7sGLiSYwSHL9xFFqpJx7LgK5WAC9VfgIKHlzRrfK-rlMCEHD4TtkaHDFmp01IK/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7eDD0j0ZSr27GKiAZVh3vs_DJuz4Z4CIFDUmtCsahRK50YOSYe4SIqrV86jXCZYLa/exec';
 
         // 숨겨진 iframe 생성 (없으면)
         let iframe = document.getElementById('feedback-iframe');
