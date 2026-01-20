@@ -682,63 +682,31 @@ function closeContactModal() {
     const modal = document.getElementById('contactModal');
     if (modal) {
         modal.classList.remove('active');
-        document.getElementById('contactName').value = '';
-        document.getElementById('contactPhone').value = '';
     }
 }
 
-async function submitContact() {
-    const name = document.getElementById('contactName').value.trim();
-    const phone = document.getElementById('contactPhone').value.trim();
-
-    if (!name || !phone) {
-        alert('이름과 전화번호를 모두 입력해주세요.');
-        return;
-    }
-
-    const contactData = {
-        name: name,
-        phone: phone,
-        question: window.currentQuestion || '',
-        timestamp: new Date().toLocaleString('ko-KR'),
-        sheetName: 'ContactRequests'
-    };
-
+async function selectPlanner(plannerName) {
     closeContactModal();
 
     try {
-        await fetch('https://script.google.com/macros/s/AKfycbzCPbV3COpzi0_8Ss2aqeAmx-KvkZHhaPjssLQ37I8ygpT-wiELLlfsTx5JRrPVvWt3/exec', {
+        // Vercel API를 통해 Slack으로 전송 (Webhook URL은 환경변수에 저장)
+        const response = await fetch('/api/slack', {
             method: 'POST',
-            mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(contactData)
+            body: JSON.stringify({
+                question: window.currentQuestion || '',
+                plannerName: plannerName
+            })
         });
 
-        // 채팅창에 확인 메시지 표시
-        const confirmDiv = document.createElement('div');
-        confirmDiv.className = 'message bot';
-        confirmDiv.innerHTML = `
-            <div class="message-avatar">✅</div>
-            <div class="message-content" style="background: #dcfce7; border: 1px solid #22c55e;">
-                <p style="font-weight: 600; color: #166534;">📞 플래너에게 전달되었습니다!</p>
-                <p style="margin-top: 8px; color: #166534;">입력하신 연락처(${phone})로 곧 연락드리겠습니다.</p>
-            </div>
-        `;
-        chatContainer.appendChild(confirmDiv);
-        scrollToBottom();
+        if (response.ok) {
+            alert('플래너에게 전달되었습니다. 플래너가 문의 내용 확인 후 질문 답변 예정입니다.');
+        } else {
+            throw new Error('Slack send failed');
+        }
 
     } catch (error) {
-        console.error('연락 요청 저장 오류:', error);
-        alert('요청 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        console.error('Slack 전송 오류:', error);
+        alert('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
 }
-
-// 엔터 키로 연락 요청 제출
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && document.getElementById('contactModal')?.classList.contains('active')) {
-        if (e.target.id === 'contactName' || e.target.id === 'contactPhone') {
-            e.preventDefault();
-            submitContact();
-        }
-    }
-});
