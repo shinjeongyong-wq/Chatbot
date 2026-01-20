@@ -138,40 +138,15 @@ async function getBotResponse(userMessage) {
 
     // 사용자 질문을 Google Sheets에 수집 (비동기, 에러 무시)
     try {
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7eDD0j0ZSr27GKiAZVh3vs_DJuz4Z4CIFDUmtCsahRK50YOSYe4SIqrV86jXCZYLa/exec';
-        const questionData = {
-            sheetName: 'UserQuestions',
-            question: userMessage,
-            timestamp: new Date().toLocaleString('ko-KR')
-        };
-
-        // 숨겨진 iframe으로 form 전송
-        let iframe = document.getElementById('question-collect-iframe');
-        if (!iframe) {
-            iframe = document.createElement('iframe');
-            iframe.id = 'question-collect-iframe';
-            iframe.name = 'question-collect-iframe';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-        }
-
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = SCRIPT_URL;
-        form.target = 'question-collect-iframe';
-        form.style.display = 'none';
-
-        Object.keys(questionData).forEach(key => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = questionData[key];
-            form.appendChild(input);
-        });
-
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
+        fetch('/api/collect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sheetName: 'UserQuestions',
+                question: userMessage,
+                timestamp: new Date().toLocaleString('ko-KR')
+            })
+        }).catch(() => { }); // 에러 무시
     } catch (e) {
         console.log('질문 수집 오류 (무시됨):', e);
     }
@@ -566,41 +541,22 @@ async function submitFeedback() {
 
     closeFeedbackModal();
 
-    // Google Sheets에 저장 (숨겨진 form + iframe 방식)
+    // Google Sheets에 저장 (Vercel API 경유)
     try {
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7eDD0j0ZSr27GKiAZVh3vs_DJuz4Z4CIFDUmtCsahRK50YOSYe4SIqrV86jXCZYLa/exec';
-
-        // 숨겨진 iframe 생성 (없으면)
-        let iframe = document.getElementById('feedback-iframe');
-        if (!iframe) {
-            iframe = document.createElement('iframe');
-            iframe.id = 'feedback-iframe';
-            iframe.name = 'feedback-iframe';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-        }
-
-        // 숨겨진 form 생성
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = SCRIPT_URL;
-        form.target = 'feedback-iframe';
-        form.style.display = 'none';
-
-        // 데이터를 form 필드로 추가
-        Object.keys(feedback).forEach(key => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = feedback[key];
-            form.appendChild(input);
+        const response = await fetch('/api/collect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sheetName: 'Feedback',
+                ...feedback
+            })
         });
 
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
-
-        alert('피드백이 제출되었습니다. 감사합니다!');
+        if (response.ok) {
+            alert('피드백이 제출되었습니다. 감사합니다!');
+        } else {
+            throw new Error('Feedback save failed');
+        }
     } catch (error) {
         console.error('피드백 저장 오류:', error);
         alert('피드백 제출 중 오류가 발생했습니다.');
