@@ -528,7 +528,7 @@ async function submitFeedback() {
 
     // Google Sheets에 저장
     try {
-        await fetch('https://script.google.com/macros/s/AKfycbzCPbV3COpzi0_8Ss2aqeAmx-KvkZHhaPjssLQ37I8ygpT-wiELLlfsTx5JRrPVvWt3/exec', {
+        await fetch('https://script.google.com/macros/s/AKfycbze5_uqIy0-UFmzOZBiGWF8F0VEe5zxyVTbHzpLrTwBAY0gK_4af5eRX0CZ8Uqv3BxD/exec', {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
@@ -560,7 +560,7 @@ function renderFeedbackList() {
             <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;">
                 모든 사용자의 피드백은 Google Sheets "Feedback" 시트에 저장됩니다.
             </p>
-            <a href="https://docs.google.com/spreadsheets/d/1Ai-3VqDn98aN0XG-FhRHBIFQ-LqqEHbcqUdvF1nWDVs/edit#gid=0" 
+            <a href="https://docs.google.com/spreadsheets/d/1-YZhxai1zHQOBspas4ivKBiNf8cFnq-JC7IXgFB0to4/edit#gid=1727721047" 
                target="_blank"
                style="display: inline-block; padding: 12px 24px; background: #536db1; color: white; text-decoration: none; border-radius: 8px; font-weight: 500;">
                 Google Sheets 열기 →
