@@ -17,33 +17,66 @@ class GoogleSheetsLoader {
     }
 
     async loadData() {
-        // 1. 브라우저 내부 사본(LocalStorage) 확인 - 네트워크 통신 0
+        // 1. 브라우저 내부 사본(LocalStorage) 확인
         const savedData = localStorage.getItem('CRYSTAL_HORIZON_DB_V1');
         if (savedData) {
-            console.log('📦 로컬 사본(LocalStorage)에서 데이터를 불러옵니다. (통신 X)');
+            console.log('📦 로컬 사본(LocalStorage)에서 데이터를 불러옵니다.');
             this.cache = JSON.parse(savedData);
+
+            // ⭐ 항상 Notion 폴더에서 최신 데이터 병합
+            this.cache = await this.mergeNotionData(this.cache);
+
             this.initData();
             return this.cache;
         }
 
-        // 2. 로컬 파일(qaData.js) 확인 - 100개 이상일 때만 사용 (샘플 데이터 무시)
+        // 2. 로컬 파일(qaData.js) 확인 - 100개 이상일 때만 사용
         if (typeof QA_DATA !== 'undefined' && QA_DATA.length > 100) {
             console.log('📂 로컬 파일(qaData.js)에서 데이터를 불러옵니다.');
             this.cache = QA_DATA;
+
+            // ⭐ Notion 폴더에서 데이터 병합
+            this.cache = await this.mergeNotionData(this.cache);
+
             localStorage.setItem('CRYSTAL_HORIZON_DB_V1', JSON.stringify(this.cache));
             this.initData();
             return this.cache;
         }
 
-        // 3. 없으면 API로 최초 1회 다운로드 (사본 생성 과정)
+        // 3. 없으면 API로 최초 1회 다운로드
         console.log('🌐 사본이 없습니다. Google Sheets에서 전체 데이터를 내려받아 사본을 생성합니다...');
         try {
             await this.fetchAndSaveAllData();
-            console.log('✅ 사본 생성 완료! 이제부터는 통신 없이 이 사본을 사용합니다.');
+            console.log('✅ 사본 생성 완료!');
             return this.cache;
         } catch (e) {
             console.error('데이터 다운로드 실패:', e);
             return [];
+        }
+    }
+
+    // ⭐ Notion 데이터 병합 메서드 - 폴더 구조에서 로드
+    async mergeNotionData(existingData) {
+        try {
+            const notionData = await this.loadNotionData();
+
+            if (!notionData || notionData.length === 0) {
+                console.log('⚠️ Notion 폴더 데이터 없음');
+                return existingData;
+            }
+
+            // 기존 데이터에서 Notion 데이터 제거 (중복 방지)
+            const nonNotionData = existingData.filter(item => item.source !== 'notion');
+
+            // 새 Notion 데이터 병합
+            const mergedData = [...nonNotionData, ...notionData];
+
+            console.log(`📘 Notion 데이터 병합: ${notionData.length}개 추가 (총 ${mergedData.length}개)`);
+
+            return mergedData;
+        } catch (e) {
+            console.warn('⚠️ Notion 폴더 로드 실패:', e.message);
+            return existingData;
         }
     }
 
@@ -59,26 +92,17 @@ class GoogleSheetsLoader {
         const parsedQA = this.parseQAData(qaRows);
         const parsedFAQ = this.parseFAQData(faqRows);
 
-        // 📘 Notion 데이터 로드
+        // 📘 Notion 데이터 로드 (오직 폴더 구조에서만)
         let notionData = [];
-
-        // 우선: notionData.js 직접 사용 (안정적)
-        if (typeof NOTION_DATA !== 'undefined' && Array.isArray(NOTION_DATA) && NOTION_DATA.length > 0) {
-            console.log(`📘 notionData.js에서 로드: ${NOTION_DATA.length}개 항목`);
-            notionData = NOTION_DATA;
-        } else {
-            // 폴백: 폴더 구조에서 로드 시도
-            try {
-                notionData = await this.loadNotionData();
-                console.log(`📘 폴더 구조에서 로드: ${notionData.length}개 항목`);
-            } catch (e) {
-                console.error('❌ Notion 데이터 로드 실패:', e.message);
-            }
+        try {
+            notionData = await this.loadNotionData();
+            console.log(`📘 Notion 폴더에서 로드: ${notionData.length}개 항목`);
+        } catch (e) {
+            console.warn('⚠️ Notion 폴더 로드 실패:', e.message);
         }
 
         this.cache = [...parsedQA, ...parsedFAQ, ...notionData];
 
-        // **핵심**: 내려받은 데이터를 로컬 사본으로 영구 저장
         localStorage.setItem('CRYSTAL_HORIZON_DB_V1', JSON.stringify(this.cache));
         this.initData();
     }
@@ -106,25 +130,20 @@ class GoogleSheetsLoader {
 
                 const data = await res.json();
 
-                // 각 항목을 검색용 포맷으로 변환
+                // 각 항목 추가 (기존 구조 유지 + 카테고리 메타데이터 보강)
                 for (const item of data.items || []) {
                     notionItems.push({
-                        id: `notion-${item.id.replace(/-/g, '').slice(0, 12)}`,
-                        source: 'notion',
-                        question: item.title,
-                        answer: item.content,
+                        ...item,
                         metadata: {
+                            ...item.metadata,
                             field: this.getCategoryField(categoryPath),
                             topic: this.getCategoryTopic(categoryPath),
-                            category: categoryPath,
-                            icon: item.icon,
-                            notionUrl: item.notionUrl,
-                            lastUpdated: item.lastUpdated
+                            categoryPath: categoryPath
                         }
                     });
                 }
             } catch (e) {
-                console.warn(`  ⚠️ ${categoryPath} 로드 실패`);
+                console.warn(`  ⚠️ ${categoryPath} 로드 실패:`, e.message);
             }
         }
 
@@ -136,35 +155,58 @@ class GoogleSheetsLoader {
         const parts = categoryPath.split('/');
         const fieldMap = {
             'partners': '파트너사',
-            'process': '개원 프로세스',
+            'hospital-basics': '개원 시 필요 영역 [기본편]',
             'advanced': '심화 콘텐츠',
-            'checklists': '체크리스트',
-            'db-records': '파트너사 상세',
+            'checklist': '체크리스트',
             'uncategorized': '기타'
         };
         return fieldMap[parts[0]] || parts[0];
     }
 
-    // 카테고리 경로에서 토픽(소분류) 추출
+    // 카테고리 경로에서 토픽(중분류+소분류) 추출
     getCategoryTopic(categoryPath) {
         const parts = categoryPath.split('/');
         const topicMap = {
+            // 중분류
             'pre-construction': '착공 이전',
+            'post-construction': '착공 이후',
             'during-construction': '시공 중',
             'post-registration': '개설신고 이후',
+            // 소분류 - 파트너사
             'interior': '인테리어',
             'signage': '간판',
             'furniture': '가구',
             'bank': '은행',
-            'website': '홈페이지',
-            'it': 'IT/네트워크',
+            'homepage': '홈페이지',
+            'pc-network': 'PC&네트워크',
+            'late-process': '중후반 프로세스',
+            'emr-crm': 'EMR/CRM',
+            'marketing': '마케팅',
+            'admin-checklist': '행정업무 체크리스트',
+            'fire-checklist': '소방점검',
+            'real-estate': '부동산',
+            // 소분류 - 기본편
             'tax': '세무',
             'loan': '대출',
             'medical-device': '의료기기',
-            'marketing': '마케팅',
-            'admin': '행정',
+            'demolition': '철거 및 운영 필수 설비',
+            'infrastructure': '운영 지원 인프라',
+            'textiles': '병원용 섬유류',
+            'waste': '의료폐기물',
+            'admin': '행정 업무',
             'insurance': '보험',
-            'emr-crm': 'EMR/CRM'
+            'pharmacy': '원내 의약품',
+            'management': '관리 관련 업체',
+            // 소분류 - 심화편
+            'medical-beauty': '의료기기 미용편',
+            'medical-pain': '의료기기 통증편',
+            'medical-internal': '의료기기 내과편',
+            'medical-dental': '의료기기 치과편',
+            // 기타
+            'facilities': '시설',
+            'construction': '공사',
+            'regulations': '규정',
+            'general': '일반'
         };
 
         // 마지막 부분 번역

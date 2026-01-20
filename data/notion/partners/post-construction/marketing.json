@@ -1,0 +1,25 @@
+{
+  "category": "partners/post-construction",
+  "subCategory": "marketing",
+  "itemCount": 1,
+  "lastUpdated": "2026-01-20T04:21:25.011Z",
+  "items": [
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8022-8ead-f8ddba554391",
+      "question": "🗣️ 마케팅 업체 (1)",
+      "answer": "[마케팅 업체 (1)] - Notion에서 상세 내용 확인",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "마케팅 업체 (1)",
+        "category": "하위 페이지",
+        "icon": "🗣️",
+        "lastUpdated": "2026-01-19T05:16:00.000Z",
+        "parentType": "page_id",
+        "structuredCategory": "partners/post-construction",
+        "structuredSubCategory": "marketing"
+      }
+    }
+  ]
+}

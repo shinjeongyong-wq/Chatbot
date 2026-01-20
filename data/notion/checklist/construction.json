@@ -1,0 +1,93 @@
+{
+  "category": "checklist",
+  "subCategory": "construction",
+  "itemCount": 5,
+  "lastUpdated": "2026-01-20T04:21:25.052Z",
+  "items": [
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8140-a359-fbcb0f274e6b",
+      "question": "인테리어 공사(소음, 일반) 지정 시간대",
+      "answer": "인테리어 공사 시 철거, 목공, 타일 작업 시에는 상당히 큰 소음, 진동, 분진이 발생합니다.\n위, 아래, 옆에 아무도 없는 신축 건물이면 괜찮지만 사방에 모두 영업 중인 곳들이 있을 경우 매우 불편한 상황이 생기게 됩니다. 인테리어 업체에서 일정 조율과 주변 임차인들 양해를 구하지만 미리 알아두면 좋습니다.\n상가 인테리어 공사는 아파트(주택) 인테리어와 반대되는 경우가 많습니다.\n아파트는 소음 공사를 주간(오전)에 하지만 상가는 야간 또는 주말에 진행합니다.\n아파트는 낮에 사람들이 일하러 나감 → 낮에 집에 사람이 많이 없고 밤에 잠자러 들어옴\n상가는 낮에 영업을 함 → 낮에 사람이 많고 밤에 사람이 없음\n야간 또는 주말에 작업할 경우 인건비가 많이(2배) 소요되니 미리 확인해 둘 필요가 있습니다.",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "인테리어 공사(소음, 일반) 지정 시간대 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "construction"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8175-bb3a-f7423eb403e2",
+      "question": "바닥 종류, 상태, 마감재, 방통",
+      "answer": "대부분 병원 인테리어 시에 바닥을 새로 시공합니다. 시공 전 현재 바닥 상태에 따라서 시공 자재, 방법 등이 바뀔 수 있으니 체크하는 것이 좋습니다.\n바닥 종류\n바닥 마감재 종류\n       b. 포세린타일 바닥\n     c. 마루 바닥\nd. 콘크리트 폴리싱 바닥\n바닥 방통 작업\n신축 건물인 경우 해당 층의 용도가 업무시설, 근생업종 어떤 용도로 사용하게 될지 미정인 상태여서 악세스 플로어 시공 여지를 남겨두기 위해 입구부와 내부에 약 15cm 정도의 단차가 있는 경우가 있습니다. 이 경우 용도에 따라서 악세스 플로어를 시공할 수도 있고, 방통(몰탈) 작업을 통해 단차를 제거해서 높이를 맞출 수 있습니다.\n방통 작업을 할 경우 이후 퇴실 시 다시 몰탈을 제거해야 하는지에 대한 여부를 확인해야 합니다.\n방통 작업은 시공, 철거가 비용이 많이 들기 때문 입니다.",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "바닥 종류, 상태, 마감재, 방통",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "construction"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-818c-868a-ee9dd09ec709",
+      "question": "폐기물 / 자재 / 장비 반출입 경로",
+      "answer": "기존 시설 철거 후 폐기물, 신규 인테리어 자재, 인테리어 잔여 폐기물 등의 반출 및 반입 경로는 철거와 인테리어 업체에서 체크하고 진행하지만 특이한 사항이 있을 수 있으니 미리 체크하는 것이 좋습니다.\n엘리베이터, 복도 등 공용부분 보양\n창문 탈거: 스카이차 작업(장비, 인력 비용 발생)\n장비 반입: CT, MRI 등 중량 장비 반입 시 창문 탈거, 벽면 해체 등 필요할 수 있음",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "폐기물 / 자재 / 장비 반출입 경로 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "construction"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8169-8745-f5e01b6744cc",
+      "question": "바닥 코아 작업 가능 여부",
+      "answer": "기존 사용하던 급배수 시설이 없거나, 레이아웃에 따라 추가 설치가 필요할 경우 배관 매립을 위해서 바닥에 구멍(코아)을 뚫어야 할 수 있습니다.\n건물의 구조가 변경되는 것이기 때문에 대부분의 임대인은 이 작업을 꺼려합니다.\n타공 시에는 건물 구조설계도면을 검토해서 위치를 선정합니다.\n경우에 따라 구조기술사의 구조안전진단 검토서를 첨부해야 하는 경우도 있습니다.\n바닥에 매립된 눈에 보이지 않는 철근, 전선, 배관 등 건물에 피해가 없고 원상복구가 수월하도록 작업해야 합니다.\n아래 층 임차인이 있을 경우 작업 동의 여부\n임대인의 동의 여부\n타공 가능 위치, 수량 협의\n타공 수량 최소화",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "바닥 코아 작업 가능 여부 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "construction"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-810c-ab59-eb7431a54bbf",
+      "question": "철거 주체 확인 (양도양수, 미철거 공실)",
+      "answer": "입주당시 현재 상태에 따라서 임대인, 관리소, 현(전) 임차인 등에 철거를 요청해야 하는 경우가 많습니다. 철거 대상 시설을 설치한 주체가 누구인지를 파악해서 철거 협의를 해야 합니다.\n신축\n구축\n[실전 팁]\n  철거는 평당 15만원 정도라고 생각하면 됩니다. ex) 100평에 1500만원\n  폐기물에 따라 달라짐 (한의원은 바닥에 난방이 깔린 경우가 많아 더 나옴)",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "철거 주체 확인 (양도양수, 미철거 공실)",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "construction"
+      }
+    }
+  ]
+}

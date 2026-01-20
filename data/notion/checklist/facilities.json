@@ -1,0 +1,178 @@
+{
+  "category": "checklist",
+  "subCategory": "facilities",
+  "itemCount": 10,
+  "lastUpdated": "2026-01-20T04:21:25.048Z",
+  "items": [
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8114-84aa-e66e51e21a89",
+      "question": "소방 시설",
+      "answer": "소방관 진입창\n소방관 진입창은 건축법 시행령 제51조 및 건축물의 피난ㆍ방화구조 등의 기준에 관한 규칙 제18조의2에 근거하며, 2층~11층에 층마다 1개소 이상, 폭 90cm 이상, 높이 1m 이상, 실내 바닥에서 80cm 이내 설치, 소방차 진입로 면해야 하고 역삼각형 표시와 타격점 표시가 필수이며, 유리 두께(이중창 24mm 이내 등) 규정을 따라야 합니다. 이 기준은 2024년 8월 26일 일부 개정되어 완화되었습니다.\n주요 설치 기준\n설치 대상: 지상 2층 이상 11층 이하의 각 층.\n위치:\n크기:\n유리 규격:\n표시:\n추가 설치: 벽면 끝까지 수평거리가 40m를 초과하는 경우 40m 이내마다 추가 설치.\n관련 법규\n건축법 제49조 (건축물의 피난시설 및 용도제한 등).\n건축법 시행령 제51조 (소방관이 진입할 수 있는 창의 설치 등).\n건축물의 피난ㆍ방화구조 등의 기준에 관한 규칙 제18조의2 (소방관이 진입할 수 있는 창의 설치기준).\n2024년 8월 26일 개정 주요 내용\n높이 완화: 소방관 진입창의 높이 기준을 1.2m에서 1m 이상으로 완화.\n노대 설치 완화: 난간이 있는 노대 등에 설치 시, 창 아랫부분 높이를 1.2m 이내로 완화.\n방화구역(방화벽, 방화창, 방화셔터 등)\n방화창\n스프링클러\n방염자재\n경보/감지설비\n소화기\n방염필증 못찾으면 양도양수 시 , 다시 인테리어 해야함",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "소방 시설",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "facilities"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8155-98f6-ca4e6212ccd2",
+      "question": "장애인 주차장",
+      "answer": "장애인 주차장\n설치 규격\n설치 예시\n규격 예시",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "장애인 주차장",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "facilities"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8158-846b-dd27907a3691",
+      "question": "간판, 각종 광고사인물",
+      "answer": "외부 간판 설치 위치 \n흔히 간판이라고 통칭하는 옥외광고물은 지자체 조례로 규격과 수량이 정해져 있습니다.\n(대부분의 병원의 경우 이것을 무시하지만..)\n병원 입지 선정 시 간판 가능 범위, 수량이 중요한 부분이 때문에 부동산 계약 전에 중개팀에서 이미 협의한 위치와 수량이 있습니다.\n협력사를 통한 간판 디자인과 설치를 위해서 기본적인 사항에 대해서 알아둘 필요가 있습니다.\n규격 외 간판을 설치할 경우 주/야간 시인성이 좋아 광고 마케팅 효과가 뛰어나지만 옥외광고물법, 소방법 등 관계법령 위반 사유로 과태료 등 행정처분이 발생할 수 있습니다.\n(대부분 주변 경쟁 병원에서의 신고 민원..)\n임대인이 허락해준다면 마케팅 홍보효과를 위해서 과태료 처분을 감수하는 경우가 대부분 입니다.\n규격 간판 예시\n규격 외 간판 예시\n내부 창문형 LED 간판\n각종 내/외부 광고 사인물\n건물 규모가 있고 1층 출입구, 내부 공용 공간 등에 각종 광고물이 설치된 경우 자리 지정 기준, 위치 별 비용이 별도로 발생할 수 있으니 체크할 필요가 있습니다. 외부 간판 설치 시에도 설치, 철거 시 외벽 훼손 우려를 감안해서 별도의 간판 보증금(이상 없을 시 반환)이 있는 경우도 있습니다. \n이행강제금\n가이드라인 근거",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "간판, 각종 광고사인물",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "facilities"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-817a-a306-eeca4cfa1119",
+      "question": "퇴실 시 원상복구 기준",
+      "answer": "계약 해지, 해제, 만기 이후 퇴실 시 원상복구 기준에 따라 최초 인테리어 시공 방식이나 구조가 바뀔 수 있으니 참고해야 합니다.\n공용부 확장(방화셔터 사용), 내부 코어 타공, 소방 설비 이설, 냉난방 설비 증설 등 병원이 입점하면서 설치한 시설, 구조 변경한 부분 등을 퇴실 시 원상복구 해야 하는데, 이 부분이 가급적 적은 비용으로 쉽게 될 수 있도록 인테리어 한다면 퇴실 시 도움이 될 수 있습니다.\n임대인에게 초기에 요청하면 좋다",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "퇴실 시 원상복구 기준 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "facilities"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8188-99ac-da205b789412",
+      "question": "바닥, 천정 누수 (흔적)",
+      "answer": "건물 천장에는 생각보다 많은 배관과 전선이 설치되어 있습니다.\n스프링클러(소방시설), 천장형 에어컨 배관, 상부층의 배수 배관 등이 있습니다.\n임대차 계약 전에 누수 상태와 흔적을 유심히 관찰해야 합니다.\n지속되어 오던 누수가 있다면 입주 전에 수리를 완료 해야 합니다.\n아래 층의 누수 여부도 파악해야 합니다.\n입주 후에 아래 층으로의 누수가 발견된다면 책임 소재가 불분명 해질 수 있어 다툼의 여지가 있습니다.",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "바닥, 천정 누수 (흔적)",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "facilities"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-81b6-8baa-dd4ead4f0190",
+      "question": "주차 입고 기준",
+      "answer": "자주식 주차\n기계식 주차\n카리프트 주차\n최근 모든 차량들이 대형화 되고 있어서 기존에 설치된 기계식 주차, 카 리프트의 경우 수용 가능한 차량 제원이 요즘 출시되는 차량들 보다 현저하게 미달되는 경우가 많습니다.",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "주차 입고 기준",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "facilities"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-81c8-a91b-f0cba7a708d4",
+      "question": "장애인 화장실 위치",
+      "answer": "장애인 화장실 위치와 크기는 건축물대장 용도/표시 변경 시에 중개팀에서 미리 확인하고 진행하지만 알아두시면 좋습니다.\n공용부 모든 문은 900CM 이상\n중문일 경우 , 문과 문 사이는 1200CM\n한쪽은 벽이면 0.9M, 양쪽 문이면 1.5M\n장애인 화장실 안내판\n장애인 점자블럭: 벽에서 30cm\n장애인 화장실: 1.6 x 2.0m\n규격 예시\n법률근거",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "장애인 화장실 위치",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "facilities"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8102-b3ad-c880eb3e6760",
+      "question": "주차 요금 체계",
+      "answer": "주차 요금 체계는 방문 환자 주차비 지원, 발렛 비용 등 고정비 영역에 포함해야 하는 부분이 생길 수 있어서 미리 파악해야 합니다.\n주차 관리 방식\n원장님, 직원 등 매일 출근하는 병원 관계자 주차\n방문 환자 주차",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "주차 요금 체계 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "facilities"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8171-9200-d81b33ab3c92",
+      "question": "피난구(비상계단) 도어 개폐 정상 작동 여부",
+      "answer": "장애인 관련 사항",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "피난구(비상계단) 도어 개폐 정상 작동 여부",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:13:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "facilities"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-81c1-8c10-db9238b6506d",
+      "question": "입원실 여부",
+      "answer": "외과 등 입원실이 있을 경우 해당 영역 근처에 스프링클러 설치",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "입원실 여부",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:13:00.000Z",
+        "parentType": "database_id",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "facilities"
+      }
+    }
+  ]
+}

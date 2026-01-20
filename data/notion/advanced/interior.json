@@ -1,0 +1,25 @@
+{
+  "category": "advanced",
+  "subCategory": "interior",
+  "itemCount": 1,
+  "lastUpdated": "2026-01-20T04:21:25.018Z",
+  "items": [
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-80da-9455-c663b339399b",
+      "question": "🏗️ 인테리어 심화편 (1)",
+      "answer": "현장에서 전문성을 보이려면 필요한 내용들이에요. \n  원장님들의 질문에 대답하는 순간, 전문성은 드러나요.\n  그래서 실전처럼 문답식으로 준비해봤어요! \n  (Untitled 을 다시 한 번 읽고 돌아오시면 좋아요! \n  단, 전부 달달 외우실 필요는 없어요. 목차 정도는 이해해주세요.)\n목차\n원장님들이 자주 여쭤보시는 질문 리스트\n인테리어 업체는 어떤 걸 보고 골라야 하나요?\n견적이 합리적인 거 맞나요?\n계약서에 나와있는 내용들이 무슨 소리죠? \n소재 종류가 무척 많네요… 어디에 어떤 걸 써야해요?\n플래너님, 잘 진행되고 있는 거 맞는거죠? \n원장님께서 여쭤보신 적 있는 질문 리스트\n저 우수내시경실(센터)인증 받을 수 있나요? \n전력량이 문제가 될 수 있다는 데 무슨 소리인가요?\n원장님들이 여쭤보실 수도 있을 것 같은 내용들",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "인테리어 심화편 (1)",
+        "category": "하위 페이지",
+        "icon": "🏗️",
+        "lastUpdated": "2026-01-19T05:39:00.000Z",
+        "parentType": "page_id",
+        "structuredCategory": "advanced",
+        "structuredSubCategory": "interior"
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "category": "partners/post-construction",
+  "subCategory": "fire-checklist",
+  "itemCount": 1,
+  "lastUpdated": "2026-01-20T04:21:25.009Z",
+  "items": [
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8044-b9e2-ecf188bb6c8c",
+      "question": "🧯 소방점검 체크리스트 (1)",
+      "answer": "소방점검 이슈 방지 방안\n  플래너가 해당 체크리스트를 원장님께 공유\n  원장님께서 체크리스트 인테리어 업체 혹은 소방 업체에게 공유드리며 확인 요청하기\n---\n안전점검표(참고용)",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "소방점검 체크리스트 (1)",
+        "category": "하위 페이지",
+        "icon": "🧯",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "page_id",
+        "structuredCategory": "partners/post-construction",
+        "structuredSubCategory": "fire-checklist"
+      }
+    }
+  ]
+}

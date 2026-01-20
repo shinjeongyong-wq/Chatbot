@@ -1,0 +1,25 @@
+{
+  "category": "partners/post-construction",
+  "subCategory": "emr-crm",
+  "itemCount": 1,
+  "lastUpdated": "2026-01-20T04:21:25.010Z",
+  "items": [
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-80b2-84e2-c93c11f3e177",
+      "question": "📊 CRM/EMR 파트너사 (원장님용) (1)",
+      "answer": "오픈닥터’S COMMENT\n  안녕하세요, 원장님! \n  개원 이후 안정적인 진료와 효율적인 고객 관리를 위해 CRM/EMR 시스템은 필수적인 도구입니다. 이번에는 병원 운영에 도움이 될 다양한 CRM/EMR 업체를 소개해드리려 합니다. 그 전에, 우리 병원에 꼭 맞는 솔루션을 선택하기 위해 어떤 점을 먼저 살펴보면 좋을지 함께 확인해볼까요?\n  ---\n  같은 CRM/EMR이라도 업체마다 강점과 특화된 기능이 다릅니다.\n  예를 들어, EMR(전자차트) 기능에 강점을 둔 곳, 진료실 운영과 병원 내 현황 관리에 특화된 곳, 혹은 고객 관리 및 마케팅 기능이 뛰어난 곳 등 각기 차별화된 강점이 있습니다.\n  우리 병원의 규모, 지역 상권, 마케팅 전략 등과 얼마나 잘 맞는지를 꼼꼼히 비교하고 선택하는 것이 중요합니다.\n  ---\n  또한, 업체 별 주요 기능 외에도 아래와 같은 부가 기능도 함께 고려해보세요!\n  데이터 마이그레이션 가능 여부\n  원내 장비와 연동 여부\n  보안 및 백업 관리 \n  직원 교육 제공 여부\n  CS 제공 여부",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "CRM/EMR 파트너사 (원장님용) (1)",
+        "category": "하위 페이지",
+        "icon": "📊",
+        "lastUpdated": "2026-01-19T05:16:00.000Z",
+        "parentType": "page_id",
+        "structuredCategory": "partners/post-construction",
+        "structuredSubCategory": "emr-crm"
+      }
+    }
+  ]
+}
