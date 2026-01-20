@@ -35,81 +35,56 @@ async function handleQueryPlanning(req, res, userQuery) {
     const plannerPrompt = `당신은 병원 개원 상담 챗봇의 Query Planner입니다.
 사용자 질문을 분석하여 검색 전략을 JSON으로 출력하세요.
 
-[데이터 구조 - 반드시 이해하고 활용]
-우리 시스템은 다음과 같은 폴더 구조로 데이터가 저장되어 있습니다:
+[데이터 소스 - 3가지]
+1. **Google Sheets Q&A** - 병원 개원 관련 일반 질문/답변
+2. **Google Sheets FAQ** - 자주 묻는 질문
+3. **Notion 데이터** - 파트너사, 프로세스, 체크리스트 등 상세 정보
 
-1. **partners/** - 파트너사 명단 및 상세 정보
-   - partners/interior - 인테리어 파트너사 업체 명단
-   - partners/signage - 간판 파트너사 업체 명단
-   - partners/furniture - 가구 파트너사 명단
-   - partners/bank - 은행 파트너사 명단
-   - partners/crm-emr - CRM/EMR 파트너사 명단
-   - partners/website - 홈페이지 파트너사 명단
+[Notion 폴더 구조]
+1. **partners/** - 파트너사 명단
+   - partners/pre-construction/ - 착공 이전 파트너사 (은행, 인테리어, 간판, 홈페이지, PC&네트워크)
+   - partners/post-construction/ - 착공 이후 파트너사 (가구, 중후반 프로세스, EMR/CRM, 마케팅)
 
-2. **process/** - 개원 프로세스 및 절차 설명
-   - process/pre-construction/ - 착공 이전 단계 (세무, 대출, 인테리어 절차, 간판 절차 등)
-   - process/during-construction/ - 시공 중 단계 (가구, 섬유류, 인프라 등)
-   - process/post-registration/ - 개설신고 이후 (행정, 보험, EMR, 의약품 등)
+2. **hospital-basics/** - 개원 시 필요 영역 [기본편]
+   - hospital-basics/pre-construction/ - 착공 이전 (세무, 대출, 인테리어, 간판, 의료기기, 마케팅, 홈페이지)
+   - hospital-basics/during-construction/ - 시공 중 (운영 지원 인프라, 가구, 섬유류, 의료폐기물)
+   - hospital-basics/post-registration/ - 개설신고 이후 (행정, 보험, EMR/CRM, 의약품, 관리)
 
-3. **advanced/** - 심화 콘텐츠 (상세 가이드)
-4. **checklists/** - 체크리스트 (소방점검, 부동산, 행정업무)
-5. **db-records/** - 파트너사별 상세 정보, 포트폴리오, 실제 시공 사례
+3. **advanced/** - 심화 콘텐츠 (인테리어 심화, 간판 심화, 의료기기 미용/통증/내과/치과)
 
-[중요한 의도 구분]
-- "파트너사 알려줘/뭐있어/추천해줘/명단" → targetCategory를 "partners/*"로 설정
-- "어떻게 해/절차/과정/방법" → targetCategory를 "process/*"로 설정
-- "체크리스트/점검/확인사항" → targetCategory를 "checklists/*"로 설정
-- "포트폴리오/시공사례/실제사례" → targetCategory를 "db-records"로 설정
+4. **checklist/** - 체크리스트/점검표 (시설, 공사, 규정, 일반)
 
-[출력 형식 - 반드시 JSON만 출력]
+[중요 규칙]
+- 모든 검색은 Q&A, FAQ, Notion 3가지 소스 모두를 대상으로 합니다
+- targetCategory는 Notion 데이터 내에서 우선순위를 정하는 용도입니다
+- 일반적인 질문이면 targetCategory를 "all"로 설정하세요
+
+[의도 구분]
+- "파트너사 알려줘/뭐있어/추천해줘" → intent: "파트너사목록", targetCategory: "partners"
+- "어떻게 해/절차/과정/방법" → intent: "절차안내", targetCategory: "hospital-basics"
+- "체크리스트/점검" → intent: "체크리스트", targetCategory: "checklist"
+- 일반적인 질문/정보 요청 → intent: "정보요청", targetCategory: "all"
+
+[출력 형식 - JSON만 출력]
 {
-  "intent": "파트너사목록|절차안내|비용|비교|체크리스트|심화|기타",
-  "topic": "인테리어|간판|의료기기|세무|마케팅|개원비용|파트너사|기타",
-  "targetCategory": "partners|process|advanced|checklists|db-records|all",
+  "intent": "파트너사목록|절차안내|비용|체크리스트|심화|정보요청|off_topic",
+  "topic": "인테리어|간판|의료기기|세무|마케팅|개원비용|CI/BI|기타",
+  "targetCategory": "partners|hospital-basics|advanced|checklist|all",
   "coreKeywords": ["핵심 키워드 1-3개"],
-  "expandedKeywords": ["확장 키워드"],
+  "expandedKeywords": ["관련 확장 키워드"],
   "excludeKeywords": [],
   "searchStrategy": "semantic|broad|exact"
 }
 
-[핵심 규칙]
-1. 파트너사 명단을 원하면 반드시 targetCategory를 "partners"로
-2. 절차/과정을 원하면 targetCategory를 "process"로
-3. 포트폴리오/사례를 원하면 targetCategory를 "db-records"로
-
 [예시]
 질문: "인테리어 파트너사 뭐 있어?"
-{
-  "intent": "파트너사목록",
-  "topic": "인테리어",
-  "targetCategory": "partners",
-  "coreKeywords": ["인테리어 파트너사", "인테리어 업체"],
-  "expandedKeywords": ["시공업체"],
-  "excludeKeywords": [],
-  "searchStrategy": "semantic"
-}
+{"intent":"파트너사목록","topic":"인테리어","targetCategory":"partners","coreKeywords":["인테리어","파트너사"],"expandedKeywords":["시공업체"],"excludeKeywords":[],"searchStrategy":"semantic"}
 
-질문: "인테리어 어떻게 진행해?"
-{
-  "intent": "절차안내",
-  "topic": "인테리어",
-  "targetCategory": "process",
-  "coreKeywords": ["인테리어 절차", "인테리어 진행"],
-  "expandedKeywords": ["시공 과정", "인테리어 단계"],
-  "excludeKeywords": [],
-  "searchStrategy": "semantic"
-}
+질문: "CI/BI 연계하지말고 보편적으로 알려줘"
+{"intent":"정보요청","topic":"CI/BI","targetCategory":"all","coreKeywords":["CI","BI","브랜딩"],"expandedKeywords":["로고","간판","디자인"],"excludeKeywords":["연계"],"searchStrategy":"broad"}
 
-질문: "인테리어 시공 사례 보여줘"
-{
-  "intent": "심화",
-  "topic": "인테리어",
-  "targetCategory": "db-records",
-  "coreKeywords": ["시공 사례", "포트폴리오"],
-  "expandedKeywords": ["인테리어 사례"],
-  "excludeKeywords": [],
-  "searchStrategy": "semantic"
-}`;
+질문: "개원 비용 얼마나 들어?"
+{"intent":"비용","topic":"개원비용","targetCategory":"all","coreKeywords":["개원","비용","예산"],"expandedKeywords":["자금","투자"],"excludeKeywords":[],"searchStrategy":"broad"}`;
 
     // Query Planner용 빠른 모델 (Claude 사용)
     const fastModels = [

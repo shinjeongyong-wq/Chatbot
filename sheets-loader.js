@@ -396,23 +396,14 @@ class GoogleSheetsLoader {
         console.log('   검색 전략:', searchStrategy);
         console.log('   타겟 카테고리:', targetCategory);
 
-        // 0. 카테고리 필터링 (임시 비활성화 - 폴더 구조 미완성으로 Notion 데이터 제외됨)
-        // TODO: 폴더 구조 완성 시 활성화
+        // 0. 전체 검색 대상 (Q&A, FAQ, Notion 모두 포함)
         let candidates = this.cache;
-        /*
-        if (targetCategory && targetCategory !== 'all') {
-            const beforeCount = candidates.length;
-            candidates = candidates.filter(item => {
-                // Notion 데이터가 아니면 통과 (Google Sheets 데이터는 유지)
-                if (item.source !== 'notion') return true;
 
-                // Notion 데이터는 카테고리 매칭
-                const itemCategory = item.metadata?.category || '';
-                return itemCategory.startsWith(targetCategory);
-            });
-            console.log(`   ✅ 카테고리 필터링: ${candidates.length}개 (${beforeCount}개 중 ${targetCategory} 대상)`);
-        }
-        */
+        // 소스별 현황 로그
+        const qaCount = candidates.filter(i => i.source === 'qa').length;
+        const faqCount = candidates.filter(i => i.source === 'faq').length;
+        const notionCount = candidates.filter(i => i.source === 'notion').length;
+        console.log(`   📊 데이터 소스: Q&A ${qaCount}개, FAQ ${faqCount}개, Notion ${notionCount}개 (총 ${candidates.length}개)`);
 
         // 1. 제외 키워드 필터링 (질문 필드에만 적용, 너무 공격적이지 않게)
         candidates = candidates.filter(item => {
@@ -429,22 +420,30 @@ class GoogleSheetsLoader {
             return true;
         });
 
-        console.log(`   제외 필터링 후: ${candidates.length}개 (원본 ${this.cache.length}개)`);
+        console.log(`   제외 필터링 후: ${candidates.length}개`);
 
-        // 2. 검색 전략에 따른 스코어링
+        // 2. 검색 전략에 따른 스코어링 (모든 소스 대상)
         const results = candidates.map(item => {
-            const score = this.calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
+            let score = this.calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
 
-            // 타겟 카테고리 매칭 시 보너스 점수
-            if (targetCategory && item.source === 'notion' && item.metadata?.category?.startsWith(targetCategory)) {
-                return { ...item, score: score * 1.5 }; // 50% 보너스
+            // Notion 데이터: 타겟 카테고리 매칭 시 보너스 점수
+            if (targetCategory && targetCategory !== 'all' && item.source === 'notion') {
+                const categoryPath = item.metadata?.categoryPath || item.metadata?.category || '';
+                if (categoryPath.startsWith(targetCategory)) {
+                    score = score * 1.5; // 50% 보너스
+                }
             }
 
             return { ...item, score };
         })
-            .filter(r => r.score > 0.15)  // 임계값 낮춤 - 더 많은 관련 문서 포함
+            .filter(r => r.score > 0.15)  // 임계값 - 관련 문서 포함
             .sort((a, b) => b.score - a.score);
 
+        // 결과 소스별 현황
+        const resultQa = results.filter(i => i.source === 'qa').length;
+        const resultFaq = results.filter(i => i.source === 'faq').length;
+        const resultNotion = results.filter(i => i.source === 'notion').length;
+        console.log(`   📚 결과 소스: Q&A ${resultQa}개, FAQ ${resultFaq}개, Notion ${resultNotion}개`);
         console.log(`   최종 결과: ${Math.min(results.length, maxResults)}개`);
 
         return results.slice(0, maxResults);
