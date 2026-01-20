@@ -526,14 +526,40 @@ async function submitFeedback() {
 
     closeFeedbackModal();
 
-    // Google Sheets에 저장
+    // Google Sheets에 저장 (숨겨진 form + iframe 방식)
     try {
-        await fetch('https://script.google.com/macros/s/AKfycbze5_uqIy0-UFmzOZBiGWF8F0VEe5zxyVTbHzpLrTwBAY0gK_4af5eRX0CZ8Uqv3BxD/exec', {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(feedback)
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxcdw7sGLiSYwSHL9xFFqpJx7LgK5WAC9VfgIKHlzRrfK-rlMCEHD4TtkaHDFmp01IK/exec';
+
+        // 숨겨진 iframe 생성 (없으면)
+        let iframe = document.getElementById('feedback-iframe');
+        if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.id = 'feedback-iframe';
+            iframe.name = 'feedback-iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+        }
+
+        // 숨겨진 form 생성
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = SCRIPT_URL;
+        form.target = 'feedback-iframe';
+        form.style.display = 'none';
+
+        // 데이터를 form 필드로 추가
+        Object.keys(feedback).forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = feedback[key];
+            form.appendChild(input);
         });
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+
         alert('피드백이 제출되었습니다. 감사합니다!');
     } catch (error) {
         console.error('피드백 저장 오류:', error);
