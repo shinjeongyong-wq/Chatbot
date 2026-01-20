@@ -553,7 +553,7 @@ async function submitFeedback() {
         });
 
         if (response.ok) {
-            alert('피드백이 제출되었습니다. 감사합니다!');
+            showSuccessModal('피드백 전달이 완료되었습니다. 빠른 시일 내에 수정해서 이용하시는데에 불편함 없도록 하겠습니다.');
         } else {
             throw new Error('Feedback save failed');
         }
@@ -656,7 +656,7 @@ async function selectPlanner(plannerName) {
         });
 
         if (response.ok) {
-            alert('플래너에게 전달되었습니다. 플래너가 문의 내용 확인 후 질문 답변 예정입니다.');
+            showSuccessModal('플래너에게 전달되었습니다. 빠른 시일 내에 연락 드리겠습니다.');
         } else {
             throw new Error('Slack send failed');
         }
@@ -664,5 +664,22 @@ async function selectPlanner(plannerName) {
     } catch (error) {
         console.error('Slack 전송 오류:', error);
         alert('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
+}
+
+// 성공 메시지 모달
+function showSuccessModal(message) {
+    const modal = document.getElementById('successModal');
+    const messageEl = document.getElementById('successModalMessage');
+    if (modal && messageEl) {
+        messageEl.textContent = message;
+        modal.classList.add('active');
+    }
+}
+
+function closeSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.classList.remove('active');
     }
 }
