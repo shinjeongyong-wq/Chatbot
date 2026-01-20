@@ -175,9 +175,13 @@ async function getBotResponse(userMessage) {
         // ========== Stage 2: Smart Search ==========
         console.log('🔍 Stage 2: Smart Search 시작...');
 
+        // 파트너사 목록 질문이면 더 많은 결과 검색
+        const isPartnerListQuery = queryPlan?.intent === '파트너사목록' || queryPlan?.targetCategory === 'partners';
+        const maxResults = isPartnerListQuery ? 20 : 10;
+
         if (queryPlan) {
             // Query Plan 기반 스마트 검색
-            relatedContexts = await sheetsLoader.smartSearch(queryPlan, 10);
+            relatedContexts = await sheetsLoader.smartSearch(queryPlan, maxResults);
         } else {
             // Fallback: 기존 키워드 검색
             relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, 10);
@@ -263,6 +267,26 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 
 **핵심: 참고문서에 조금이라도 관련 내용이 있으면 [OFF_TOPIC]이나 [NO_DATA] 없이 바로 답변하세요!**
 **절대로 참고문서에 없는 내용을 지어내지 마세요. 할루시네이션은 금지입니다.**
+
+# ⭐ 파트너사/업체 목록 질문에 대한 응답 규칙
+"파트너사 알려줘", "업체 추천", "명단", "리스트" 같은 질문이면:
+
+→ 참고문서에 있는 **모든 업체**를 **아래 형식으로 나열**하세요:
+
+**1. [업체명] [1]**
+- 업력: (설립연도, 몇년차)
+- 주요 특징: (간략 설명)
+- 가격대: (있으면)
+
+**2. [업체명] [2]**
+- 업력: (설립연도, 몇년차)
+- 주요 특징: (간략 설명)
+- 가격대: (있으면)
+
+... (참고문서에 있는 모든 업체 나열)
+
+→ 업체 정보가 있으면 **가능한 많이** 나열 (3개 이상 권장)
+→ 업체명만 언급하고 설명 없이 끝내지 말 것
 
 # 답변 스타일 규칙 (참고문서에 관련 내용이 있을 때만)
 
