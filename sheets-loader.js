@@ -461,6 +461,19 @@ class GoogleSheetsLoader {
             }
         }
 
+        // 5. 파트너사 검색 패턴 보너스 (의도가 파트너사 목록일 때)
+        const isPartnerSearch = coreKeywords?.some(kw => kw && (kw.includes('파트너') || kw.includes('업체')));
+        if (isPartnerSearch) {
+            // "회사 소개", "예상 가격", "포트폴리오" 등 파트너사 상세 페이지 패턴
+            if (answer.includes('회사 소개') || answer.includes('예상 가격') || answer.includes('포트폴리오')) {
+                score += 0.3; // 파트너사 상세 페이지 보너스
+            }
+            // 업체명 페이지 (의료폐기물, 청소, 가구 등 실제 업체)
+            if (answer.includes('년차') || answer.includes('설립') || answer.includes('진행 가능')) {
+                score += 0.2;
+            }
+        }
+
         return score;
     }
 }
