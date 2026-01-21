@@ -138,7 +138,7 @@ async function getBotResponse(userMessage) {
 
     // 사용자 질문을 Google Sheets에 수집 (비동기, 에러 무시)
     try {
-        fetch('/api/collect', {
+        await fetch('/api/collect', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
