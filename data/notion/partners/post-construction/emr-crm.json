@@ -1,24 +1,79 @@
 {
-  "category": "partners/post-construction",
-  "subCategory": "emr-crm",
-  "itemCount": 1,
-  "lastUpdated": "2026-01-20T04:21:25.010Z",
+  "category": "partners",
+  "subCategory": "post-construction/emr-crm",
+  "itemCount": 4,
+  "lastUpdated": "2026-01-21T07:46:36.562Z",
   "items": [
     {
       "id": "notion-2ed62aded336",
       "source": "notion",
-      "pageId": "2ed62ade-d336-80b2-84e2-c93c11f3e177",
-      "question": "📊 CRM/EMR 파트너사 (원장님용) (1)",
-      "answer": "오픈닥터’S COMMENT\n  안녕하세요, 원장님! \n  개원 이후 안정적인 진료와 효율적인 고객 관리를 위해 CRM/EMR 시스템은 필수적인 도구입니다. 이번에는 병원 운영에 도움이 될 다양한 CRM/EMR 업체를 소개해드리려 합니다. 그 전에, 우리 병원에 꼭 맞는 솔루션을 선택하기 위해 어떤 점을 먼저 살펴보면 좋을지 함께 확인해볼까요?\n  ---\n  같은 CRM/EMR이라도 업체마다 강점과 특화된 기능이 다릅니다.\n  예를 들어, EMR(전자차트) 기능에 강점을 둔 곳, 진료실 운영과 병원 내 현황 관리에 특화된 곳, 혹은 고객 관리 및 마케팅 기능이 뛰어난 곳 등 각기 차별화된 강점이 있습니다.\n  우리 병원의 규모, 지역 상권, 마케팅 전략 등과 얼마나 잘 맞는지를 꼼꼼히 비교하고 선택하는 것이 중요합니다.\n  ---\n  또한, 업체 별 주요 기능 외에도 아래와 같은 부가 기능도 함께 고려해보세요!\n  데이터 마이그레이션 가능 여부\n  원내 장비와 연동 여부\n  보안 및 백업 관리 \n  직원 교육 제공 여부\n  CS 제공 여부",
+      "pageId": "2ed62ade-d336-8140-9326-e16f4cfecdde",
+      "question": "베가스 CRM",
+      "answer": "[이미지]\n\n### 🩺주요 진료과\n피부과, 성형외과\n\n### 💵이용료\n• 초기 설치비 - 165만 원 (최대 10인)\n• 월 이용료 - \n\n### 📝특이사항\n• 미용과 EMR 사용률 1위\n  • 1,500개 이상 병원에서 사용\n• 10년 이상의 업력\n\n### ✨주요 기능\n• CRM(고객관리) 기능\n• 진료 예약 기능\n• 청구 사전 심사\n• 사진 입력\n• PACS 연동\n• 비급여 정보 입력\n• 전자서명\n• 카드 결제 연동\n\n### 👍부가 기능\n\n### ⭐의사 리뷰\n• 선택 이유\n• (이용 이후) 장점\n  • 타 EMR에 비해 CRM 잘 되어 있음\n  • 직관적 인터페이스\n  • 비보험 진료 위주인 경우 편함\n• (이용 이후) 단점\n  • 클라우드 방식으로 서버 다운 간혹 발생 + 영향 심각",
       "metadata": {
         "field": "플래너 AI",
-        "topic": "CRM/EMR 파트너사 (원장님용) (1)",
-        "category": "하위 페이지",
-        "icon": "📊",
-        "lastUpdated": "2026-01-19T05:16:00.000Z",
-        "parentType": "page_id",
-        "structuredCategory": "partners/post-construction",
-        "structuredSubCategory": "emr-crm"
+        "topic": "베가스 CRM",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "피부미용(비보험과)",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/emr-crm"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8141-bdc3-da91edf42a43",
+      "question": "스마트/우노 CRM",
+      "answer": "[이미지]\n\n### 🩺주요 진료과\n피부과, 성형외과\n\n### 💵이용료\n• 초기 설치비 - 확인 필요\n• 월 이용료 - 확인 필요\n\n### 📝특이사항\n• UNO CRM - 클라우드 형태\n\n### ✨주요 기능\n• SMART CRM\n  • 원클릭 예약판\n  • 전화연동 기능\n  • 통계 분석\n  • 펜차트 기능\n• UNO CRM\n  • 태블릿 간편접수\n  • 펜차트 기능\n  • 타임테이블 기반 예약 및 접수 관리\n  • 통합 차트 관리\n  • 각종 연동 기능\n  • 통계 분석\n\n### 👍부가 기능\n\n### ⭐의사 리뷰\n• 선택 이유 이유\n• (이용 이후) 장점\n• (이용 이후) 단점",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "스마트/우노 CRM",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "피부미용(비보험과)",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/emr-crm"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8169-a6ae-df134f75a53e",
+      "question": "KOS CRM",
+      "answer": "[이미지]\n[이미지]\n\n### 🩺주요 진료과\n피부과, 성형외과\n\n### 💵이용료\n• 월 이용료 - 30만 원\n\n### 📝특이사항\n• 강남언니에서 만든 비급여 미용의료를 위한 신규 CRM\n• 서비스 소개서 ⏬\n[파일]\n[이미지]\n  • KOS CRM 설명서 \nhttps://healingpaper.notion.site/KOS-688f42f6ed164026a25f419b102eac9c\n  • KOS 홈페이지\nhttps://kos-solution.com/\n• 비급여 미용의료 중심으로, 보험청구 및 DUR 연동 기능은 없습니다 🥲\n\n### ✨주요 기능\n• 신규 및 재방문 고객 관리\n  • PC 및 태블릿 전용 웹기반 고객 차트\n• 리소스 최적화 \n  • 상품 및 이벤트 데이터 관리 기능\n  • 시술 현황 관리\n• 통계 기반 인센티브 설계\n  • 결제/구매/시술/예약내원 통계\n• 홈페이지와 강남언니 등 외부채널 예약 연동\n\n### 👍부가 기능\n• 결제 단말기 연동\n• 택스리펀 서비스 연동\n• 문자메시지 발송 서비스\n• 080 무료수신거부 서비스\n\n### 🎁 오픈닥터 혜택\n• 초기 3개월 이용료 : 무료\n\n### ⭐의사 리뷰\n• 선택 이유\n• (이용 이후) 장점\n• (이용 이후) 단점",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "KOS CRM",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "피부미용(비보험과)",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/emr-crm"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-818c-b21c-cfd51b60c67c",
+      "question": "스마트닥터CRM",
+      "answer": "[이미지]\n\n### 🩺주요 진료과\n피부과, 성형외과\n\n### 💵이용료\n• 초기 설치비 - 확인 필요\n• 월 이용료 - 확인 필요\n\n### 📝특이사항\n• 차트-EMR-CRM 제품 간 연동성\n• 전국 3,500개 이상 이용\n\n### ✨주요 기능\n1. 스마트차트\n  • 펜차트 기능\n  • 스마트NC / 타 EMR 모두 연동\n  • 촬영 이미지 차트 연동\n  • 모바일 이용 가능\n1. 스마트NC (EMR)\n  • 접수 및 수납 처리 기능\n  • 화면 구성 커스터마이징 가능\n  • 청구 실시간 사전점검 기능\n  • 전자서명, 진료실 안내 등\n1. 스마트닥터CRM\n  • 예진/문진 관리\n  • 통계 관리\n  • 차트 및 EMR과의 연동 편리성\n\n### 👍부가 기능\n• 기존 종이차트 스캔해 삽입 가능\n• 타 EMR에서 마이그레이션 가능\n\n### ⭐의사 리뷰\n• 선택 이유 이유\n• (이용 이후) 장점\n• (이용 이후) 단점",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "스마트닥터CRM",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "피부미용(비보험과)",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/emr-crm"
       }
     }
   ]

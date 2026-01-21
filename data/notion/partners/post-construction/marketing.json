@@ -1,24 +1,25 @@
 {
-  "category": "partners/post-construction",
-  "subCategory": "marketing",
+  "category": "partners",
+  "subCategory": "post-construction/marketing",
   "itemCount": 1,
-  "lastUpdated": "2026-01-20T04:21:25.011Z",
+  "lastUpdated": "2026-01-21T07:46:36.566Z",
   "items": [
     {
       "id": "notion-2ed62aded336",
       "source": "notion",
-      "pageId": "2ed62ade-d336-8022-8ead-f8ddba554391",
-      "question": "🗣️ 마케팅 업체 (1)",
-      "answer": "[마케팅 업체 (1)] - Notion에서 상세 내용 확인",
+      "pageId": "2ed62ade-d336-81e2-bf82-f6566376fc60",
+      "question": "플랜티",
+      "answer": "[이미지]\n[이미지]\n\n### ⌛ 회사 소개 \n• 10년 이상 경력\n• 누적 약 1천 건 이상의 프로젝트 진행 경험 보유 (치과 90%)\n• 오프라인 마케팅 전문\n• 개원 2~3개월 전 계약 → 유동인구 상권·상가·시장 중심 홍보 진행\n• 물티슈·각티슈 등 판촉물, 주변 상가·업체와 제휴 협약 체결, 개원 선물 추천·연계.\n• 아르바이트 인력이 아닌 직원 운영 팀이 직접 설명 및 안내 진행 → 전문성 확보\n• MOU 진행 가능 - 병의원 제휴 및 협약 전담 실장 운영\n• 개원 마케팅 이후 구독 시스템 운영 (업계 내 독자적 보유)\n• 치과뿐만 아니라 내과, 한의원, 피부과 등 다양한 진료과 의원의 오프라인 마케팅 진행 경험 보유\n• 내부 인력 직접 운영으로 타 업체 대비 가격대는 있으나, 그 이상의 만족도 제공\n\n### ⭐ 원장님 리뷰\n• “주변에서 많이 추천해줘서 진행했습니다. 패키지 보관 관련해서 서비스가 살짝 아쉽긴 했습니다만 이유가 있어 그리한거라 생각하여 큰 문제는 되지 않았습니다. ” (치과, 25년 10월 개원)\n• “정산 처리 방식이 좋았습니다.”(치과 25년 10월 개원)\n\n### 💵 예상 견적\n• 예시 구성 : 16,300,000원\n  • 물티슈 10,000ea, 각티슈 2,000ea, 칫솔 2,000ea, 일회용 앞치마 3,000ea, 홍보인원 4명*8일 \n    • 서비스 항목 : 물티슈 1,000ea, 칫솔 1,000ea 지원 \n• 5일 1200만 원, 8일 1500만 원, 12일 2200만 원(치과 기준)\n• 피부과·한의원은 판촉물 구성 차이로 금액 변동 가능\n\n### 📁 포트폴리오\nhttps://m.blog.naver.com/plan-t?tab=1",
       "metadata": {
         "field": "플래너 AI",
-        "topic": "마케팅 업체 (1)",
-        "category": "하위 페이지",
-        "icon": "🗣️",
-        "lastUpdated": "2026-01-19T05:16:00.000Z",
-        "parentType": "page_id",
-        "structuredCategory": "partners/post-construction",
-        "structuredSubCategory": "marketing"
+        "topic": "플랜티",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "마케팅 파트너사",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/marketing"
       }
     }
   ]

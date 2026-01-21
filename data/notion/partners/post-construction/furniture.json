@@ -1,24 +1,115 @@
 {
-  "category": "partners/post-construction",
-  "subCategory": "furniture",
-  "itemCount": 1,
-  "lastUpdated": "2026-01-20T04:21:25.014Z",
+  "category": "partners",
+  "subCategory": "post-construction/furniture",
+  "itemCount": 6,
+  "lastUpdated": "2026-01-21T07:46:36.585Z",
   "items": [
     {
       "id": "notion-2ed62aded336",
       "source": "notion",
-      "pageId": "2ed62ade-d336-80d1-b13a-c8517760a5e5",
-      "question": "💺 오픈닥터 가구 파트너사 (1)",
-      "answer": "---\n⚠본 콘텐츠의 모든 자료에 대한 저작권은 오픈닥터에 있으며, 원장님의 비상업적 용도 \n사용 외에 상업적 용도 사용, 무단 복제 및 무단 전제, 재배포를 금합니다. \n⚠ 오픈닥터는 원장님 진료과에 적합한 업체를 우선적으로 소개해드리고 있습니다. 위 업체와의 컨택이 필요할 경우 반드시 담당 플래너를 통해 진행해 주시기 바랍니다.",
+      "pageId": "2ed62ade-d336-819d-b479-eca3dd889ed6",
+      "question": "바우스가구",
+      "answer": "[이미지]\n\n### ⌛ 회사 소개\n• 1985년 설립(41년차)\n• 중저가부터 하이엔드까지 모든 품목의 시공이 가능\n• A/S 담당 전문 기사들이 3일 이내에 현장 마무리 책임, 시공 후 에도 유상 A/S 가능\n• 중간 유통업체 없이 공장 직영 운영으로 최고의 품질과 합리적인 가격\n• 11명의 본사 담당자, 30명의 시공팀, 10명의 생산 직원이 상담부터 생산, 시공까지 한번에 같이 진행 \n• 병의원용 제작 가구 업체로 추천. 좋은 품질\n• 붙박이 가구(수납장, 원장실 책상, 상담실 가구 등) 전문 제작\n  • 오산에 본사 및 공장 두고 있음 (남부 지역 최대 규모(약 2,000평)의 부지에 최신 설비를 갖춘 2개의 공장을 운영)\n  • 품질 저하를 막기 위해 LPM·PT 상판 등 저가 소재는 거의 사용하지 않음. 페트(PET) 소재 이상을 기본으로 제안\n• ‘오늘의 집’ 공식 파트너사로 참여 중.\n• 원장님 미팅 및 시공 진행 방식\n  • 저가 LPM·PT 상판은 사용하지 않음. 병원 내부 실사용 빈도·내구성을 고려해 무광 페트 등 검증된 자재로 기본 견적 산출\n  • 가격이 크게 차이 나지 않는 범위 내에서 원장님이 이해할 수 있도록 대체 자재 옵션을 함께 안내\n  • 붙박이 가구 견적은 항목별 상세 단가와 시공비 포함해 투명하게 제시하고 있음\n  • 시공 시 최소 4~5일 이상의 공정 기간 확보되면 좋음 (AS 및 마감 퀄리티 보장)\n[이미지]\n[이미지]\n\n### 💵 예상 견적\n• 제작 가구이므로 자재, 디자인, 수량 등에 따라 상이\n\n📊 📁오픈닥터 고객 사례",
       "metadata": {
         "field": "플래너 AI",
-        "topic": "오픈닥터 가구 파트너사 (1)",
-        "category": "하위 페이지",
-        "icon": "💺",
-        "lastUpdated": "2026-01-19T05:15:00.000Z",
-        "parentType": "page_id",
-        "structuredCategory": "partners/post-construction",
-        "structuredSubCategory": "furniture"
+        "topic": "바우스가구",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "붙박이가구",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/furniture"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-810e-99b3-f672afa0a801",
+      "question": "오름앤컴퍼니",
+      "answer": "[이미지]\n\n### ⌛ 회사 소개\n• 2009년 설립 (17년차)\n• 네이버, SKT 등 국내 대기업 진행\n• 판교 G&E 메디컬센터, 충남대병원 등 진행  \n• 하이엔드 가구 디자인을 모티프로 한 커스텀 제작에 강점\n• 명화 레퍼런스 아트 구매 가능\n• 유상 A/S 지원\n• 해외 디자이너 브랜드 가구 구매 가능\n• 고급스러운 분위기의 병의원 전용 이동가구 구매 가능\n\n### 💵 예상 견적\n• 120평 기준 3,000만 원\n(제품 종류 및 디자인에 따라 다름)\n\n📊 📁오픈닥터 고객 사례",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "오름앤컴퍼니",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "이동가구 파트너사",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/furniture"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8178-9d20-f63d47a9b452",
+      "question": "UNWIND",
+      "answer": "[이미지]\n\n### ⌛ 회사 소개\n• 2018년 설립(8년차)\n• 다양한 해외(일본) 브랜드 가구 보유\n• 서래마을과 판교에 쇼룸 보유\n• 원목가구 감성, 젠 스타일 추구, 블랙 앤 모던 스타일도 보유\n• 가구, 조명, 패브릭, 오디오 전부 취급\n• 국내, 수입 가구 유상 A/S 가능\n• 브랜딩 / 브랜딩 전략/ 네이밍 / 가구 스타일링 진행 가능 \n• 가구 제작 가능\n• 가성비 있는 가구부터 하이엔드까지 전부 진행 가능\n\n### 💵 예상 견적\n• 가구 종류에 따라 상이\n\n### 📝오픈닥터 파트너 혜택\n• B2B 전용 가격으로 제공 + 추가 10% 할인 (다만 브랜드별 상이하며 B2B 할인이 아예 없는 브랜드도 존재함)\n\n📊 📁오픈닥터 고객 사례\n• 미즈메디병원의 산후조리원/ 디어원 로비/ 이을 성형외과\n[이미지]\n[이미지]\n[이미지]\n[이미지]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "UNWIND",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "이동가구 파트너사",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/furniture"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8182-9746-eb9dd1d67151",
+      "question": "DS소파",
+      "answer": "[이미지]\n\n### ⌛ 회사 소개\n• 경기도 오산 공장 수작업\n• 설계부터 제작까지 전부 진행\n• 병의원 전용 방염 쇼파, 제작 쇼파 등 맞춤 진행\n\n### 💵견적\n• 재질, 수량 등에 따라 상이\n\n📊 📁오픈닥터 고객 사례\n\n### 📁 진행 포트폴리오\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n[이미지]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "DS소파",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "이동가구 파트너사",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/furniture"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-81c3-ad8e-d573c4ab7ed5",
+      "question": "루벨루테",
+      "answer": "[이미지]\n\n### ⌛ 회사 소개\n• 2019년도 설립 (6년차)  \n• 대표님 30년 이상 가구 제작 경력 보유\n• 병원·상업공간 맞춤형 디자인 이동가구 제작 전문\n  • 고정가구(붙박이장 등 일부)도 고급형으로 별도 제작 가능하나, 주력은 이동식 가구(소파, 상담 데스크, 대기실 가구 등)\n  • 의자, 탁자는 주로 기성품 사용\n• 병원 공간 컨셉과 예산에 맞춰 설계 및 제작\n• 국내 주요 병의원 인테리어 업체와 협업 경험 다수 보유 \n  • 아베크, 플랜디자인, 플럭스, 아임디자인, 그레이밸런스, MD스페이스 등 주요 인테리어 업체와 협업 경험 多  \n  • 과거 대기업 로비, 극장(CGV, 롯데시네마) 등 대형 상업공간 가구 제작 경험 → 코로나 이후 병원 가구 시장으로 전환\n• A/S 유상 지원\n• 운영 방식 :\n  • 맞춤 제작 중심: 병원마다 공간 컨셉과 예산에 맞춰 설계·제작 → 자체 공장은 없고, 전문 팀(소파: 일산, 금속: 남양주, 목공: 파주)으로 분업화해 국내 생산.\n  • 인테리어 업체와 긴밀 연계 : 대부분 인테리어 업체에서 3D 시안을 잡으면 이를 기반으로 가구를 수정·제작\n  • 포트폴리오 공개 최소화 : 디자인 카피 리스크 방지 차원에서 홈페이지나 SNS는 최소 운영. 신뢰할 수 있는 파트너사·원장님 중심으로 입소문으로만 진행.\n  • 카피나 무리한 저가 비딩이 빈번한 신규 루트는 지양\n\n### 💵 예상 가격 및 작업 기간\n• 자재, 크기, 수량에 따라 상이\n\n📊 📁오픈닥터 고객 사례",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "루벨루테",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "이동가구 파트너사",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/furniture"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-81df-8ada-f87e12a39100",
+      "question": "메종비퍼니처",
+      "answer": "[이미지]\n\n### ⌛ 회사 소개\n• 수입가구 및 커스텀 가구 전문점 \n• 하이엔드 가구 디자인 모티프로 한 이동형 소파, 체어, 테이블, 야외용 가구 등을 저렴한 가격에 제작 가능\n• 중국 공장에서 제조\n\n### 💵 예상 견적\n• 하이엔드 가구 업체 대비 절반 수준\n\n📊 📁오픈닥터 고객 사례\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n[이미지]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "메종비퍼니처",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "이동가구 파트너사",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "post-construction/furniture"
       }
     }
   ]

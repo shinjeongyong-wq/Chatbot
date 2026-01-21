@@ -1,171 +1,135 @@
 {
-  "version": "3.0",
-  "generatedAt": "2026-01-20T04:21:24.996Z",
-  "totalItems": 220,
+  "version": "5.0",
+  "generatedAt": "2026-01-21T08:44:00.000Z",
+  "totalItems": 197,
   "categories": {
-    "partners/pre-construction/pc-network": {
-      "itemCount": 1,
-      "file": "pc-network.json"
-    },
-    "partners/pre-construction/homepage": {
-      "itemCount": 1,
-      "file": "homepage.json"
-    },
-    "partners/pre-construction/signage": {
-      "itemCount": 1,
-      "file": "signage.json"
-    },
-    "partners/pre-construction/interior": {
+    "advanced/interior": {
       "itemCount": 1,
       "file": "interior.json"
     },
-    "partners/pre-construction/bank": {
+    "advanced/medical-device-beauty": {
       "itemCount": 1,
-      "file": "bank.json"
+      "file": "medical-device-beauty.json"
     },
-    "partners/post-construction/real-estate": {
+    "advanced/medical-device-dental": {
       "itemCount": 1,
-      "file": "real-estate.json"
+      "file": "medical-device-dental.json"
     },
-    "partners/post-construction/fire-checklist": {
+    "advanced/medical-device-internal": {
       "itemCount": 1,
-      "file": "fire-checklist.json"
+      "file": "medical-device-internal.json"
     },
-    "partners/post-construction/emr-crm": {
+    "advanced/medical-device-pain": {
       "itemCount": 1,
-      "file": "emr-crm.json"
-    },
-    "partners/post-construction/marketing": {
-      "itemCount": 1,
-      "file": "marketing.json"
-    },
-    "partners/post-construction/admin-checklist": {
-      "itemCount": 1,
-      "file": "admin-checklist.json"
-    },
-    "partners/post-construction/late-process": {
-      "itemCount": 1,
-      "file": "late-process.json"
-    },
-    "partners/post-construction/furniture": {
-      "itemCount": 1,
-      "file": "furniture.json"
+      "file": "medical-device-pain.json"
     },
     "advanced/signage": {
       "itemCount": 1,
       "file": "signage.json"
     },
-    "advanced/medical-beauty": {
-      "itemCount": 1,
-      "file": "medical-beauty.json"
+    "checklist/facilities": {
+      "itemCount": 13,
+      "file": "facilities.json"
     },
-    "advanced/medical-pain": {
-      "itemCount": 1,
-      "file": "medical-pain.json"
+    "checklist/general": {
+      "itemCount": 24,
+      "file": "general.json"
     },
-    "advanced/interior": {
+    "checklist/regulations": {
       "itemCount": 1,
-      "file": "interior.json"
-    },
-    "advanced/medical-internal": {
-      "itemCount": 1,
-      "file": "medical-internal.json"
-    },
-    "advanced/medical-dental": {
-      "itemCount": 1,
-      "file": "medical-dental.json"
-    },
-    "hospital-basics/pre-construction/tax": {
-      "itemCount": 1,
-      "file": "tax.json"
-    },
-    "hospital-basics/pre-construction/medical-device": {
-      "itemCount": 1,
-      "file": "medical-device.json"
-    },
-    "hospital-basics/pre-construction/loan": {
-      "itemCount": 1,
-      "file": "loan.json"
-    },
-    "hospital-basics/pre-construction/demolition": {
-      "itemCount": 1,
-      "file": "demolition.json"
-    },
-    "hospital-basics/pre-construction/pc-network": {
-      "itemCount": 1,
-      "file": "pc-network.json"
-    },
-    "hospital-basics/pre-construction/marketing": {
-      "itemCount": 1,
-      "file": "marketing.json"
-    },
-    "hospital-basics/pre-construction/homepage": {
-      "itemCount": 1,
-      "file": "homepage.json"
-    },
-    "hospital-basics/pre-construction/interior": {
-      "itemCount": 1,
-      "file": "interior.json"
-    },
-    "hospital-basics/pre-construction/signage": {
-      "itemCount": 1,
-      "file": "signage.json"
-    },
-    "hospital-basics/during-construction/waste": {
-      "itemCount": 1,
-      "file": "waste.json"
-    },
-    "hospital-basics/during-construction/infrastructure": {
-      "itemCount": 1,
-      "file": "infrastructure.json"
+      "file": "regulations.json"
     },
     "hospital-basics/during-construction/furniture": {
       "itemCount": 1,
       "file": "furniture.json"
     },
+    "hospital-basics/during-construction/infrastructure": {
+      "itemCount": 4,
+      "file": "infrastructure.json"
+    },
     "hospital-basics/during-construction/textiles": {
-      "itemCount": 1,
+      "itemCount": 3,
       "file": "textiles.json"
     },
-    "hospital-basics/post-registration/management": {
-      "itemCount": 4,
-      "file": "management.json"
-    },
-    "hospital-basics/post-registration/emr-crm": {
+    "hospital-basics/during-construction/waste": {
       "itemCount": 1,
-      "file": "emr-crm.json"
+      "file": "waste.json"
     },
-    "hospital-basics/post-registration/insurance": {
-      "itemCount": 1,
-      "file": "insurance.json"
-    },
-    "hospital-basics/post-registration/admin": {
+    "hospital-basics/post-opening/admin": {
       "itemCount": 1,
       "file": "admin.json"
     },
-    "hospital-basics/post-registration/pharmacy": {
+    "hospital-basics/post-opening/emr-crm": {
       "itemCount": 1,
+      "file": "emr-crm.json"
+    },
+    "hospital-basics/post-opening/management": {
+      "itemCount": 1,
+      "file": "management.json"
+    },
+    "hospital-basics/post-opening/pharmacy": {
+      "itemCount": 2,
       "file": "pharmacy.json"
     },
-    "checklist/facilities": {
-      "itemCount": 10,
-      "file": "facilities.json"
+    "hospital-basics/pre-construction/demolition": {
+      "itemCount": 1,
+      "file": "demolition.json"
     },
-    "checklist/general": {
-      "itemCount": 162,
-      "file": "general.json"
+    "hospital-basics/pre-construction/interior": {
+      "itemCount": 1,
+      "file": "interior.json"
     },
-    "checklist/construction": {
-      "itemCount": 5,
-      "file": "construction.json"
+    "hospital-basics/pre-construction/marketing": {
+      "itemCount": 1,
+      "file": "marketing.json"
     },
-    "checklist/regulations": {
-      "itemCount": 2,
-      "file": "regulations.json"
+    "hospital-basics/pre-construction/medical-device": {
+      "itemCount": 1,
+      "file": "medical-device.json"
     },
-    "uncategorized/general": {
-      "itemCount": 2,
-      "file": "general.json"
+    "hospital-basics/pre-construction/signage": {
+      "itemCount": 1,
+      "file": "signage.json"
+    },
+    "hospital-basics/pre-construction/tax-loan": {
+      "itemCount": 1,
+      "file": "tax-loan.json"
+    },
+    "partners/post-construction/emr-crm": {
+      "itemCount": 4,
+      "file": "emr-crm.json"
+    },
+    "partners/post-construction/furniture": {
+      "itemCount": 6,
+      "file": "furniture.json"
+    },
+    "partners/post-construction/marketing": {
+      "itemCount": 1,
+      "file": "marketing.json"
+    },
+    "partners/pre-construction/bank": {
+      "itemCount": 3,
+      "file": "bank.json"
+    },
+    "partners/pre-construction/homepage": {
+      "itemCount": 4,
+      "file": "homepage.json"
+    },
+    "partners/pre-construction/interior": {
+      "itemCount": 12,
+      "file": "interior.json"
+    },
+    "partners/pre-construction/pc-network": {
+      "itemCount": 3,
+      "file": "pc-network.json"
+    },
+    "partners/pre-construction/signage": {
+      "itemCount": 14,
+      "file": "signage.json"
+    },
+    "portfolio/customers": {
+      "itemCount": 86,
+      "file": "customers.json"
     }
   }
 }

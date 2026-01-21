@@ -48,7 +48,7 @@ async function handleQueryPlanning(req, res, userQuery) {
 2. **hospital-basics/** - 개원 시 필요 영역 [기본편]
    - hospital-basics/pre-construction/ - 착공 이전 (세무, 대출, 인테리어, 간판, 의료기기, 마케팅, 홈페이지)
    - hospital-basics/during-construction/ - 시공 중 (운영 지원 인프라, 가구, 섬유류, 의료폐기물)
-   - hospital-basics/post-registration/ - 개설신고 이후 (행정, 보험, EMR/CRM, 의약품, 관리)
+   - hospital-basics/post-opening/ - 개설신고 이후 (행정, 보험, EMR/CRM, 의약품, 관리)
 
 3. **advanced/** - 심화 콘텐츠 (인테리어 심화, 간판 심화, 의료기기 미용/통증/내과/치과)
 

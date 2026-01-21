@@ -171,6 +171,7 @@ class GoogleSheetsLoader {
             'pre-construction': '착공 이전',
             'post-construction': '착공 이후',
             'during-construction': '시공 중',
+            'post-opening': '개설신고 이후',
             'post-registration': '개설신고 이후',
             // 소분류 - 파트너사
             'interior': '인테리어',
@@ -188,6 +189,7 @@ class GoogleSheetsLoader {
             // 소분류 - 기본편
             'tax': '세무',
             'loan': '대출',
+            'tax-loan': '세무/대출',
             'medical-device': '의료기기',
             'demolition': '철거 및 운영 필수 설비',
             'infrastructure': '운영 지원 인프라',
@@ -198,6 +200,10 @@ class GoogleSheetsLoader {
             'pharmacy': '원내 의약품',
             'management': '관리 관련 업체',
             // 소분류 - 심화편
+            'medical-device-beauty': '의료기기 미용편',
+            'medical-device-pain': '의료기기 통증편',
+            'medical-device-internal': '의료기기 내과편',
+            'medical-device-dental': '의료기기 치과편',
             'medical-beauty': '의료기기 미용편',
             'medical-pain': '의료기기 통증편',
             'medical-internal': '의료기기 내과편',

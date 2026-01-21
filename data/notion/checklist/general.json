@@ -1,15 +1,69 @@
 {
   "category": "checklist",
   "subCategory": "general",
-  "itemCount": 162,
-  "lastUpdated": "2026-01-20T04:21:25.049Z",
+  "itemCount": 24,
+  "lastUpdated": "2026-01-21T07:46:36.546Z",
   "items": [
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8102-b3ad-c880eb3e6760",
+      "question": "주차 요금 체계 ",
+      "answer": "주차 요금 체계는 방문 환자 주차비 지원, 발렛 비용 등 고정비 영역에 포함해야 하는 부분이 생길 수 있어서 미리 파악해야 합니다.\n1. 주차 관리 방식\n  1. 직접 관리: 주차관리원 상주\n[이미지]\n  b. 외주 관리: AMANO, AJ, 하이파킹 등\n[이미지]\n  c. 발렛: 직접 관리와 유사\n[이미지]\n1. 원장님, 직원 등 매일 출근하는 병원 관계자 주차\n  1. 대형 빌딩, 사옥의 경우\n    1. 강남의 경우 임대 100~150평당 1대 제공\n    1. 그 외 지역도 비슷한 수준\n    1. 세부 기준은 관리사무소 문의\n  1. 집합건물(~~프라자, 분양 상가)\n    1. 분양 호실 당 1대\n    1. 호실 면적이 작을 경우 N개 호실 당 1대\n    1. 세부 기준은 관리사무소 문의\n1. 방문 환자 주차\n  1. 가장 일반적인 경우: 기본 N시간 무료, 이후 N분당 ~~원\n  1. 기본 무료 없음, N분당 ~~원: 일반 요금 동일 부과, 방문 업체 확인 시 할인\n  1. 발렛: 병원에서 매달 박스(부스)비 지급 + 방문 환자 2~3시간 3~4천원\n    1. 발렛 박스비: 신사 80~100만/월, 압구정로데오 150~200만/월, 청담 200~만/월\n  1. 주차 불가",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "주차 요금 체계 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-810c-ab59-eb7431a54bbf",
+      "question": "철거 주체 확인 (양도양수, 미철거 공실)",
+      "answer": "입주당시 현재 상태에 따라서 임대인, 관리소, 현(전) 임차인 등에 철거를 요청해야 하는 경우가 많습니다. 철거 대상 시설을 설치한 주체가 누구인지를 파악해서 철거 협의를 해야 합니다.\n1. 신축\n  1. 기본 마감 상태\n  기본 텍스타일 천장, 형광등, 바닥타일 등 시공 상태, 사무실 용도로 등으로 바로 사용 가능한 수준\n[이미지]\n  b. 미 마감 상태\n[이미지]\n1. 구축\n  1. 공실(이전 임차인의 인테리어가 남아있는 상태)\n  임대인, 관리주체에 불필요한 시설, 인테리어 철거 요청\n[이미지]\n  b. 동일 진료과 양도양수\n  피부과 → 피부과, 치과 → 치과\n[이미지]\n  c. 타 진료과 양도양수\n  피부과 → 성형외과, 성형외과 → 피부과\n  d. 타 업종 양도양수\n  스터디카페 → 내과, 학원 → 치과\n💡 [실전 팁]\n  철거는 평당 15만원 정도라고 생각하면 됩니다. ex) 100평에 1500만원\n  폐기물에 따라 달라짐 (한의원은 바닥에 난방이 깔린 경우가 많아 더 나옴)",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "철거 주체 확인 (양도양수, 미철거 공실)",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8114-84aa-e66e51e21a89",
+      "question": "소방 시설",
+      "answer": "소방관 진입창\n소방관 진입창은 건축법 시행령 제51조 및 건축물의 피난ㆍ방화구조 등의 기준에 관한 규칙 제18조의2에 근거하며, 2층~11층에 층마다 1개소 이상, 폭 90cm 이상, 높이 1m 이상, 실내 바닥에서 80cm 이내 설치, 소방차 진입로 면해야 하고 역삼각형 표시와 타격점 표시가 필수이며, 유리 두께(이중창 24mm 이내 등) 규정을 따라야 합니다. 이 기준은 2024년 8월 26일 일부 개정되어 완화되었습니다.\n주요 설치 기준\n• 설치 대상: 지상 2층 이상 11층 이하의 각 층.\n• 위치:\n  • 소방차 진입로 또는 진입 가능한 공터에 면할 것.\n  • 창문 아랫부분은 실내 바닥면으로부터 80cm 이내에 설치.\n• 크기:\n  • 폭 90cm 이상.\n  • 높이 1m 이상 (개정 전 1.2m에서 완화).\n• 유리 규격:\n  • 두께 6mm 이하 플로트 판유리, 5mm 이하 강화유리 또는 배강도 유리.\n  • 이중창의 경우 공기층 포함 총 두께 24mm 이하 (삼중창 불가).\n  • 소방관이 파괴하기 쉽게 규정됨.\n• 표시:\n  • 창문 중앙에 지름 20cm 이상의 붉은색 역삼각형 표시.\n  • 모서리에는 타격지점을 원형으로 표시 (예: 3cm 이상 원형).\n• 추가 설치: 벽면 끝까지 수평거리가 40m를 초과하는 경우 40m 이내마다 추가 설치.\n관련 법규\n• 건축법 제49조 (건축물의 피난시설 및 용도제한 등).\n• 건축법 시행령 제51조 (소방관이 진입할 수 있는 창의 설치 등).\n• 건축물의 피난ㆍ방화구조 등의 기준에 관한 규칙 제18조의2 (소방관이 진입할 수 있는 창의 설치기준).\n2024년 8월 26일 개정 주요 내용\n• 높이 완화: 소방관 진입창의 높이 기준을 1.2m에서 1m 이상으로 완화.\n• 노대 설치 완화: 난간이 있는 노대 등에 설치 시, 창 아랫부분 높이를 1.2m 이내로 완화.\n[이미지]\n[이미지]\n방화구역(방화벽, 방화창, 방화셔터 등)\n[이미지]\n[이미지]\n방화창\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n스프링클러\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n방염자재\n[이미지]\n[이미지]\n경보/감지설비\n소화기\n[이미지]\n• 방염필증 못찾으면 양도양수 시 , 다시 인테리어 해야함",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "소방 시설",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
     {
       "id": "notion-2ed62aded336",
       "source": "notion",
       "pageId": "2ed62ade-d336-813b-b76b-f982b8b4b7e1",
       "question": "기존 내부 급/배수 현황",
-      "answer": "병/의원은 거의 모든 진료과에서 내부 수도를 필요로 합니다.\n파우더룸, 소독실, 직원실 싱크대, 원장실 세면대, 치과 체어 등 물 사용 시설이 많습니다.\n건물 신축 시 계획한 용도, 기존 입점했던 업종에 따라서 내부에 수도 시설이 있을 수도, 없을 수도 있습니다.\n있는지? 없는지?\n있다면 어디에 어떻게 있는지?\n없다면 공사가 가능한지?\n공사를 어떤 방식으로 해야 하는지?\n확인해야 합니다.\n수도 시설에 따라 전체 레이아웃이 바뀔 수도 있습니다.",
+      "answer": "병/의원은 거의 모든 진료과에서 내부 수도를 필요로 합니다.\n파우더룸, 소독실, 직원실 싱크대, 원장실 세면대, 치과 체어 등 물 사용 시설이 많습니다.\n건물 신축 시 계획한 용도, 기존 입점했던 업종에 따라서 내부에 수도 시설이 있을 수도, 없을 수도 있습니다.\n• 있는지? 없는지?\n• 있다면 어디에 어떻게 있는지?\n• 없다면 공사가 가능한지?\n• 공사를 어떤 방식으로 해야 하는지?\n확인해야 합니다.\n수도 시설에 따라 전체 레이아웃이 바뀔 수도 있습니다.\n[이미지]",
       "metadata": {
         "field": "플래너 AI",
         "topic": "기존 내부 급/배수 현황",
@@ -17,6 +71,187 @@
         "icon": "",
         "lastUpdated": "2026-01-19T05:19:00.000Z",
         "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8140-a359-fbcb0f274e6b",
+      "question": "인테리어 공사(소음, 일반) 지정 시간대 ",
+      "answer": "인테리어 공사 시 철거, 목공, 타일 작업 시에는 상당히 큰 소음, 진동, 분진이 발생합니다.\n위, 아래, 옆에 아무도 없는 신축 건물이면 괜찮지만 사방에 모두 영업 중인 곳들이 있을 경우 매우 불편한 상황이 생기게 됩니다. 인테리어 업체에서 일정 조율과 주변 임차인들 양해를 구하지만 미리 알아두면 좋습니다.\n[이미지]\n상가 인테리어 공사는 아파트(주택) 인테리어와 반대되는 경우가 많습니다.\n아파트는 소음 공사를 주간(오전)에 하지만 상가는 야간 또는 주말에 진행합니다.\n아파트는 낮에 사람들이 일하러 나감 → 낮에 집에 사람이 많이 없고 밤에 잠자러 들어옴\n상가는 낮에 영업을 함 → 낮에 사람이 많고 밤에 사람이 없음\n야간 또는 주말에 작업할 경우 인건비가 많이(2배) 소요되니 미리 확인해 둘 필요가 있습니다.",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "인테리어 공사(소음, 일반) 지정 시간대 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8155-98f6-ca4e6212ccd2",
+      "question": "장애인 주차장",
+      "answer": "장애인 주차장\n1. 설치 규격\n[이미지]\n1. 설치 예시\n[이미지]\n[이미지]\n1. 규격 예시\n[이미지]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "장애인 주차장",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8158-846b-dd27907a3691",
+      "question": "간판, 각종 광고사인물",
+      "answer": "외부 간판 설치 위치 \n흔히 간판이라고 통칭하는 옥외광고물은 지자체 조례로 규격과 수량이 정해져 있습니다.\n(대부분의 병원의 경우 이것을 무시하지만..)\n병원 입지 선정 시 간판 가능 범위, 수량이 중요한 부분이 때문에 부동산 계약 전에 중개팀에서 이미 협의한 위치와 수량이 있습니다.\n협력사를 통한 간판 디자인과 설치를 위해서 기본적인 사항에 대해서 알아둘 필요가 있습니다.\n규격 외 간판을 설치할 경우 주/야간 시인성이 좋아 광고 마케팅 효과가 뛰어나지만 옥외광고물법, 소방법 등 관계법령 위반 사유로 과태료 등 행정처분이 발생할 수 있습니다.\n(대부분 주변 경쟁 병원에서의 신고 민원..)\n임대인이 허락해준다면 마케팅 홍보효과를 위해서 과태료 처분을 감수하는 경우가 대부분 입니다.\n[이미지]\n1. 규격 간판 예시\n[이미지]\n1. 규격 외 간판 예시\n[이미지]\n[이미지]\n1. 내부 창문형 LED 간판\n[이미지]\n[이미지]\n1. 각종 내/외부 광고 사인물\n건물 규모가 있고 1층 출입구, 내부 공용 공간 등에 각종 광고물이 설치된 경우 자리 지정 기준, 위치 별 비용이 별도로 발생할 수 있으니 체크할 필요가 있습니다. 외부 간판 설치 시에도 설치, 철거 시 외벽 훼손 우려를 감안해서 별도의 간판 보증금(이상 없을 시 반환)이 있는 경우도 있습니다. \n[이미지]\n[이미지]\n[이미지]\n1. 이행강제금\n[이미지]\n가이드라인 근거\n[파일]\n[파일]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "간판, 각종 광고사인물",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8169-8745-f5e01b6744cc",
+      "question": "바닥 코아 작업 가능 여부 ",
+      "answer": "기존 사용하던 급배수 시설이 없거나, 레이아웃에 따라 추가 설치가 필요할 경우 배관 매립을 위해서 바닥에 구멍(코아)을 뚫어야 할 수 있습니다.\n건물의 구조가 변경되는 것이기 때문에 대부분의 임대인은 이 작업을 꺼려합니다.\n타공 시에는 건물 구조설계도면을 검토해서 위치를 선정합니다.\n경우에 따라 구조기술사의 구조안전진단 검토서를 첨부해야 하는 경우도 있습니다.\n바닥에 매립된 눈에 보이지 않는 철근, 전선, 배관 등 건물에 피해가 없고 원상복구가 수월하도록 작업해야 합니다.\n• 아래 층 임차인이 있을 경우 작업 동의 여부\n• 임대인의 동의 여부\n• 타공 가능 위치, 수량 협의\n• 타공 수량 최소화 \n[이미지]\n[이미지]\n[이미지]\n[이미지]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "바닥 코아 작업 가능 여부 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8175-bb3a-f7423eb403e2",
+      "question": "바닥 종류, 상태, 마감재, 방통",
+      "answer": "대부분 병원 인테리어 시에 바닥을 새로 시공합니다. 시공 전 현재 바닥 상태에 따라서 시공 자재, 방법 등이 바뀔 수 있으니 체크하는 것이 좋습니다.\n1. 바닥 종류\n  1. 일반적인 바닥: 단차 없이 콘크리트 타설된 형태\n[이미지]\n   b. 악세스 플로어(악세스 후로아, OA 플로어 등)\n  바닥 밑에 공간이 있어서 전기, 통신 선로 등이 매립되어 있음\n[이미지]\n1. 바닥 마감재 종류\n  1. 데코타일 바닥(가장 많은 경우)\n[이미지]\n       b. 포세린타일 바닥\n[이미지]\n     c. 마루 바닥\n[이미지]\nd. 콘크리트 폴리싱 바닥\n[이미지]\n1. 바닥 방통 작업\n신축 건물인 경우 해당 층의 용도가 업무시설, 근생업종 어떤 용도로 사용하게 될지 미정인 상태여서 악세스 플로어 시공 여지를 남겨두기 위해 입구부와 내부에 약 15cm 정도의 단차가 있는 경우가 있습니다. 이 경우 용도에 따라서 악세스 플로어를 시공할 수도 있고, 방통(몰탈) 작업을 통해 단차를 제거해서 높이를 맞출 수 있습니다.\n방통 작업을 할 경우 이후 퇴실 시 다시 몰탈을 제거해야 하는지에 대한 여부를 확인해야 합니다.\n방통 작업은 시공, 철거가 비용이 많이 들기 때문 입니다.\n[이미지]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "바닥 종류, 상태, 마감재, 방통",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-817a-a306-eeca4cfa1119",
+      "question": "퇴실 시 원상복구 기준 ",
+      "answer": "계약 해지, 해제, 만기 이후 퇴실 시 원상복구 기준에 따라 최초 인테리어 시공 방식이나 구조가 바뀔 수 있으니 참고해야 합니다.\n공용부 확장(방화셔터 사용), 내부 코어 타공, 소방 설비 이설, 냉난방 설비 증설 등 병원이 입점하면서 설치한 시설, 구조 변경한 부분 등을 퇴실 시 원상복구 해야 하는데, 이 부분이 가급적 적은 비용으로 쉽게 될 수 있도록 인테리어 한다면 퇴실 시 도움이 될 수 있습니다.\n[이미지]\n[이미지]\n• 임대인에게 초기에 요청하면 좋다",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "퇴실 시 원상복구 기준 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8188-99ac-da205b789412",
+      "question": "바닥, 천정 누수 (흔적)",
+      "answer": "건물 천장에는 생각보다 많은 배관과 전선이 설치되어 있습니다.\n스프링클러(소방시설), 천장형 에어컨 배관, 상부층의 배수 배관 등이 있습니다.\n임대차 계약 전에 누수 상태와 흔적을 유심히 관찰해야 합니다.\n지속되어 오던 누수가 있다면 입주 전에 수리를 완료 해야 합니다.\n아래 층의 누수 여부도 파악해야 합니다.\n입주 후에 아래 층으로의 누수가 발견된다면 책임 소재가 불분명 해질 수 있어 다툼의 여지가 있습니다.\n[이미지]\n[이미지]\n[이미지]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "바닥, 천정 누수 (흔적)",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-818c-868a-ee9dd09ec709",
+      "question": "폐기물 / 자재 / 장비 반출입 경로 ",
+      "answer": "기존 시설 철거 후 폐기물, 신규 인테리어 자재, 인테리어 잔여 폐기물 등의 반출 및 반입 경로는 철거와 인테리어 업체에서 체크하고 진행하지만 특이한 사항이 있을 수 있으니 미리 체크하는 것이 좋습니다.\n1. 엘리베이터, 복도 등 공용부분 보양\n[이미지]\n[이미지]\n1. 창문 탈거: 스카이차 작업(장비, 인력 비용 발생)\n[이미지]\n1. 장비 반입: CT, MRI 등 중량 장비 반입 시 창문 탈거, 벽면 해체 등 필요할 수 있음\n[이미지]\n[이미지]\n[이미지]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "폐기물 / 자재 / 장비 반출입 경로 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-819c-aa74-caaac3d7c382",
+      "question": "냉난방 방식, 증설 ",
+      "answer": "냉난방 방식은 크게\n• FCU(Fan Coil Unit)\n[이미지]\n[이미지]\n• 개별 냉난방(시스템 에어컨)\n[이미지]\n방식으로 구분할 수 있습니다.\n주상복합상가, 대형 빌딩의 경우 FCU 방식이 많이 설치되어 있으며, 병원의 경우 실(room) 구분이 많아서 추가로 개별 냉난방기 설치가 가능한지 여부를 파악해야 합니다.\n추가 설치가 가능할 경우 실외기실 위치를 알아야 합니다. 실외기실 까지의 거리가 멀 경우 냉난방 효율이 떨어질 수 있고 설치비(배관)가 크게 발생할 수 있습니다.",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "냉난방 방식, 증설 ",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-81b6-8baa-dd4ead4f0190",
+      "question": "주차 입고 기준",
+      "answer": "1. 자주식 주차\n  1. 직접 운전해서 주차\n  1. 대형 빌딩, 사옥, 메디컬 프라자 등\n  1. 입고 차량 제한이 거의 없음\n  1. 가장 선호하는 주차방식\n[이미지]\n1. 기계식 주차\n  1. 차를 입고 후 운전자가 내림\n  1. 입고 차량 제한이 있음\n  1. 전기차 전차종 입고 불가\n[이미지]\n1. 카리프트 주차\n  • 차를 탄 채로 리프트를 타고 지하로 내려감\n  • 지하에서 직접 주차함\n  • 기계식 주차와 거의 같음\n  • 노후 건물에 많은 유형\n  • 가장 비선호하는 주차 방식\n[이미지]\n최근 모든 차량들이 대형화 되고 있어서 기존에 설치된 기계식 주차, 카 리프트의 경우 수용 가능한 차량 제원이 요즘 출시되는 차량들 보다 현저하게 미달되는 경우가 많습니다.\n[이미지]\n[이미지]\n[이미지]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "주차 입고 기준",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
         "structuredCategory": "checklist",
         "structuredSubCategory": "general"
       }
@@ -26,7 +261,7 @@
       "source": "notion",
       "pageId": "2ed62ade-d336-81bc-8c10-cffc1be6cd8f",
       "question": "옆/위/아래 기존 임차인 현황",
-      "answer": "임대할 부분 외 건물 내 기존 임차인 현황이 중요한 이유",
+      "answer": "1. 임대할 부분 외 건물 내 기존 임차인 현황이 중요한 이유\n  1. 인테리어 공사\n    1. 인접한 공간에 산후조리원, 학원 등 소음 민감 업종이 있을 경우\n      → 철거, 목공, 코어 타공 등 작업 협조가 원활하지 않을 수 있음\n    1. 인접한 공간이 모두 공실(비어있을)일 경우\n      → 공사 협조가 비교적 수월함\n  1. 의료기관 개설신고\n    1. 건물 내 위락시설(유흥주점, 단란주점 등)이 있을 경우\n      → 병원급 의료시설 개설 불가\n      → 건물 내에서 위락시설과의 거리 등을 따져보아 개설이 불가 할 수도 있음(지자체 기준)\n      cf.) 노래연습장(청소년 출입가능 업소)은 위락시설 아님\n[이미지]\n[이미지]\n[이미지]",
       "metadata": {
         "field": "플래너 AI",
         "topic": "옆/위/아래 기존 임차인 현황",
@@ -34,40 +269,7 @@
         "icon": "",
         "lastUpdated": "2026-01-19T05:19:00.000Z",
         "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81d5-b44b-e29cb8e8e28d",
-      "question": "휠체어 경사로",
-      "answer": "휠체어 접근을 위한 각도 1/12 기준(완화 시 1/8 까지 가능)\n규격 예시",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "휠체어 경사로",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:19:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-819c-aa74-caaac3d7c382",
-      "question": "냉난방 방식, 증설",
-      "answer": "냉난방 방식은 크게\nFCU(Fan Coil Unit)\n개별 냉난방(시스템 에어컨)\n방식으로 구분할 수 있습니다.\n주상복합상가, 대형 빌딩의 경우 FCU 방식이 많이 설치되어 있으며, 병원의 경우 실(room) 구분이 많아서 추가로 개별 냉난방기 설치가 가능한지 여부를 파악해야 합니다.\n추가 설치가 가능할 경우 실외기실 위치를 알아야 합니다. 실외기실 까지의 거리가 멀 경우 냉난방 효율이 떨어질 수 있고 설치비(배관)가 크게 발생할 수 있습니다.",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "냉난방 방식, 증설 ",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:19:00.000Z",
-        "parentType": "database_id",
+        "parentDbName": "목록",
         "structuredCategory": "checklist",
         "structuredSubCategory": "general"
       }
@@ -77,7 +279,7 @@
       "source": "notion",
       "pageId": "2ed62ade-d336-81c7-937d-d25bc3e6384f",
       "question": "기타 시설 파손 여부",
-      "answer": "공용부에 해당하는 화장실, 계단, 엘리베이터, 방화문, 방화셔터 등 건물 기본 시설의 파손 여부를 잘 체크해서 이후에 책임 소재가 명확하도록 해야하고 입주 전에 수리가 완료 될 수 있도록 해야합니다.\n방문하는 환자들이 건물에 들어오면서 부터 불쾌 할 수 있는 요소가 없도록 체크해야 합니다.",
+      "answer": "공용부에 해당하는 화장실, 계단, 엘리베이터, 방화문, 방화셔터 등 건물 기본 시설의 파손 여부를 잘 체크해서 이후에 책임 소재가 명확하도록 해야하고 입주 전에 수리가 완료 될 수 있도록 해야합니다.\n방문하는 환자들이 건물에 들어오면서 부터 불쾌 할 수 있는 요소가 없도록 체크해야 합니다.\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n[이미지]",
       "metadata": {
         "field": "플래너 AI",
         "topic": "기타 시설 파손 여부",
@@ -85,6 +287,25 @@
         "icon": "",
         "lastUpdated": "2026-01-19T05:19:00.000Z",
         "parentType": "database_id",
+        "parentDbName": "목록",
+        "structuredCategory": "checklist",
+        "structuredSubCategory": "general"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-81c8-a91b-f0cba7a708d4",
+      "question": "장애인 화장실 위치",
+      "answer": "장애인 화장실 위치와 크기는 건축물대장 용도/표시 변경 시에 중개팀에서 미리 확인하고 진행하지만 알아두시면 좋습니다.\n• 공용부 모든 문은 900CM 이상\n• 중문일 경우 , 문과 문 사이는 1200CM\n• 한쪽은 벽이면 0.9M, 양쪽 문이면 1.5M\n1. 장애인 화장실 안내판\n[이미지]\n[이미지]\n1. 장애인 점자블럭: 벽에서 30cm\n[이미지]\n1. 장애인 화장실: 1.6 x 2.0m\n[이미지]\n1. 규격 예시\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n1. 법률근거\n[파일]\n[파일]\n[파일]",
+      "metadata": {
+        "field": "플래너 AI",
+        "topic": "장애인 화장실 위치",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "목록",
         "structuredCategory": "checklist",
         "structuredSubCategory": "general"
       }
@@ -94,7 +315,7 @@
       "source": "notion",
       "pageId": "2ed62ade-d336-81ce-ab1a-ccd869fc6959",
       "question": "창호 깨짐 여부",
-      "answer": "채광과 단열 기능을 하는 창문은 생각보다 고가 제품 입니다.\n전 임차인의 부주의로 인한 파손, 이사 도중 파손, 시공 불량으로 인한 파손, 건물 뒤틀림으로 인한 파손 등\n다양한 원인이 있을 수 있습니다.\n파손 여부를 미리 발견하고 수리를 요청하지 않으면 이후에 책임 소재가 불분명 해질 수 있습니다.",
+      "answer": "채광과 단열 기능을 하는 창문은 생각보다 고가 제품 입니다.\n전 임차인의 부주의로 인한 파손, 이사 도중 파손, 시공 불량으로 인한 파손, 건물 뒤틀림으로 인한 파손 등\n다양한 원인이 있을 수 있습니다.\n파손 여부를 미리 발견하고 수리를 요청하지 않으면 이후에 책임 소재가 불분명 해질 수 있습니다.\n[이미지]\n[이미지]",
       "metadata": {
         "field": "플래너 AI",
         "topic": "창호 깨짐 여부",
@@ -102,6 +323,7 @@
         "icon": "",
         "lastUpdated": "2026-01-19T05:19:00.000Z",
         "parentType": "database_id",
+        "parentDbName": "목록",
         "structuredCategory": "checklist",
         "structuredSubCategory": "general"
       }
@@ -110,8 +332,8 @@
       "id": "notion-2ed62aded336",
       "source": "notion",
       "pageId": "2ed62ade-d336-81cf-af42-fd9bccae6314",
-      "question": "출입구 폐쇄 시간 여부",
-      "answer": "건물 출입 시간 제한이 있을 경우 야간, 주말, 공휴일 진료 스케쥴 조정 및 특정 진료과의 경우 입원환자 수용이 어려울 수 있으니 미리 파악해야 합니다. 시간 조정 협의가 대부분 가능하지만 어렵다면 해당 위치에 입점하기 어렵습니다.\n대부분 09시~20시 정도 진료를 하는 스케쥴이고 야간 진료가 있을 경우 21~22시까지 병원에 사람이 남아있을 수 있습니다.\n통제시간에 들어가는 것만 불가인지? 들어오고 나가는 것 모두 불가인지?\n대형빌딩, 사옥의 경우 경비인력 인건비 문제로 야간에 출입을 제한하는 경우가 많습니다.",
+      "question": "출입구 폐쇄 시간 여부 ",
+      "answer": "건물 출입 시간 제한이 있을 경우 야간, 주말, 공휴일 진료 스케쥴 조정 및 특정 진료과의 경우 입원환자 수용이 어려울 수 있으니 미리 파악해야 합니다. 시간 조정 협의가 대부분 가능하지만 어렵다면 해당 위치에 입점하기 어렵습니다.\n대부분 09시~20시 정도 진료를 하는 스케쥴이고 야간 진료가 있을 경우 21~22시까지 병원에 사람이 남아있을 수 있습니다.\n통제시간에 들어가는 것만 불가인지? 들어오고 나가는 것 모두 불가인지?\n대형빌딩, 사옥의 경우 경비인력 인건비 문제로 야간에 출입을 제한하는 경우가 많습니다.\n[이미지]",
       "metadata": {
         "field": "플래너 AI",
         "topic": "출입구 폐쇄 시간 여부 ",
@@ -119,6 +341,7 @@
         "icon": "",
         "lastUpdated": "2026-01-19T05:19:00.000Z",
         "parentType": "database_id",
+        "parentDbName": "목록",
         "structuredCategory": "checklist",
         "structuredSubCategory": "general"
       }
@@ -128,7 +351,7 @@
       "source": "notion",
       "pageId": "2ed62ade-d336-81d0-ba0a-e9d4512d46a6",
       "question": "현재 전기 용량 (차단기)",
-      "answer": "현재 공실이거나 이전 업종이 전기를 많이 사용하지 않았던 업종(사무실, 학원 등)이었을 경우 계약전력이 20kW 미만인 경우가 많습니다.\n병원은 각종 장비, 전등, 냉난방기 등 전력소모가 많은 편 입니다.\n특히 CT, MRI, C-arm 등 검진, 통증 장비의 경우 상당히 많은 전력을 필요로 하고, 피부과의 경우에도 레이저 미용 기기 등이 많아서 필요 전력 체크를 해야 합니다.\n건물 내에 잉여 전력이 있으면 분전반 차단기 공사를 통해서 손쉽게 해결할 수 있지만 인입 전력(전봇대로 부터)이 모자랄 경우 큰 비용이 발생할 수 있습니다.\n현재 차단기 용량 체크\n건물 내 잉여 전력 체크\n증설 공사 협조 가능여부(비용 부담 주체)\n*삼상이 효율이 좋다.",
+      "answer": "현재 공실이거나 이전 업종이 전기를 많이 사용하지 않았던 업종(사무실, 학원 등)이었을 경우 계약전력이 20kW 미만인 경우가 많습니다.\n병원은 각종 장비, 전등, 냉난방기 등 전력소모가 많은 편 입니다.\n특히 CT, MRI, C-arm 등 검진, 통증 장비의 경우 상당히 많은 전력을 필요로 하고, 피부과의 경우에도 레이저 미용 기기 등이 많아서 필요 전력 체크를 해야 합니다.\n건물 내에 잉여 전력이 있으면 분전반 차단기 공사를 통해서 손쉽게 해결할 수 있지만 인입 전력(전봇대로 부터)이 모자랄 경우 큰 비용이 발생할 수 있습니다.\n• 현재 차단기 용량 체크\n  • 100A 차단기의 경우 1kW 당 5A 로 계산하면 대략 20kW 정도로 추산할 수 있습니다.\n  • 대부분의 경우는 전기 증설이 필요 합니다.\n• 건물 내 잉여 전력 체크\n• 증설 공사 협조 가능여부(비용 부담 주체)\n[이미지]\n*삼상이 효율이 좋다.",
       "metadata": {
         "field": "플래너 AI",
         "topic": "현재 전기 용량 (차단기)",
@@ -136,6 +359,7 @@
         "icon": "",
         "lastUpdated": "2026-01-19T05:19:00.000Z",
         "parentType": "database_id",
+        "parentDbName": "목록",
         "structuredCategory": "checklist",
         "structuredSubCategory": "general"
       }
@@ -143,16 +367,17 @@
     {
       "id": "notion-2ed62aded336",
       "source": "notion",
-      "pageId": "2ed62ade-d336-810f-a29a-cb7e3bce70fd",
-      "question": "자동화재속보설비 작동 여부",
-      "answer": "[자동화재속보설비 작동 여부] - Notion에서 상세 내용 확인",
+      "pageId": "2ed62ade-d336-81d5-b44b-e29cb8e8e28d",
+      "question": "휠체어 경사로",
+      "answer": "휠체어 접근을 위한 각도 1/12 기준(완화 시 1/8 까지 가능)\n[이미지]\n[이미지]\n1. 규격 예시\n[이미지]\n[이미지]\n[이미지]\n[이미지]",
       "metadata": {
         "field": "플래너 AI",
-        "topic": "자동화재속보설비 작동 여부",
+        "topic": "휠체어 경사로",
         "category": "DB 레코드",
         "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
         "parentType": "database_id",
+        "parentDbName": "목록",
         "structuredCategory": "checklist",
         "structuredSubCategory": "general"
       }
@@ -160,16 +385,17 @@
     {
       "id": "notion-2ed62aded336",
       "source": "notion",
-      "pageId": "2ed62ade-d336-817f-b1b8-d1de58ab176c",
-      "question": "피난경로 확보 여부",
-      "answer": "[피난경로 확보 여부] - Notion에서 상세 내용 확인",
+      "pageId": "2ed62ade-d336-81fc-a475-da6e80d583a4",
+      "question": "의료기관 개설 신고 가능 여부",
+      "answer": "1. 정의\n의원, 치과의원, 한의원 및 조산원을 개설하려는 자는 의료법 제33조(개설 등) 및 의료법 시행규칙 제25조(의료기관 개설신고)에 따라 모든 의료기관은 시/군/구청장(지자체 기준)에게 신고해야한다.\ncf.) 병원급은 의료기관 개설허가 대상임\n1. 관계법령 근거\n의료법 제33조(개설 등)\nhttps://www.law.go.kr/lsSc.do?section=&menuId=1&subMenuId=15&tabMenuId=81&eventGubun=060101&query=의료법#undefined\n의료법 시행규칙 제25조(의료기관 개설신고)\nhttps://www.law.go.kr/lsSc.do?section=&menuId=1&subMenuId=15&tabMenuId=81&eventGubun=060101&query=의료법#J25:0\n1. 의료기관 개설신고서\n[파일]\n1. 의료기관 시설기준\n[파일]\n[파일]\n1. 오픈닥터에서 개설신고와 관련하여 체크해야 할 가장 중요한 사항\n  장애인 편의시설의 종류 및 기준(500㎡ 를 넘느냐 안넘느냐..그것이 문제)\n[파일]\n[파일]\n[이미지]\n  서울시 주차장 설치 및 관리 조례 제25조(10대 미만 면제, 10대 이상 3%)\n  https://www.law.go.kr/LSW/ordinSideInfoP.do?ordinSeq= 1892099&chrClsCd=010202&gubun=&joNo=0021&joBrNo=02&docCls=jo&urlMode=ordinScJoRltInfoR\n  건축물대장 용도 표시\n[이미지]\n[이미지]",
       "metadata": {
         "field": "플래너 AI",
-        "topic": "피난경로 확보 여부",
+        "topic": "의료기관 개설 신고 가능 여부",
         "category": "DB 레코드",
         "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
         "parentType": "database_id",
+        "parentDbName": "목록",
         "structuredCategory": "checklist",
         "structuredSubCategory": "general"
       }
@@ -177,2566 +403,17 @@
     {
       "id": "notion-2ed62aded336",
       "source": "notion",
-      "pageId": "2ed62ade-d336-8121-9d4d-f4e3d8a68ca9",
-      "question": "자동화재탐지설비",
-      "answer": "[자동화재탐지설비] - Notion에서 상세 내용 확인",
+      "pageId": "2ed62ade-d336-8044-b9e2-ecf188bb6c8c",
+      "question": "🧯 소방점검 체크리스트 (1)",
+      "answer": "📌 소방점검 이슈 방지 방안\n  • 플래너가 해당 체크리스트를 원장님께 공유\n  • 원장님께서 체크리스트 인테리어 업체 혹은 소방 업체에게 공유드리며 확인 요청하기\n\n📊 소방점검 체크리스트\n---\n\n### 안전점검표(참고용)\n[표]",
       "metadata": {
         "field": "플래너 AI",
-        "topic": "자동화재탐지설비",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8123-be4f-ef1cabb21036",
-      "question": "소화기 비치 여부",
-      "answer": "일반적으로 방마다 하나씩 설치\n넓은 대기실과 같은 공간에는 여러 개 설치한다고 생각\n야광스티커로 표시되어있는지 여부",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "소화기 비치 여부",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8142-bb55-fc8074f74d65",
-      "question": "유도등 및 유도표지",
-      "answer": "[유도등 및 유도표지] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "유도등 및 유도표지",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8163-8ec7-ce559c640888",
-      "question": "도면과의 일치 여부",
-      "answer": "[도면과의 일치 여부] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "도면과의 일치 여부",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81a4-abe3-ef926bcd8368",
-      "question": "비상 콘센트, 누전차단기 작동 여부",
-      "answer": "[비상 콘센트, 누전차단기 작동 여부] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "비상 콘센트, 누전차단기 작동 여부",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81ce-9a5a-e0332c4e920a",
-      "question": "전기실 및 EPS실 접근 불가하거나 잠금 상태 아님",
-      "answer": "[전기실 및 EPS실 접근 불가하거나 잠금 상태 아님] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "전기실 및 EPS실 접근 불가하거나 잠금 상태 아님",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-814f-84c1-e90c49ea9b29",
-      "question": "내부 마감재 방염 처리 여부",
-      "answer": "[내부 마감재 방염 처리 여부] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "내부 마감재 방염 처리 여부",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-819a-ab71-f51055ba7a5d",
-      "question": "비상방송설비 또는 시각경보기",
-      "answer": "[비상방송설비 또는 시각경보기] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "비상방송설비 또는 시각경보기",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81ff-bb4c-fc9651abf643",
-      "question": "계단실/복도 연기감지기 및 비상조명등 작동 상태",
-      "answer": "[계단실/복도 연기감지기 및 비상조명등 작동 상태] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "계단실/복도 연기감지기 및 비상조명등 작동 상태",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:13:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8141-bdc3-da91edf42a43",
-      "question": "스마트/우노 CRM",
-      "answer": "🩺주요 진료과\n피부과, 성형외과\n💵이용료\n초기 설치비 - 확인 필요\n월 이용료 - 확인 필요\n📝특이사항\nUNO CRM - 클라우드 형태\n✨주요 기능\nSMART CRM\nUNO CRM\n👍부가 기능\n⭐의사 리뷰\n선택 이유 이유\n(이용 이후) 장점\n(이용 이후) 단점",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "스마트/우노 CRM",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8169-a6ae-df134f75a53e",
-      "question": "KOS CRM",
-      "answer": "🩺주요 진료과\n피부과, 성형외과\n💵이용료\n월 이용료 - 30만 원\n📝특이사항\n강남언니에서 만든 비급여 미용의료를 위한 신규 CRM\n서비스 소개서 ⏬\n비급여 미용의료 중심으로, 보험청구 및 DUR 연동 기능은 없습니다 🥲\n✨주요 기능\n신규 및 재방문 고객 관리\n리소스 최적화 \n통계 기반 인센티브 설계\n홈페이지와 강남언니 등 외부채널 예약 연동\n👍부가 기능\n결제 단말기 연동\n택스리펀 서비스 연동\n문자메시지 발송 서비스\n080 무료수신거부 서비스\n🎁 오픈닥터 혜택\n초기 3개월 이용료 : 무료\n⭐의사 리뷰\n선택 이유\n(이용 이후) 장점\n(이용 이후) 단점",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "KOS CRM",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8140-9326-e16f4cfecdde",
-      "question": "베가스 CRM",
-      "answer": "🩺주요 진료과\n피부과, 성형외과\n💵이용료\n초기 설치비 - 165만 원 (최대 10인)\n월 이용료 - \n📝특이사항\n미용과 EMR 사용률 1위\n10년 이상의 업력\n✨주요 기능\nCRM(고객관리) 기능\n진료 예약 기능\n청구 사전 심사\n사진 입력\nPACS 연동\n비급여 정보 입력\n전자서명\n카드 결제 연동\n👍부가 기능\n⭐의사 리뷰\n선택 이유\n(이용 이후) 장점\n(이용 이후) 단점",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "베가스 CRM",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81c5-8978-f54013dfc45e",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-818c-b21c-cfd51b60c67c",
-      "question": "스마트닥터CRM",
-      "answer": "🩺주요 진료과\n피부과, 성형외과\n💵이용료\n초기 설치비 - 확인 필요\n월 이용료 - 확인 필요\n📝특이사항\n차트-EMR-CRM 제품 간 연동성\n전국 3,500개 이상 이용\n✨주요 기능\n스마트차트\n스마트NC (EMR)\n스마트닥터CRM\n👍부가 기능\n기존 종이차트 스캔해 삽입 가능\n타 EMR에서 마이그레이션 가능\n⭐의사 리뷰\n선택 이유 이유\n(이용 이후) 장점\n(이용 이후) 단점",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "스마트닥터CRM",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81e2-bf82-f6566376fc60",
-      "question": "플랜티",
-      "answer": "⌛ 회사 소개 \n10년 이상 경력\n누적 약 1천 건 이상의 프로젝트 진행 경험 보유 (치과 90%)\n오프라인 마케팅 전문\n개원 2~3개월 전 계약 → 유동인구 상권·상가·시장 중심 홍보 진행\n물티슈·각티슈 등 판촉물, 주변 상가·업체와 제휴 협약 체결, 개원 선물 추천·연계.\n아르바이트 인력이 아닌 직원 운영 팀이 직접 설명 및 안내 진행 → 전문성 확보\nMOU 진행 가능 - 병의원 제휴 및 협약 전담 실장 운영\n개원 마케팅 이후 구독 시스템 운영 (업계 내 독자적 보유)\n치과뿐만 아니라 내과, 한의원, 피부과 등 다양한 진료과 의원의 오프라인 마케팅 진행 경험 보유\n내부 인력 직접 운영으로 타 업체 대비 가격대는 있으나, 그 이상의 만족도 제공\n⭐ 원장님 리뷰\n“주변에서 많이 추천해줘서 진행했습니다. 패키지 보관 관련해서 서비스가 살짝 아쉽긴 했습니다만 이유가 있어 그리한거라 생각하여 큰 문제는 되지 않았습니다. ” (치과, 25년 10월 개원)\n“정산 처리 방식이 좋았습니다.”(치과 25년 10월 개원)\n💵 예상 견적\n예시 구성 : 16,300,000원\n5일 1200만 원, 8일 1500만 원, 12일 2200만 원(치과 기준)\n피부과·한의원은 판촉물 구성 차이로 금액 변동 가능\n📁 포트폴리오\nhttps://m.blog.naver.com/plan-t?tab=1",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "플랜티",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81cb-bb7c-f380557179dd",
-      "question": "⭐ 레지움피부과",
-      "answer": "[레지움피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "레지움피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-811b-a91d-e6fe327d0ec3",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-813d-a182-d4da8f277611",
-      "question": "⭐ 핀트성형외과",
-      "answer": "[핀트성형외과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "핀트성형외과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-814c-b551-f676e50fd8d3",
-      "question": "⭐ 레지움피부과",
-      "answer": "[레지움피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "레지움피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8186-a1db-dd2c9f19ba0f",
-      "question": "⭐ 룬피부과",
-      "answer": "[룬피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "룬피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8189-a6b4-e15781621489",
-      "question": "⭐ 셀리에의원",
-      "answer": "[셀리에의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "셀리에의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8116-8bae-f407a4238c19",
-      "question": "⭐ 디오레의원",
-      "answer": "[디오레의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "디오레의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-814d-8556-e06bd200642c",
-      "question": "⭐ 레지움피부과",
-      "answer": "[레지움피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "레지움피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8170-b4b1-fc36da852a93",
-      "question": "⭐ 셀리에의원",
-      "answer": "[셀리에의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "셀리에의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81a4-a1c1-c4c4d86ff110",
-      "question": "⭐ 프라임영상의학과",
-      "answer": "[프라임영상의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "프라임영상의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81b7-b77f-e7f2ca02356c",
-      "question": "⭐ 프라임영상의학과",
-      "answer": "[프라임영상의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "프라임영상의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8101-a345-fe6c615adc52",
-      "question": "⭐ 프라임영상의학과",
-      "answer": "[프라임영상의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "프라임영상의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-818b-b10c-c2fe386a40f8",
-      "question": "⭐ 라인드치과교정과의원",
-      "answer": "[라인드치과교정과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "라인드치과교정과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8192-a1f5-f19ad5c2630c",
-      "question": "⭐ 셀리에의원",
-      "answer": "[셀리에의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "셀리에의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81d7-ab1c-c26b01972da9",
-      "question": "⭐ 신촌연세재활의학과",
-      "answer": "[신촌연세재활의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "신촌연세재활의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81f5-9900-d6dd4a2056f2",
-      "question": "⭐ 바다치과",
-      "answer": "[바다치과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "바다치과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-815f-8d44-c884d4d77150",
-      "question": "⭐ 서울린치과",
-      "answer": "[서울린치과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "서울린치과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8172-8eca-cf6d1819acb0",
-      "question": "⭐ 핀트성형외과",
-      "answer": "[핀트성형외과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "핀트성형외과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8196-8789-f223d8624f77",
-      "question": "⭐ 경희유연한의원",
-      "answer": "[경희유연한의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "경희유연한의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-819a-8bfb-f8e04fe8a63a",
-      "question": "⭐ 레지움피부과",
-      "answer": "[레지움피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "레지움피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81b4-9166-f2680ab68059",
-      "question": "⭐ 룬피부과",
-      "answer": "[룬피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "룬피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8141-9299-da064736f609",
-      "question": "⭐ 프라임영상의학과",
-      "answer": "블라인드 및 커텐 사진 첨부",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "프라임영상의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8184-96ec-c0c6b30561b5",
-      "question": "⭐ 신촌연세재활의학과",
-      "answer": "[신촌연세재활의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "신촌연세재활의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8187-9880-eb1d8c5f59ba",
-      "question": "⭐ 레지움피부과",
-      "answer": "블라인드 설치 사진",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "레지움피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8188-a328-d12d52b3fbb7",
-      "question": "⭐ 셀리에의원",
-      "answer": "블라인드\n커텐",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "셀리에의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8123-a34b-e13a3e2fcbde",
-      "question": "💊 네이처파마",
-      "answer": "[네이처파마] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "네이처파마",
-        "category": "DB 레코드",
-        "icon": "💊",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-814c-bf57-c41caacc7c70",
-      "question": "💊 유원팜",
-      "answer": "룬피부과\n국내 비뇨기과 점유율 높음",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "유원팜",
-        "category": "DB 레코드",
-        "icon": "💊",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8194-ac07-f9bd97dc5bbb",
-      "question": "코웨이",
-      "answer": "⌛ 회사 소개\n1989년도 설립, 업계 1위 \n정수기, 공기청정기, 비데 등 렌탈 가능\n무상 A/S 서비스 제공\n점검 주기에 맞춘 안심 위생 점검과 필터 교체\n전문 서비스 매니저의 제품 설치\n💵 예상 가격 \n모델, 렌탈 기간, 월 별 이벤트에 따라 상이\n얼음 정수기 렌탈 : 월 4만 원 대~ \n비데 : 월 1만 원 대~\n공기 청정기 : 월 1만 원 대~\n📝오픈닥터 파트너 혜택\n(동일 시점 기준) 최대 할인율 기반 최저가 제공\n설치비 무료\n🧊 다양한 제품 라인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "코웨이",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8137-87fe-dba58ef96590",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8183-a6a0-d80041b11d5b",
-      "question": "규수방",
-      "answer": "⌛ 회사 소개\n2010년 온라인 샵 오픈(16년차)\n국내 직접 생산 시스템으로 합리적인 가격과 품질\n침구/ 커텐/ 블라인드/ 패브릭 소품/ 가운 등 전부 진행 가능\n전국 병의원 대상 제품 공급 가능\n⭐ 의사 리뷰\n“환자들이 침구 퀄리티 보고 훌륭하다고 했어요”\n“퀄리티가 좋아서 제 개인 침구류 제작까지 문의했어요”\n“호텔 스파에 온 느낌을 받았다고 환자들이 좋아합니다”\n💵 예상 가격 및 작업 기간\n가격은 종류, 원단, 수량에 따라 상이\n계약 이후 배송까지 약 2주 소요\n커텐/블라인드는 현장 미팅 하여 실측 후, 제작 10일 소요\n📝 오픈닥터 파트너 혜택\n~10% 할인 제공",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "규수방",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81a1-854b-c626cc946ac1",
-      "question": "가림",
-      "answer": "⌛회사 소개\n2020년 설립 (6년차)\n커튼 및 블라인드 맞춤 제작\n병원에 필요한 방염 커튼 보유\n💵 예상 가격\n크기, 재질, 종류에 따라 가격 상이",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "가림",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-817a-8c10-e684744074c6",
-      "question": "클린앤제이",
-      "answer": "⌛ 회사 소개\n2021년도 설립(5년차)\n직영 운영으로 직원에 대한 체계적 관리 가능하며, 전문 교육 과정 수료한 한국인 청소팀으로 구성\n청소 이후 8일 무상 A/S 제공\n정기 청소 외 방역 및 시설 관리 진행 가능\n청소 관련 사고 발생 시 업체가 책임 (현대해상 책임보험 가입되어 있음)\n병의원 50개 이상 진행. 재계약률 100%\n💵 예상 가격\n주 5일, 100평 기준 : 월 100-105만 원\n📝오픈닥터 파트너 혜택\n최저 비용으로 조율 가능 (평균 10만 원 할인)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "클린앤제이",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8151-a9ab-cf7584673c68",
-      "question": "⭐ 룬피부과",
-      "answer": "[룬피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "룬피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8172-a176-c83b0da28ec5",
-      "question": "⭐ 셀리에의원-쇼파",
-      "answer": "[셀리에의원-쇼파] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "셀리에의원-쇼파",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8195-bc79-cd032f6e5e08",
-      "question": "⭐ 레지움피부과",
-      "answer": "[레지움피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "레지움피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81db-a500-f9708809567b",
-      "question": "⭐ 셀리에의원-작품스타일링제작",
-      "answer": "[셀리에의원-작품스타일링제작] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "셀리에의원-작품스타일링제작",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81eb-87e1-cea99afa3111",
-      "question": "⭐ 라인드치과교정과의원",
-      "answer": "[라인드치과교정과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "라인드치과교정과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81f8-bef6-ff2270dea775",
-      "question": "⭐ 강한서울정형외과",
-      "answer": "[강한서울정형외과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "강한서울정형외과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8101-8f8c-d8e9285e534c",
-      "question": "⭐ 핀트성형외과",
-      "answer": "[핀트성형외과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "핀트성형외과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-819d-b479-eca3dd889ed6",
-      "question": "바우스가구",
-      "answer": "⌛ 회사 소개\n1985년 설립(41년차)\n중저가부터 하이엔드까지 모든 품목의 시공이 가능\nA/S 담당 전문 기사들이 3일 이내에 현장 마무리 책임, 시공 후 에도 유상 A/S 가능\n중간 유통업체 없이 공장 직영 운영으로 최고의 품질과 합리적인 가격\n11명의 본사 담당자, 30명의 시공팀, 10명의 생산 직원이 상담부터 생산, 시공까지 한번에 같이 진행 \n병의원용 제작 가구 업체로 추천. 좋은 품질\n붙박이 가구(수납장, 원장실 책상, 상담실 가구 등) 전문 제작\n‘오늘의 집’ 공식 파트너사로 참여 중.\n원장님 미팅 및 시공 진행 방식\n💵 예상 견적\n제작 가구이므로 자재, 디자인, 수량 등에 따라 상이",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "바우스가구",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81df-8ada-f87e12a39100",
-      "question": "메종비퍼니처",
-      "answer": "⌛ 회사 소개\n수입가구 및 커스텀 가구 전문점 \n하이엔드 가구 디자인 모티프로 한 이동형 소파, 체어, 테이블, 야외용 가구 등을 저렴한 가격에 제작 가능\n중국 공장에서 제조\n💵 예상 견적\n하이엔드 가구 업체 대비 절반 수준",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "메종비퍼니처",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8182-9746-eb9dd1d67151",
-      "question": "DS소파",
-      "answer": "⌛ 회사 소개\n경기도 오산 공장 수작업\n설계부터 제작까지 전부 진행\n병의원 전용 방염 쇼파, 제작 쇼파 등 맞춤 진행\n💵견적\n재질, 수량 등에 따라 상이\n📁 진행 포트폴리오",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "DS소파",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81c3-ad8e-d573c4ab7ed5",
-      "question": "루벨루테",
-      "answer": "⌛ 회사 소개\n2019년도 설립 (6년차)  \n대표님 30년 이상 가구 제작 경력 보유\n병원·상업공간 맞춤형 디자인 이동가구 제작 전문\n병원 공간 컨셉과 예산에 맞춰 설계 및 제작\n국내 주요 병의원 인테리어 업체와 협업 경험 다수 보유 \nA/S 유상 지원\n운영 방식 :\n💵 예상 가격 및 작업 기간\n자재, 크기, 수량에 따라 상이",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "루벨루테",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-810e-99b3-f672afa0a801",
-      "question": "오름앤컴퍼니",
-      "answer": "⌛ 회사 소개\n2009년 설립 (17년차)\n네이버, SKT 등 국내 대기업 진행\n판교 G&E 메디컬센터, 충남대병원 등 진행  \n하이엔드 가구 디자인을 모티프로 한 커스텀 제작에 강점\n명화 레퍼런스 아트 구매 가능\n유상 A/S 지원\n해외 디자이너 브랜드 가구 구매 가능\n고급스러운 분위기의 병의원 전용 이동가구 구매 가능\n💵 예상 견적\n120평 기준 3,000만 원\n(제품 종류 및 디자인에 따라 다름)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "오름앤컴퍼니",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8178-9d20-f63d47a9b452",
-      "question": "UNWIND",
-      "answer": "⌛ 회사 소개\n2018년 설립(8년차)\n다양한 해외(일본) 브랜드 가구 보유\n서래마을과 판교에 쇼룸 보유\n원목가구 감성, 젠 스타일 추구, 블랙 앤 모던 스타일도 보유\n가구, 조명, 패브릭, 오디오 전부 취급\n국내, 수입 가구 유상 A/S 가능\n브랜딩 / 브랜딩 전략/ 네이밍 / 가구 스타일링 진행 가능 \n가구 제작 가능\n가성비 있는 가구부터 하이엔드까지 전부 진행 가능\n💵 예상 견적\n가구 종류에 따라 상이\n📝오픈닥터 파트너 혜택\nB2B 전용 가격으로 제공 + 추가 10% 할인 (다만 브랜드별 상이하며 B2B 할인이 아예 없는 브랜드도 존재함)\n미즈메디병원의 산후조리원/ 디어원 로비/ 이을 성형외과",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "UNWIND",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81b0-b6f2-e38a1037abc8",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8102-b366-d3eb9c507d74",
-      "question": "⭐ 아차산마루마취통증의학과",
-      "answer": "[아차산마루마취통증의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "아차산마루마취통증의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-810a-a2a6-f38312648165",
-      "question": "⭐ 라인드치과교정과의원",
-      "answer": "[라인드치과교정과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "라인드치과교정과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-810f-9b4a-ddd9a437124d",
-      "question": "⭐ 아차산마루마취통증의학과",
-      "answer": "[아차산마루마취통증의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "아차산마루마취통증의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-812a-8f50-d0d1377fa3ee",
-      "question": "⭐ 핀트성형외과",
-      "answer": "[핀트성형외과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "핀트성형외과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-813f-97ec-f932039d8d11",
-      "question": "⭐ 룬피부과",
-      "answer": "[룬피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "룬피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-817d-8df4-f71b8154b227",
-      "question": "⭐ 레지움피부과",
-      "answer": "[레지움피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "레지움피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81af-bfee-e1106c361ff2",
-      "question": "⭐ 핀트성형외과",
-      "answer": "[핀트성형외과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "핀트성형외과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81b8-b5ac-f9379eebec5a",
-      "question": "⭐ 경희유연한의원",
-      "answer": "[경희유연한의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "경희유연한의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81d8-8529-f87bb6dfcd86",
-      "question": "⭐ 분당새로이치과의원",
-      "answer": "[분당새로이치과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "분당새로이치과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-810f-82ba-de46f82ab8bf",
-      "question": "⭐ 턱투미구강내과",
-      "answer": "[턱투미구강내과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "턱투미구강내과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-815d-897a-fd352727a3f2",
-      "question": "⭐ 셀리에의원",
-      "answer": "[셀리에의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "셀리에의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8175-94b1-e5d11eca6350",
-      "question": "⭐ 분당새로이치과의원",
-      "answer": "[분당새로이치과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "분당새로이치과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81b7-8fed-d29db4b7a086",
-      "question": "⭐ 서울사려깊은치과의원",
-      "answer": "[서울사려깊은치과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "서울사려깊은치과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81e4-a5f2-e722869a9cc6",
-      "question": "⭐ 라인드치과교정과의원",
-      "answer": "[라인드치과교정과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "라인드치과교정과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81fa-ba7a-e4087958591a",
-      "question": "⭐ 연세그대로치과",
-      "answer": "[연세그대로치과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "연세그대로치과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81ca-a1a9-ede9138a2cdf",
-      "question": "LG U+",
-      "answer": "*아정당\n*LG 공식 홈페이지\n인터넷 전화 요금(3년 약정 기준) : 아래 상품 가입 시 단말기는 추가금 내고 종류 골라 사용 가능\n인터넷 요금 : \nCCTV/보안(에스원) : 월 2회 출동 무료, 그 이후 추가 33,000원, 실시간 휴대폰으로 볼 수 있음. 클라우드 15일간 보관 무료. 설치비 무료. 3년 약정\n- CCTV : 1달 기본 이용료 13,200원, 특수 카메라 추가 : 2,200원\n최종 요금 조합(4대 기준)\n에스원 따로 가입 시\n3-4 \n10대\ncctv\n7700\n38500  58300\n64000\n\n35만원+(상품권 9만,)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "LG U+",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81d6-961b-ef4c307d3572",
-      "question": "KT (내부용)",
-      "answer": "⌛회사 소개\n😀 상담 신청 절차\n신청 전, 매니지먼트팀 + 플래너 + 보안담당자, 인터넷, 전화 담당자 등이 포함된 단톡방 생성. 상담 전 곧 신청할 것임을 안내드리기.\n아래 절차대로 원장님과 함께 상담 신청(원장님 폰으로 인증번호 가므로, 같이 있을 때 하면 좋습니다)\n신청 후 카톡방에서 담당자에게 원장님 정보(성함, 연락처 등), 평면도 보내드리고 현장 미팅 혹은 연락 시기 잡기 (CCTV 갯수 등을 여쭙기 위한 현장 미팅)\n미리 원하는 CCTV 갯수를 정했다 하더라도, 현장 상황이나 가구 위치 등에 따라 갯수가 달라질 수 있으므로 개원지에서 현장 미팅을 하는 것이 가장 좋음.\n원장님과 상의해서 추천 번호 뒷번호 받아서 담당자에게 예상 전화번호 10개이상 요청(현장미팅 필요없으며, 계약서도 전화로 진행 가능)\n\n로그인\nKT telecop -> 사외채널 선택\nID/PW 입력\ngigaeyes 가입 신청 -> 가망고객 신청 버튼 클릭 (초록색)\n정보입력\n희망서비스 - gigaeyes i-guard (2025) 선택\n필수 입력 정보 기입 (빨간 별표)\n가입 신청\n만 14세 이상 고객 동의\n하단에 '서명' 버튼 클릭 시 원장님께 카톡으로 서명 요청이 감\n원장님 서명 후 '신청 완료' 클릭 시 종료\n📝 오픈닥터 파트너 혜택\n오픈닥터 통해 보안(KT 텔레캅) 이용 시 월 요금 5개월 무료(50이상 상당) (오픈닥터 수수료 없음)\n인터넷 - 설치비 면제. 17-20만원 상품권 지급\n전화 설치비는 면제 아님 \n📝 예시 견적\n인터넷 및 전화 : 보안과 같이 할 경우, 보안 쪽에서 할인이 들어감\n[가입예정상품]\n1. 오피스넷 에센스(1G 인터넷) 1회선 : 44,550원 (VAT포함) \n2. 일반전화 1회선(FAX) (02,031로 시작되는 번호): 5,140원\n3. 기업용 인터넷전화(Centrex) 4회선 (070으로 시작되는 번호) : 12,320원(VAT포함)\n[월 청구요금]\n- 62,010원 (VAT포함)\n[1회성 요금(출동비)]\n1. 일반전화 2회선: 68,000원\n2. 인터넷 1회선 : 36,000원 (KT플라자 강동점 수납 지원 예정 / 고객 부담 없음)\n3. 기업용 인터넷전화(Centrex) 4회선 : 자동 면제\n[가입고객 혜택]\n- 개통 후 익월 말 : 170,000월 상품권 지급(고객 휴대폰으로 전송)\n- 인터넷 1회선에 대한 출동비 수납 지원 : 36,000원\n※ 해당 고객 혜택은 상품권으로 제공 가능 (롯데, 이마트(신세계) 선택 가능)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "KT (내부용)",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81db-85f5-eb8e6ec776b3",
-      "question": "SK쉴더스(ADT캡스)",
-      "answer": "🩺주요 진료과\n전체\n💵오픈닥터 프로모션\nSK브로드밴드 + ADT캡스 + 사이버보안 패키지를 오픈닥터 특별 프로모션가에 제공합니다.\n📝특이사항\n병원 건물에 SK 인터넷 망이 설치되어 있거나, 설치 가능해야 이용이 가능합니다.\nADT CAPTS\n결합 시, 2개월 회차 월정료 100%, 15대월 회사 50%, 25개월 회사 50% 할인. 총 세번 할인\n인터넷 및 전화도 통신 요금에 따라, 월 1100원 부터 5500원 추가 할인\nSKB(브로드밴드) +캡스 + 3년 약정 : 월정료 2개월치를 세번에 나눠 할인이 들어갑니다.",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "SK쉴더스(ADT캡스)",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-813f-9e7f-e5c48fd56726",
-      "question": "덴탈컴넷",
-      "answer": "⌛ 회사 소개\n2대째 이어지는 치과 위주의 높은 업력\n치과 원장님 중심으로 후기 좋음\n치과 EMR 덴트웹과 연계 잘 됨\n병원 전화번호 후보 좋은 번호로 제안 받을 수 있음\n거품 없는 가격\n컴퓨터 A/S 1년 무상, 그 후는 출장비 있음. 그 외 장비는 제조사 A/S 기간에 따름 \n⭐ 의사 리뷰\n“대표님이 굉장히 친절하시고 잘 맞춰주려 노력해주신다.”\n💵 예상 견적\nPC  : 29만 원 ~ (사양 및 수량에 따라 다름)\n모니터 : 10만 원~ (브랜드에 따라 다름) \nDID : 40만 원~ (브랜드, 수량 및 화면 크기에 따라 다름) \nCCTV 카메라 및 녹화기 : 63만 원 ~ (수량 및 부속품에 따라 다름)\n기타 가전제품 (브랜드 및 모델에 따라 다름)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "덴탈컴넷",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8140-a062-dded84ce0fb9",
-      "question": "중앙정보기술",
-      "answer": "⌛회사 소개\n2016년 설립 (10년차)\n250개 이상 병의원 설치 경험\nPC / 네트워크 관련 넓은 제품 커버리지 제공 (PC, 모니터, 네트워크, 가전제품 등)\n신뢰도 높은 A/S 처리\n🔔A/S 관련 정보\nPC : 2년 무상\n모니터 등 전산장비 : 1년 무상\n네트워크 : 1년 무상\n복합기 : 3년 무상\n가전제품 : 제조사의 조건에 따름\n⭐ 의사 리뷰\n“복합기 정기 구독 서비스에 매우 만족했습니다.”\n“번거롭게 이곳 저곳 알아볼 필요 없이 한 곳에서 구매부터 설치까지 전부 해결해서 좋았습니다.”\n💵 예상 가격\nPC & 모니터 : 1,000만 원~ (사양 및 수량에 따라 다르며, 10대 기준으로 가격 제시)\n네트워크 : 140만 원~  (수량에 따라 다름)\n기타 가전제품 (브랜드 및 모델에 따라 다름)\n📝 오픈닥터 파트너 혜택\n복합기 리스 진행 : 잉크 등 소모품 무제한 무료\n세탁기/건조기 : 20-25만원 선에서 설치 가능 (성형외과/피부과 대상)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "중앙정보기술",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-816e-83a5-f5758fc30d8b",
-      "question": "⭐ 라인드치과교정과의원",
-      "answer": "[라인드치과교정과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "라인드치과교정과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81b5-9f74-e0d76dced98e",
-      "question": "⭐ 턱투미구강내과",
-      "answer": "[턱투미구강내과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "턱투미구강내과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81cc-a004-d0eab7fd5195",
-      "question": "⭐ 메인비뇨의학과의원",
-      "answer": "[메인비뇨의학과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "메인비뇨의학과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-811b-b241-d2bb03504a99",
-      "question": "⭐ 디오레의원",
-      "answer": "[디오레의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "디오레의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8150-8881-e5cdfa825166",
-      "question": "⭐ 리스토리성형외과",
-      "answer": "[리스토리성형외과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "리스토리성형외과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8177-80a9-cd7d438a4ff9",
-      "question": "⭐ 아차산마루마취통증의학과",
-      "answer": "[아차산마루마취통증의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "아차산마루마취통증의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8187-a53b-e6295e35f344",
-      "question": "⭐ 신촌연세재활의학과의원",
-      "answer": "[신촌연세재활의학과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "신촌연세재활의학과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81bb-b876-fb993a6791f2",
-      "question": "⭐ 레지움피부과",
-      "answer": "내부사인물 진행",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "레지움피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81c6-8290-d2e1e51a915c",
-      "question": "⭐ 서울사려깊은치과의원",
-      "answer": "[서울사려깊은치과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "서울사려깊은치과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81dc-b2c0-e11b74f3df13",
-      "question": "⭐ 연세튼튼재활의학과",
-      "answer": "[연세튼튼재활의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "연세튼튼재활의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81df-8636-c08fa939ceab",
-      "question": "⭐ 서울린교정치과",
-      "answer": "[서울린교정치과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "서울린교정치과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8196-8032-d2187ec18698",
-      "question": "⭐ 분당새로이치과의원",
-      "answer": "[분당새로이치과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "분당새로이치과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81ca-9a9e-e879fb328b25",
-      "question": "⭐ 연세그대로치과",
-      "answer": "[연세그대로치과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "연세그대로치과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81f9-990a-c43d6b791ac7",
-      "question": "YourDev:유어데브",
-      "answer": "⌛ 회사 소개\n2013년도 설립 (13년차)\n원페이지 홈페이지 제작으로 특화된 업체\n구글 및 네이버 검색 최적화 작업의 강점\nAdmin 페이지 통한 자체 관리 가능 (이벤트 페이지, 고객 문의, 게시판 등)\n간편한 유지/보수 \n관리자 페이지에서 팝업 내용 직접 업로드, 수정, 삭제 가능\n💵 예상 가격 및 작업 기간\n실속형: 250만원 (3주) - 양에 비례해서 가격이 달라지진 않음\n고급형: 500만원 (1.5개월)\n팝업 디자인: 33,000원/개\n기본 호스팅 비용: 1년 12만원\n추가 서비스 가격 \n*실속형 (8개 화면 섹션 이하로 제작)\nPC/모바일 텍스트 분리 반응형 코딩\n페이지 분리없는 원페이지 스크롤 방식\n관리자 페이지 포함\n바로가기 퀵메뉴 (카톡,인스타,블로그,유튜브,네이버예약 등) 포함\n빠른상담 고객 DB받는 퀵메뉴 포함\n팝업 관리자 포함\n*고급형 (10개 컨텐츠 메뉴 기본)\n메인페이지 제작 (PC/모바일 텍스트 분리 반응형)\n관리자페이지 포함\n병원소개페이지 기본3개포함 (의료진소개, 병원둘러보기, 진료시간/오시는길)\n바로가기 퀵메뉴 포함 (카톡,인스타,블로그,유튜브,네이버예약 등)\n빠른상담 고객 DB받는 퀵메뉴 포함\n팝업 관리자 포함\n컨텐츠 페이지 10개 포함 (텍스트가 시스템폰트로 코딩되므로 검색 노출 최적화가 됨)\n공지사항 게시판 페이지 무료\n온라인상담 게시판 페이지 무료\n별도)\n이벤트 게시판 프로그램 10만원\n온라인 예약 프로그램 10만원\n컨텐츠 페이지 추가 시 1개당 30만원\n📝오픈닥터 파트너 혜택\n호스팅 비용 5년 무상 제공 (12만원*5=60만원)\n호스팅 비용 6년차 이후 50% 할인 제공 (12만원 → 6만원)\n🛎️ 추가 자료",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "YourDev:유어데브",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-812e-9dd8-e9822885cae6",
-      "question": "BUD",
-      "answer": "⌛ 회사 소개\n2018년 설립(8년차)\n홈페이지 제작을 기반으로 브랜딩에 특화된 업체\n브랜딩 기획부터 제작, 마케팅까지 전 과정을 책임지는 크리에이티브 프로덕션으로, 예술적 감각과 실무적 노하우를 바탕으로 다양한 분야에서 차별화된 콘텐츠를 제공\n💵  예상 가격\n홈페이지 단독 진행시 : 기본형 350만원 / 고급형 550만원 (VAT별도)\n브랜딩 (로고, 네이밍, BI, 컬러시스템 etc.) 함께 진행시 2000만원 (VAT별도)\n📁포트폴리오\n청담리투의원 https://www.retooclinic.com/\n룬피부과의원 https://www.lunnclinic.com/\n셀리에의원 https://www.cellierclinic.com/\n자세한 내용은 담당 플래너에게 요청 하시면 개별 공유로 진행 \n그 외 포트폴리오 : 청담리투의원, 메종프리베 오명진 원장의 유튜브 채널(2021), 소라의 [LANDSCAPE] 뮤직비디오, [SING IN THE PICTURE] 시리즈, 현대자동차·기아자동차 / 위스키 맥켈란 광고 영상, 다양한 축제 및 문화 행사 홍보 영상",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "BUD",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81f8-891a-f679a2c2e8fe",
-      "question": "파인애플피티엘",
-      "answer": "⌛ 회사 소개\n2013년 설립 (13년차)\n하이엔드 디자인 홈페이지 제작 업체\n제작기간 : 약 10주 ~ 16주\n홈페이지 오픈 후 한달간 기능상의 오류나 간단한 이미지, 텍스트 수정의 경우에 무상으로 진행\n브랜드 필름 제작 가능\n진행 과정 : \nSNS/브랜드 마케팅\n💵 예상 가격\n800만원~1,500만원\n📁포트폴리오\n홈페이지",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "파인애플피티엘",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8146-911c-e6fbc7779e5e",
-      "question": "원프레임",
-      "answer": "⌛ 회사 소개\n2020년 설립(6년차)\n제작 기간 : 2주 (개원 3~5주 전 컨텍 권장)\n병원 홈페이지 검색엔진 상단 노출 \n마케팅 없이 1년 7,000회 페이지 뷰 보장\n비용이 저렴하고 합리적\n원페이지 홈페이지 제작으로 특화된 업체 (한 페이지에 꼭 필요한 내용 모두 포함)\n반응형 홈페이지 제작(하나의 제작으로 PC, mobile, Smart pad 맞춤형으로 홈페이지 변환 가능)\n부가 기능\n💵 예상 가격\n한정수량이벤트 : 200만 원 → 180만 원 (10% 할인, 마이크로프레임 추가시 189만원)\n📁포트폴리오\n서울이해드림치과\n아산웰마취통증의학과\n홈페이지",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "원프레임",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-810a-8e22-f2428bb6e47f",
-      "question": "⭐ 룬피부과",
-      "answer": "[룬피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "룬피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8118-bf58-c67e2940e644",
-      "question": "⭐ 상동척척연합의원",
-      "answer": "[상동척척연합의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "상동척척연합의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8124-b7d4-eadc283ace36",
-      "question": "⭐ 셀리에의원",
-      "answer": "[셀리에의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "셀리에의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-814c-910d-c8cec3a094a5",
-      "question": "⭐ 연세튼튼재활의학과",
-      "answer": "[연세튼튼재활의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "연세튼튼재활의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-815f-b3ea-dfd5a3665c61",
-      "question": "⭐ 강한서울정형외과",
-      "answer": "[강한서울정형외과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "강한서울정형외과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8171-9135-f69b709b1f69",
-      "question": "⭐ 프라임영상의학과",
-      "answer": "[프라임영상의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "프라임영상의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81e4-afa5-dbb5de6c3410",
-      "question": "⭐ 경희유연한의원",
-      "answer": "[경희유연한의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "경희유연한의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8100-9f7d-de3beba8bf65",
-      "question": "⭐ 구리사암한의원",
-      "answer": "[구리사암한의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "구리사암한의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8178-80c1-d828c4d8f76f",
-      "question": "⭐ 레지움피부과",
-      "answer": "[레지움피부과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "레지움피부과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8191-82f1-ce59fae2230a",
-      "question": "⭐ 신촌연세재활의학과",
-      "answer": "[신촌연세재활의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "신촌연세재활의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81ac-a233-cf4f34446f86",
-      "question": "⭐ 이젠스마일치과",
-      "answer": "[이젠스마일치과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "이젠스마일치과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-819e-b520-e05340f47a63",
-      "question": "디온에이(D.on.A)",
-      "answer": "⌛ 회사 소개\n2021년 설립(5년차)\n병의원 간판 전문 업체\n간판 플랫폼 ‘간판의 품격’ 1위\n원장님 니즈에 맞춘 디자인 시안\n가성비 + 퀄리티 두 가지 모두 챙기는 업체 \n수도권 중심이나, 지방(김해·부산 등)도 시공 경험 有\n원장 소개·커뮤니티 기반으로 신규 계약 다수 발생, 만족도 높음\n미팅 프로세스 : 실측 → 규정 검토 및 패널티 사전 안내 → 원장님과 협의 → 시안 반영 → 계약. 규정 위반 가능성 사전 고지 후 선택 유도\n외부 간판, 내부 사인물, 인쇄물(명함·봉투·쇼핑백 등), 로고 디자인 (메디컬 전문 디자인팀 운영) 진행 가\n서울탑치과(300평대), 평택 치과, 용인 요양병원, 송파 내과, 김해·부산 요양병원, 압구정·청담 성형외과 등\n💵 예상 가격\n디자인에 따라 상이하나,\n1천만 원 중반~ \n📁 포트폴리오",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "디온에이(D.on.A)",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8154-b2ac-e90939e4e264",
-      "question": "더프라임",
-      "answer": "⌛ 회사 소개\n10년 이상 경력\n300곳 이상의 병의원 간판 진행\n광고 내용은 보건소 담당에게 사전 질의를 하고, 원장님과 해당 사항을 상의 후 진행\n고객의 니즈에 맞춘 디자인 능력과 원장님들과의 원활한 커뮤니케이션\n미팅 프로세스 : 실측 → 초안/시안 제안 → 원장님 검토·수정 → 계약\n가성비 있는 업체\n로고 디자인 가급적 비진행 \n무상 A/S 1년\n💵 예상 가격\n디자인, 구성, 규격에 따라 상이\n예시 가격",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "더프라임",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81f0-b8c2-ca734937cd34",
-      "question": "디자인캐프",
-      "answer": "⌛ 회사 소개\n2009년 설립 (17년차)\n120개 이상 병의원 진행 경험\n1년 무상 A/S 서비스 제공\n좋은 소재 및 마감재 사용으로 내구성 좋다는 평가\n디자인적 완성도와 감각적인 연출에 중점을 두는 원장님께 추천드\n⭐ 의사 리뷰\n“내 요구 사항에 맞춰 트랜드에 맞는 로고나 디자인을 잘 제안하고 제작해주셨다.”\n“대표가 빠르게 소통이 잘되고, 디자인도 원하는 대로 잘 뽑는다.”\n💵 예상 가격\n1500만 원~5000만 원 (디자인, 글자수, 규격, LED 사용 따라 가격이 상이함)\n📝 오픈닥터 파트너 혜택\n저가 현수막에 경우 현수막 무료 제공 (단, 건물 및 법적 상황에 따라 다르며, 300만원 이상의 대형 현수막은 어려움)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "디자인캐프",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81d8-b016-cb6fc26b4954",
-      "question": "동부기업",
-      "answer": "⌛ 회사 소개\n1976년 설립(약 50년 동안 가업 승계 운영)\n공장식 제작이 아닌, 각 병원별 브랜딩과 디자인이 담긴 간판을 제작하는 하이엔드 업체\n규모 있는 간판 제작에 강점\nA/S 철저\n💵 예상 견적\n디자인 및 규모에 따라 상이 (2천만 원대~)\n📁 포트폴리오\n연세스탠다정형외과\n연세더퍼스트정형외과\n연세히어로정형외과\n자유한의원\n연세사랑병원",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "동부기업",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8127-8acb-c2466eaf3b78",
-      "question": "LS디자인",
-      "answer": "⌛ 회사 소개\n2009년 설립(17년차)\n규모 있는 병원부터 소규모 병의원까지 다양한 환경과 접하며, 공간과 꼭 맞는 사인&광고물 작업\n가격 대비 만족 비율 높음\n⭐ 의사 리뷰\n“대표님께서 꼼꼼히 설명을 잘 해주셔서 원하는 시안 조율이 빨랐습니다” (치과, 25년 8월 개원)\n“결과물 퀄리티가 매우 좋아 만족스럽습니다” (치과, 25년 10월 개원)\n💵 예상 견적\n 디자인, 글자수, 규격, LED 사용 따라 가격이 상이함\n내부 사인 :  200만 원 후반~ 300만 원 후반\n외부 사인 : 700만 원 ~ 2000만 원 대\n📁 포트폴리오\n연세퍼스트치과\nJM 가정의학과\n마디튼튼의원 (통증 네트워크)\n유앤아이의원 (미용 네트워크)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "LS디자인",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-811a-8b87-ec81d31e064e",
-      "question": "⭐ 연세그대로치과",
-      "answer": "[연세그대로치과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "연세그대로치과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81b1-86e3-ff6cbdc2e539",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81f5-871b-f9bb5c9aa59a",
-      "question": "⭐ 턱투미구강내과",
-      "answer": "[턱투미구강내과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "턱투미구강내과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81fc-b757-e320b5b0d2bd",
-      "question": "⭐ 분당새로이치과의원",
-      "answer": "[분당새로이치과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "분당새로이치과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:12:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-814b-a074-c0b1eda74d1b",
-      "question": "⭐ 룬피부과의원",
-      "answer": "[룬피부과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "룬피부과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-819d-8a2f-d29d5b247ab1",
-      "question": "⭐ 벨리스성수의원",
-      "answer": "[벨리스성수의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "벨리스성수의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8155-888e-fac5422b1515",
-      "question": "⭐ 이젠스마일치과",
-      "answer": "[이젠스마일치과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "이젠스마일치과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8108-b93d-c81026f34a29",
-      "question": "⭐ 서울든든한치과의원",
-      "answer": "[서울든든한치과의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "서울든든한치과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8121-b929-c50c47fe7e88",
-      "question": "⭐ 신촌연세재활의학과",
-      "answer": "[신촌연세재활의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "신촌연세재활의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8142-8e05-d602298e9244",
-      "question": "⭐ 상동척척연합의원",
-      "answer": "[상동척척연합의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "상동척척연합의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-814e-ae8a-e503593bedac",
-      "question": "⭐ 라인드치과교정과의원",
-      "answer": "[",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "라인드치과교정과의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8173-8ddc-de0dd4f25a30",
-      "question": "⭐ 강한서울정형외과",
-      "answer": "[강한서울정형외과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "강한서울정형외과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81d3-9eb0-cfd6b2cb2784",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8122-9fef-c9105c5e51ee",
-      "question": "⭐ 수유바로본의원",
-      "answer": "[수유바로본의원] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "수유바로본의원",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8173-86a9-c37ba1668014",
-      "question": "⭐ 프라임영상의학과",
-      "answer": "[프라임영상의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "프라임영상의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81ee-94bb-d667b227b76a",
-      "question": "⭐ 아차산마루마취통증의학과",
-      "answer": "인테리어",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "아차산마루마취통증의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81f3-b471-d3dd12af199f",
-      "question": "⭐ 연세튼튼재활의학과",
-      "answer": "[연세튼튼재활의학과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "연세튼튼재활의학과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-817b-905e-ee021a90d84c",
-      "question": "⭐ 삼성스마트신경과",
-      "answer": "[삼성스마트신경과] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "삼성스마트신경과",
-        "category": "DB 레코드",
-        "icon": "⭐",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81bf-84c7-e1e95faa9098",
-      "question": "씨투와이",
-      "answer": "⌛ 회사 소개\n2018년 설립(8년차)\n인테리어 및 시공 스타트업\n베트남에서 병의원 인테리어 7년 이상 경력 보유\n규모 있는 공사 특화\n1년 무상 A/S\n회사소개서 ⏬\nNAYA 고객 전용 앱 (인테리어 보고) 이용한 공사 관리 보고 시스템 제공\n설계 및 시공 프로세스\n고객 소통 방식\n📄건설업등록증 보유 여부\n⭕\n📁포트폴리오\n신경과 (도면+3D)\n병원 제안서(도면+3D+가구제안서)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "씨투와이",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81e1-8370-cd92bff73e96",
-      "question": "메이드바이",
-      "answer": "⌛ 회사 소개\n2011년 설립(15년차)\n연간 시공 건 약 30건 내외\n주요 분야: 내과, 정형외과, 통증의학과 위주\n2년 무상 A/S, A/S팀 별도 운영 \n규모: 총 9명(대표 2인, 에이스팀, 시공팀, 설계실 등 별도 구성)\n다양한 도면 제안과 빠른 피드백\n수도권 외 공사 및 보수공사, 리모델링 공사는 지양\n미팅 프로세스\n📄건설업등록증 보유 여부\n⭕\n*각 세부 페이지 내에서 실제 시공 사진을 확인하실 수 있습니다!",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "메이드바이",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81f6-8a96-d209d0d4b1e5",
-      "question": "더 코나 메디스페이스",
-      "answer": "755\n⌛ 회사 소개\n2010년 설립(16년차)\n병의원 인테리어 500건 이상 진행\n1년 무상 A/S 진행\n브랜딩, 마케팅 같이 진행 가능\n부분 리모델링가능\n성형외과, 피부과, 치과 주로 진행 \n가구 디자이너가 내부적으로 있어 자체 제작 가능\n구성원 10인, 현장 소장은 자체 직원으로 진행 (외부소장 쓰지 않아, 소통이 빨라 일을 수월하게 진행할 수 있다는 장점이 있다)\n진행 절차\n1차 무료 상담 (더코나 오피스에서) -> 가견적서 메일로 발송\n가견적서 확인 후 -> 설계 계약 작성\n설계 계약비 (300만원 내외)\n설계 후 공사 계약 (공사 계약후 설계비 반환)\n공사시작\n💵 예상 견적(평당가)\n베이직 : 평단가 230만원 이하\n프리미엄 : 평단가 250~300 만원\n베이직 VS 프리미엄 : 베이직은 단순하고 정제된 소재를 중심으로, 조경이나 간접조명 등 장식적 요소를 최소화한 디자인입니다. 곡선보다는 직선 위주의 구성으로 깔끔하고 기능적인 공간을 지향합니다.\n평단가 200만원 이하는 진행 어려움\n도면 받기 전 사전 착수 비용(300~400만 원) 있으나, 수정 자유롭고 3D 랜더링까지 제시\n📄 건설업등록증 보유 여부\n⭕\n📁 포트폴리오\nhttps://theconamedispace.co.kr/portfolio/portfolio_list.php (포트폴리오 링크)\n이보다 구강악안면외과 치과의원(107평)\n리라의원(78평)\n르 로제 성형외과(75평)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "더 코나 메디스페이스",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8107-9a2d-c0fa0505b0d7",
-      "question": "무아디자인",
-      "answer": "⌛ 회사 소개\n2007년 설립(18년차)\n병의원 인테리어 800건 이상 진행\n1년 무상 A/S 보장\n합리적인 가격 및 투명한 견적\n높은 재무건전성으로 오랜기간 안정적인 실적\n탄탄한 도면 구성이 강점\n⭐ 의사 리뷰\n구매 결정 이유\n(이용 이후) 장점\n(이용 이후) 단점\n💵 예상 견적(평당가)\n약 170~250만 원 (디자인에 따라 상이)\n📄건설업등록증 보유 여부\n⭕\n*각 세부 페이지 내에서 실제 시공 사진을 확인하실 수 있습니다!",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "무아디자인",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8112-b6c5-f64db0bccfaa",
-      "question": "플랜디자인",
-      "answer": "⌛ 회사 소개\n2001년 설립(25년차)\n한 해 평균 100건 이상 병의원 인테리어 담당\n1년 무상 A/S\n24년 매출액 379억, 직원 수 40명의 안정적인 회사\n협력사 다양하게 보유\n⭐ 의사 리뷰\n구매 결정 이유\n(이용 이후) 장점\n(이용 이후) 단점\n💵 예상견적(평당가)\n~291만 원(25.07.08기준)\n📄 건설업등록증 보유 여부\n⭕\n📁포트폴리오\nhttp://www.plananc.com/plandesign/portfolio/list.php?open_menu=y (플랜디자인 포트폴리오 링크)\n연세두드림 정형외과\n판교윙이비인후과\n신사모원성형외과",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "플랜디자인",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-811e-80c4-e8b779b92132",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8182-99cb-e317c96cceae",
-      "question": "네스트디자인",
-      "answer": "⌛ 회사 소개\n2007년 설립 (18년차)\n병의원 인테리어 720건 이상 진행 (치과 다수 보유)\n부분 인테리어 가능\n가성비\n1년 무상 A/S\n진행 방식\n⭐  의사 리뷰\n“인테리어 업체를 여러 군데 만나봤는데,  다른 업체 대비 공간 구성에 대한 이해가 굉장히 좋으시고 가장 이상적으로 잘 짜주셨다” (치과, 25년 12월 개원)\n“공사 결과물 매우 만족스럽다” (치과)\n💵 예상 견적(평당가)\n200-220만 원\n📄 건설업등록증 보유 여부\n⭕\n📁 포트폴리오\nhttp://nestdesign.co.kr/hospital/ (네스트디자인 병원 포트폴리오 링크)\n오라클피부과 잠실점(99평)\n강남타토아의원(133평)\nL.G. 치과(35평)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "네스트디자인 ",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-819f-bc75-fb1c2986974c",
-      "question": "인투익스",
-      "answer": "⌛ 회사 소개\n2009년 설립(17년차)\n1년 무상 A/S\n트렌디한  인테리어, 호텔식 하이엔드 인테리어\n국제 디자인 공모전 수상 경력 다수\n동양적 젠 무드, 인더스트리얼 무드 \n💵 예상 견적(평당가)\n220 ~ 310만 원 대 , 디자인에 따라 상이. \n📄건설업등록증 보유 여부\n⭕\n📁포트폴리오\nhttp://www.intoex.co.kr/bbs/board.php?bo_table=projects&sca=HOSPITAL&page=1 (인투익스 병원 포트폴리오 링크)\n클림의원 명동(333평)\n세예의원 강남(330평)\n닥터스 피부과 반포(73평)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "인투익스",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8109-aad1-e705cfaf49b5",
-      "question": "플럭스",
-      "answer": "⌛ 회사 소개\n2006년 설립(20년차) \n1년 무상 A/S\n1억 이상 프로젝트만 진행 \n치과 포트폴리오 다수 보유, 치과 전문\n치과 인테리어 업계 1위\n디자인 교수 출신 대표\n⭐ 의사 리뷰\n치과 인테리어 가장 잘해요. 디자인이 정말 마음에 들었습니다\n💵 예상 견적(평당가)\n약 210~230만 원 \n📄건설업등록증 보유 여부\n⭕\n📁포트폴리오\nhttp://www.fluxdesign.co.kr/home/portfolio (플럭스 디자인 포트폴리오 링크)\n서울리브치과\n삼성사랑니졸업치과\n똑똑플란트치과",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "플럭스",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8108-a018-d9d76abcf0d5",
-      "question": "JWC그룹",
-      "answer": "⌛ 회사 소개\n2021년 설립(5년차), 25명 직원 규모\n메디컬 전문 인테리어사에 오랜 근무 경력 있는 대표\n1년 무상 A/S\n업무 체계, 업계 평판 우수\n1차 도면 이후 진행은 진행비 50만 원 있음\n💵 예상 견적(평당가)\n디자인에 따라 상이 \n📄 건설업등록증 보유 여부\n⭕\n📁포트폴리오\nhttp://jwcgroup.gamgakdesign.com/product/list.php?ca_id=20 (포트폴리오 링크)\n청담 미닛클리닉\n원주 서울인성치과\n압구정 온기소아청소년과의원",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "JWC그룹",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81cb-8551-d813cccafd00",
-      "question": "써드스페이스",
-      "answer": "⌛ 회사 소개\n2016년 설립(10년차)\n화이트 톤, 우드 계열 인테리어 특화\n브랜드 디자인, 그래픽 디자인 가능. DID에 들어간 브랜드에 맞는 다양한 그래픽 영상 제작 가능\n📄건설업등록증 보유 여부\n⭕\n📁포트폴리오\nhttps://www.3rd-s.com/MEDICAL  (포트폴리오 링크)\n합정 메디원 내과 검진센터(600평) (중간우드+갤러리 스타일)\n릴리브 피부과 의원(61평) (메이플우드+화이트)\n선릉숲 정신의학과 (화이트톤 + 플랜테리어)\n브릴린클리닉 (중간톤 우드+대리석)\n다피네 피부과 의원(다크우드 + 무늬 벽지 포인트)",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "써드스페이스",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-818f-adab-e14e9987d834",
-      "question": "톤앤무드",
-      "answer": "⌛ 회사 소개\n2023년 설립(3년차)\n2년 무상 A/S + 3년 유상 A/S 진행\n트렌디한 디자인, 젊은 감각\n플랜 디자인 출신 대표의 책임 시공\n계약이행증권 발급 (공사대금지급보증 필요)\n💵 예상 견적(평당가)\n210-245만 원\n📄 건설업등록증 보유 여부\n⭕\n📁포트폴리오",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "톤앤무드",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8139-ac09-db544c3edd48",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8145-b867-d6931b0bbe31",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8168-907d-eae9e20980cd",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8188-9fdf-e6c6d4688630",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-816c-8626-ff5226555620",
-      "question": "[하나은행] 닥터플래티늄",
-      "answer": "의과/치과\n신용점수 NICE/KCB 909점 이상일 경우 최대 금액 시도 가능합니다.",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "[하나은행] 닥터플래티늄",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-8151-bd28-c8363927664a",
-      "question": "부산은행",
-      "answer": "[부산은행] - Notion에서 상세 내용 확인",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "부산은행",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
-        "structuredCategory": "checklist",
-        "structuredSubCategory": "general"
-      }
-    },
-    {
-      "id": "notion-2ed62aded336",
-      "source": "notion",
-      "pageId": "2ed62ade-d336-81dd-b3d9-e2dbdd7cd198",
-      "question": "[경남은행] 메디칼론",
-      "answer": "의과/치과",
-      "metadata": {
-        "field": "플래너 AI",
-        "topic": "[경남은행] 메디칼론",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
+        "topic": "소방점검 체크리스트 (1)",
+        "category": "페이지",
+        "icon": "🧯",
+        "lastUpdated": "2026-01-19T05:19:00.000Z",
+        "parentType": "page_id",
+        "parentTitle": "플래너 AI",
         "structuredCategory": "checklist",
         "structuredSubCategory": "general"
       }
@@ -2744,16 +421,17 @@
     {
       "id": "notion-2ed62aded336",
       "source": "notion",
-      "pageId": "2ed62ade-d336-81bf-8337-ec3159d8221c",
-      "question": "",
-      "answer": "[] - Notion에서 상세 내용 확인",
+      "pageId": "2ed62ade-d336-801f-aac5-ea0017299ab8",
+      "question": "🗃️ 행정업무 체크리스트 (원장님용) (1)",
+      "answer": "💡 :로고: 의료기관 개설신고는 병의원을 합법적으로 운영하기 위한 필수 행정 절차입니다. 시·군·구 보건소에 사업장 시설과 의료 인력 등에 대한 자격을 확인받는 과정이죠. 이 절차를 거쳐 발급받는 ‘의료기관 개설 신고증명서’는 세무서에서도 요구하는 중요한 서류이므로, 개원 초기부터 꼼꼼하게 준비 해야합니다.\n  • 신고 시기 : 인테리어 공사가 80% 정도 완료되고, 소방 시설이 갖춰진 시점에 신청하는 것이 일반적입니다. 너무 빨리 신청하면 시설 미비로 반려될 수 있고, 너무 늦으면 개원 일정에 차질이 생길 수 있으므로 적절한 시기를 잡는 것이 중요합니다. \n  • 신고 장소 : 병원을 개원할 지역의 관할 보건소 의약과에 직접 방문하여 신고하면 됩니다. \n\n### 개설신고완료 전 프로세스\n[표]\n💡 :로고: 개설신고 절차 \n인테리어 업체와 소방점검 언제쯤 가능할지 먼저 확인을 합니다. 개설신고 담당 주무관에게 인테리어업체와 협의한 소방점검일 말씀드리고, 주무관 일정과 조율하여 접수합니다. 접수 시 신분증과 현금 4만원, 그리고 아래 나온 서류들이 필요합니다.\n\n### (개설신고완료 전)행정 절차 체크리스트\n    ☐ 원장님 퇴사완료 (서류 접수 전, 봉직했던 병원에서 퇴사 처리와 함께 심평원에 전화로 인력 등록에서 제외되었는지 반드시 확인해야 합니다. 등록되어있는 병원에 퇴사 처리 요청)\n    ☐ 방문 전, 담당 주무관과 통화 후 방문 날짜 잡는 것을 추천 드립니다 : 지역마다 제출 서류 혹은 절차가 조금씩 다르므로 문의 필요합니다.\n    ☐ 개설신고접수(@보건소)\n📌 원장님 미리 준비하셔야 하는 서류\n      ☐ 신분증 사본 1부\n      ☐ 의사 면허증 사본 1부\n      ☐ 전문의인 경우 전문의 자격증 사본 1부\n      ☐ 직원(간호조무사 or 치위생사) 면허증 사본 1부\n      ☐ 허가도면(건축평면도) → 인테리어 업체에 요청 1부\n      ☐ 건축물 대장 원본 1부(참고용)\n      ☐ 임대차계약서사본(참고용)\n      ☐ 사업자 사본(상호명 확인용, 참고용)\n      📌 보건소에 비치 된 서류 (미리 작성해 가는 것을 권장드립니다)\n      ☐ 의료기관 개설신고서, 인력시설장비개요서, 의료기관 자가점검표, 범죄사실 조회 동의서\n\n### 📄 파일함\n[파일]\n[파일]\n[파일]\n        ▸ 참고사항\n          인력, 시설 및 장비 개요서의 경우, 보건소마다 말이 달라요. \n          어떤 곳은 ‘진료과목 및 진료과목별 시설, 정원 등의 개설 설명서’ 를 요구하는 경우도 있어요. \n          심지어는 필요 없다고 하는 경우도 있어요.\n[파일]\n      📌 그 외 준비 사항\n      ☐ 현금 4만원\n      ☐ 공동인증서(미리 만들면 좋습니다)\n      ☐ 수술실, 입원실이 있을 경우: 수술실/입원실 설치 시 공기정화설비/환기설비 시험성적서\n        • 수술실 관련 CCTV 및 법규 페이지 아래 별도 정리\n    ☐ 준공청소\n    ☐ 소방점검 : 인테리어 소장님이 대응하는것이 좋습니다\n    ☐ 보건소 실사 : 원장님이 계셔야 합니다\n      • 소방서 점검 사항에는 스프링쿨러, 소화기 및 소화전, 비상구 안내, 차단기, 화재감지기, 방염시트 및 방염성능검사 결과통보서(인테리어사 통해 복사본 받아두면 좋습니다) 가 있으며,\n        보건소 점검 사항에는 멸균소독기, 방충 시설 여부 확인이 있습니다.\n    ☐ 검사 후, 개설신고증 보건소 가서 받아오기 (면허세를 내야하므로 직접 방문해야합니다)\n    • 개설신고완료! : 완료 후, 심평원에서 요양기관번호가 적혀있는 번호를 문자로 받게 됩니다.\n\n### 개설신고완료 후 프로세스\n[표]\n\n### (개설신고완료 후)행정 절차 체크리스트\n  ☐ 요양기관 현황 신고(@보건의료자원신고포털, www.hurb.or.kr) : 앞으로 이곳에 인력 관련 내용 신고를 하게 됩니다\n    ☐ 지급계좌 신고\n      ☐ 통장 사본(보험청구했을 때 돈 지급 받을 통장)\n      ☐ 사업자등록증 사본\n      →위 두가지를 PC에 발급 받아 두고 파일로 첨부합니다.\n  ☐ 공인인증서 발급(@국민건강보험공단) : 공단 본사가 아닌 지사 방문! (개설신고 전 가능)\n  • 진단서 발급 용도로는 원장님 개인 공인인증서 필요합니다\n    • 신청하면 현장에서 접수증을 줍니다. 보관하고 있어야 하며, 분실 위험 있으니 사진 찍어두면 좋습니다! 그 접수 번호를 가지고 사인게이트라는 사이트를 이용하여 원장님 병원용 공동인증서 발급 가능합니다. USB 혹은 서버PC에 저장해둡니다. (무료 버전 가능)\n    • EMR 에도 공동인증서 설치가 필요합니다\n    ☐ 사업자 등록증 사본\n    ☐ 원장님 신분증\n    ☐ 신청\n  ☐ 요양기관 기호 발급 확정 \n  ☐ 요양기관으로서 보험심사평가원 가입 및 공동인증서 등록\n  ☐ 요양기관으로서 국민의료보험공단 가입 및 공동인증서 등록\n    • 이후, 보험청구프로그램 정상 구동 가능, 심평원 , 공단 다 이용 가능\n    • 직원관련 정보는 의료관련신고포탈에서, 보험청구관련 장비들은 보험청구 할 수 있도록 등록 필요.\n---\n  ☐ 사업용 계좌 신고(담당 세무사 통해)\n    ☐ 홈택스 로그인\n    ☐ 사업용 계좌 검색 후 신고\n  ☐ 특수의료장비 등록* : www.hurb.or.kr\n    ☐ 개설신고증명서 사본\n    ☐ 영상의학과 전문의 자격증 및 방사선사면허증 사본\n    ☐ 의료기기 제조허가증 또는 수입허가증 사본\n    ☐ 세금계산서, 계약서 등 구입 또는 임차 사실 증명자료 사본\n  ☐ 검사*\n  ☐ 진단용 방사선 장치 신고 : 보통 장비 신고는 제조인증서,세금계산서 등만 필요하나 방사선 장치면 장치검사, 시설검사 성적서가 추가로 요구됩니다.\n    ☐ 장치검사 성적서 사본 \n    ☐ 시설검사 성적서 사본\n    ☐ 제조인증서(요구하는 경우)\n    ☐ 세금계산서, 계약서 등 구입 또는 임차 사실 증명 자료\n    ☐ 건강검진결과서\n    ☐ 의사면허증\n  ☐ 탕전실 신고(필요 시)\n*치과, 성형외과(CTO), 정형외과, 재활의학과, 영상의학과, 통증의학과, 내과(건강검진)의 경우 해당\n참고)\n[표]\n**CT 업체에서 검사 후 검사성적표 수령 \n** 방사선신고(주로 장비 업체에서 대신 합니다)\n• 방사선 장비 설치 당일 혹은 다음날 방사선 장치와 실에 대한 성능 검사(업체에서) 들어감. \n검사를 위한 비용 많이 드는 편이나 주로 기기 업체에서 합니다.\n• 필증(검사성적서) 받아서 보건소에 방사선장비 신고 해야함.\n그 시기는 개설신고증이 나온 이후, 신고 후 현장실사 주무관 나옵니다.\n심사 후 방사선 신고필증 나오게 됩니다. \n\n### [별지 제14호 서식]의료기관 개설 신고서 설명\n[이미지]\n(개인사업자, 의원급 기준으로 설명)\n개설 예정일 : 개원 예정일과 동일하며, 실사 일정에 참고합니다.\n설립 구분 : “04 개인”에 01~03으로 맞게 코드를 쓰면 됩니다.\n---\n시설 현황 : 인테리어 도면을 보고 작성하시면 됩니다.\n인원 현황 : 원장 1명과 직원 1명만 작성하시면 됩니다.\n[이미지]\n진료과목 현황\n[이미지]\n[이미지]\n    • 진료과목 수를 최대한 늘려도 좋고, 하나만 해도 됩니다.\n    • 변경도 자유롭습니다.\n    • 체감되는 건 네이버에서 의원 검색하시면 나오는 항목입니다.\n행정정보 공동이용 동의서\n[이미지]\n면허 조회와 관련된 내용으로, 원본 대조를 위해 사용됩니다. (면허 사본과 별도)\n하단의 인적 사항만 작성하면 됩니다.\n---\n\n### 자가점검표\n[이미지]\n• 병원 급 이상에 해당하는 내용으로, 가볍게 확인하시고 예시와 동일하게 작성하시면 됩니다.\n[파일]\n[파일]\n[이미지]\n안전 관리 시설 : 적합 or 해당없음으로 상황에 맞게 작성하시면 됩니다.\n고가 의료 장비 : X-ray, CT, MRI 등이 있을 경우에만 해당됩니다.베\n  미설치 or 설치 예정으로 작성하면 됩니다.\n정원 기준\n  간호조무사나 치위생사 1명만 있으면 기준은 대체로 충족됩니다.\n  병원 급 관련 사항은 대체로 해당 없음\n\n### 인력 시설 및 장비 개요서, 범죄 경력 조회 동의서\n범죄 경력 조회 동의서는 개설자만 작성하면 됩니다.\n[이미지]\n[이미지]\n\n### 공동인증서 신청서 양식 예시\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n[이미지]\n\n### 요양기호발급(확정신고) 방법\n• 홈페이지 메인에 신고 프로세스 안내가 상세히 나와있습니다.\n[이미지]\n[이미지]\n1. 보건의료자원통합신고포털에 들어가서 먼저 메인 화면 상단에 개설신고·변경을 클릭합니다.\n[이미지]\n1. 지급계좌 신고 버튼을 클릭합니다.\n[이미지]\n1. 마지막으로 로그인을 하셔야 합니다. 아직 미신고 기관이기 때문에 '요양기관현황미신고기관 비회원 로그인'을 클릭하여 진행하여 주시기 바랍니다. 로그인을 하시면 지급 계좌, 사업자 등록증 등 다양한 내용들을 신고해 주시면 됩니다. \n\n### 수술실 관련 법규 \n[파일]\n[파일]\n[파일]\n[파일]\n• 수술방에는 CCTV 필수\n  • 촬영 안내판은 의무 사항 아님\n• 입원실 면적 1명 기준 10제곱미터 이상, 1명당 6.3제곱미터 이상/ 병상 2개면 12.6 제곱미터 이상 \n• 입원실 최대 4병상까지 가능. 최소 거리 1.5m (투석내과도 이에 해당), 미리 베드가 설치 되어있어야함\n• 입원실에는 손씻는 시설 및 환기시설(창문) 필수\n• 수술실은 칸막이벽으로 구획되어야 함\n• 수술실 1개 당 1수술대만 가능\n• 공기정화설비 필수(HEFA필터)\n• 내부 벽면은 불침투질(전용 자재가 있음)\n• 난방, 멸균수세(스크럽), 수술용 피복, 기계기구, 의료가스, 소독 배수 갖춰야함\n• 바닥은 접지가 되야함(전용 자재 있음), 이음새 있으면 안됨(하나의 자재로 이음새 없이 깔아야함)\n• 콘센트는 바닥으로부터 1m이상 유지\n• 삽관유지장치, 인공호흡기, 호흡감시장치, 심전도 모니터 장치 필수(보건소 검사 항목)\n  • EKG 모니터 : 심전도 +SpO2까지 확인 가능하면, 환자호흡감시/심전도모니터 장치 둘 다 충족된 것으로 인정\n  • 삽관 유지 장치 : 삽관용 부자재 포함 기본 세트 구비 필요, 다만 튜브 대신 아이겔도 무방\n  • 가스는 미리 준비할 필요 없음\n• UPS필요하나, 위의 의료기기에 축전지가 내장되어 있는 경우, UPS가 있는 것으로 인정됨\n  • 인공호흡기/EKG 모니터, 최소 2개는 장착되어 있어야 함",
       "metadata": {
         "field": "플래너 AI",
-        "topic": "",
-        "category": "DB 레코드",
-        "icon": "",
-        "lastUpdated": "2026-01-19T05:11:00.000Z",
-        "parentType": "database_id",
+        "topic": "행정업무 체크리스트 (원장님용) (1)",
+        "category": "페이지",
+        "icon": "🗃️",
+        "lastUpdated": "2026-01-19T05:16:00.000Z",
+        "parentType": "page_id",
+        "parentTitle": "플래너 AI",
         "structuredCategory": "checklist",
         "structuredSubCategory": "general"
       }
