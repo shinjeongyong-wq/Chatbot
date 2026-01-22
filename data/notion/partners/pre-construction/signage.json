@@ -2,7 +2,7 @@
   "category": "partners",
   "subCategory": "pre-construction/signage",
   "itemCount": 14,
-  "lastUpdated": "2026-01-21T07:46:36.589Z",
+  "lastUpdated": "2026-01-22T01:19:43.871Z",
   "items": [
     {
       "id": "notion-2ed62aded336",
@@ -19,7 +19,10 @@
         "parentType": "database_id",
         "parentDbName": "PC&네트워크 파트너사 ",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/signage"
+        "structuredSubCategory": "pre-construction/signage",
+        "specialties": [
+          "치과"
+        ]
       }
     },
     {
@@ -37,7 +40,16 @@
         "parentType": "database_id",
         "parentDbName": "PC&네트워크 파트너사 ",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/signage"
+        "structuredSubCategory": "pre-construction/signage",
+        "specialties": [
+          "전체진료과"
+        ],
+        "features": [
+          "토탈솔루션",
+          "합리적가격",
+          "강력한A/S지원"
+        ],
+        "website": "https://www.jait.co.kr/"
       }
     },
     {
@@ -55,7 +67,17 @@
         "parentType": "database_id",
         "parentDbName": "파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/signage"
+        "structuredSubCategory": "pre-construction/signage",
+        "specialties": [
+          "전체"
+        ],
+        "features": [
+          "병원간판",
+          "병의원간판",
+          "병원에 최적화된 시스템 제공",
+          "가심비"
+        ],
+        "website": "https://lsdesign.biz/"
       }
     },
     {
@@ -73,7 +95,15 @@
         "parentType": "database_id",
         "parentDbName": "파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/signage"
+        "structuredSubCategory": "pre-construction/signage",
+        "specialties": [
+          "전체"
+        ],
+        "features": [
+          "외부 간판",
+          "내부 사인물"
+        ],
+        "website": "blog.naver.com/fineledprime"
       }
     },
     {
@@ -91,7 +121,17 @@
         "parentType": "database_id",
         "parentDbName": "파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/signage"
+        "structuredSubCategory": "pre-construction/signage",
+        "specialties": [
+          "전체"
+        ],
+        "features": [
+          "외부 간판",
+          "내부 사인물",
+          "인쇄물",
+          "LED전광판"
+        ],
+        "website": "https://donasign.co.kr/main/"
       }
     },
     {
@@ -109,7 +149,18 @@
         "parentType": "database_id",
         "parentDbName": "파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/signage"
+        "structuredSubCategory": "pre-construction/signage",
+        "specialties": [
+          "미용",
+          "통증",
+          "치과"
+        ],
+        "features": [
+          "병의원간판",
+          "병원에 최적화된 시스템 제공",
+          "하이엔드"
+        ],
+        "website": "http://www.feelthesign.com"
       }
     },
     {
@@ -127,7 +178,16 @@
         "parentType": "database_id",
         "parentDbName": "파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/signage"
+        "structuredSubCategory": "pre-construction/signage",
+        "specialties": [
+          "내과",
+          "통증"
+        ],
+        "features": [
+          "경쟁사대비동일조건하저렴함",
+          "트랜디한디자인",
+          "높은내구성"
+        ]
       }
     },
     {

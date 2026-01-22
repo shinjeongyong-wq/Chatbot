@@ -2,7 +2,7 @@
   "category": "partners",
   "subCategory": "post-construction/emr-crm",
   "itemCount": 4,
-  "lastUpdated": "2026-01-21T07:46:36.562Z",
+  "lastUpdated": "2026-01-22T01:18:56.955Z",
   "items": [
     {
       "id": "notion-2ed62aded336",
@@ -19,7 +19,13 @@
         "parentType": "database_id",
         "parentDbName": "피부미용(비보험과)",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/emr-crm"
+        "structuredSubCategory": "post-construction/emr-crm",
+        "specialties": [
+          "피부",
+          "미용",
+          "성형외과"
+        ],
+        "website": "https://www.vegas-solution.com/home/main"
       }
     },
     {
@@ -37,7 +43,13 @@
         "parentType": "database_id",
         "parentDbName": "피부미용(비보험과)",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/emr-crm"
+        "structuredSubCategory": "post-construction/emr-crm",
+        "specialties": [
+          "피부",
+          "미용",
+          "성형외과"
+        ],
+        "website": "https://carecrm.co.kr/index"
       }
     },
     {
@@ -55,7 +67,12 @@
         "parentType": "database_id",
         "parentDbName": "피부미용(비보험과)",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/emr-crm"
+        "structuredSubCategory": "post-construction/emr-crm",
+        "specialties": [
+          "피부",
+          "미용"
+        ],
+        "website": "https://kos-solution.com/"
       }
     },
     {
@@ -73,7 +90,13 @@
         "parentType": "database_id",
         "parentDbName": "피부미용(비보험과)",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/emr-crm"
+        "structuredSubCategory": "post-construction/emr-crm",
+        "specialties": [
+          "피부",
+          "미용",
+          "성형외과"
+        ],
+        "website": "https://smartdoctor.cc/"
       }
     }
   ]

@@ -2,7 +2,7 @@
   "category": "partners",
   "subCategory": "pre-construction/pc-network",
   "itemCount": 3,
-  "lastUpdated": "2026-01-21T07:46:36.592Z",
+  "lastUpdated": "2026-01-22T01:19:29.480Z",
   "items": [
     {
       "id": "notion-2ed62aded336",
@@ -37,7 +37,11 @@
         "parentType": "database_id",
         "parentDbName": "통신&보안 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/pc-network"
+        "structuredSubCategory": "pre-construction/pc-network",
+        "specialties": [
+          "전체"
+        ],
+        "website": "https://gigaeyes.kttelecop.co.kr/#/sfaLogin"
       }
     },
     {
@@ -55,7 +59,10 @@
         "parentType": "database_id",
         "parentDbName": "통신&보안 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/pc-network"
+        "structuredSubCategory": "pre-construction/pc-network",
+        "specialties": [
+          "전체"
+        ]
       }
     }
   ]

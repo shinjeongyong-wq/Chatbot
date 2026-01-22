@@ -2,7 +2,7 @@
   "category": "partners",
   "subCategory": "pre-construction/interior",
   "itemCount": 12,
-  "lastUpdated": "2026-01-21T07:46:36.600Z",
+  "lastUpdated": "2026-01-22T01:19:22.915Z",
   "items": [
     {
       "id": "notion-2ed62aded336",
@@ -19,7 +19,17 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "통증",
+          "내과"
+        ],
+        "features": [
+          "병의원인테리어 최다진행",
+          "합리적비용",
+          "투명한견적"
+        ],
+        "website": "https://www.mooadesign.co.kr/"
       }
     },
     {
@@ -37,7 +47,14 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "미용",
+          "통증",
+          "치과",
+          "내과"
+        ],
+        "website": "http://jwcgroup.gamgakdesign.com/sub03/sub01.php"
       }
     },
     {
@@ -55,7 +72,17 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "치과",
+          "한의원"
+        ],
+        "features": [
+          "업계1위",
+          "오래된업력",
+          "포트폴리오최다"
+        ],
+        "website": "http://www.fluxdesign.co.kr/"
       }
     },
     {
@@ -73,7 +100,20 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "미용",
+          "피부",
+          "치과",
+          "내과"
+        ],
+        "features": [
+          "좋은후기",
+          "오래된업력",
+          "병의원인테리어 최다진행",
+          "포트폴리오최다"
+        ],
+        "website": "http://www.plananc.com/"
       }
     },
     {
@@ -91,7 +131,19 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "치과",
+          "미용",
+          "내과",
+          "성형"
+        ],
+        "features": [
+          "가성비",
+          "오래된업력",
+          "도면구성좋음"
+        ],
+        "website": "http://nestdesign.co.kr/"
       }
     },
     {
@@ -109,7 +161,16 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "미용",
+          "치과"
+        ],
+        "features": [
+          "트렌디한디자인",
+          "철저한A/S"
+        ],
+        "website": "https://www.toneandtones.co.kr/index.php"
       }
     },
     {
@@ -127,7 +188,17 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "피부",
+          "미용"
+        ],
+        "features": [
+          "하이엔드인테리어",
+          "좋은후기",
+          "트렌디한디자인"
+        ],
+        "website": "http://www.intoex.co.kr/"
       }
     },
     {
@@ -145,7 +216,16 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "통증",
+          "내과"
+        ],
+        "features": [
+          "탄탄한재무",
+          "국보디자인"
+        ],
+        "website": "www.nayac2y.com"
       }
     },
     {
@@ -163,7 +243,13 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "정신과",
+          "내과",
+          "전체진료과"
+        ],
+        "website": "https://www.3rd-s.com/"
       }
     },
     {
@@ -181,7 +267,13 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "통증",
+          "내과",
+          "정형외과"
+        ],
+        "website": "http://made-by.co.kr/"
       }
     },
     {
@@ -199,7 +291,21 @@
         "parentType": "database_id",
         "parentDbName": "인테리어 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/interior"
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "피부",
+          "치과",
+          "내과",
+          "정신과",
+          "미용"
+        ],
+        "features": [
+          "브랜딩가능",
+          "많은포트폴리오",
+          "화이트모던인테리어",
+          "미니멀인테리어"
+        ],
+        "website": "https://theconamedispace.co.kr/"
       }
     },
     {

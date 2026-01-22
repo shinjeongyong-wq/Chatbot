@@ -2,7 +2,7 @@
   "category": "partners",
   "subCategory": "post-construction/marketing",
   "itemCount": 1,
-  "lastUpdated": "2026-01-21T07:46:36.566Z",
+  "lastUpdated": "2026-01-22T01:19:05.572Z",
   "items": [
     {
       "id": "notion-2ed62aded336",
@@ -19,7 +19,16 @@
         "parentType": "database_id",
         "parentDbName": "마케팅 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/marketing"
+        "structuredSubCategory": "post-construction/marketing",
+        "specialties": [
+          "전체",
+          "치과"
+        ],
+        "features": [
+          "오프라인마케팅",
+          "판촉마케팅"
+        ],
+        "website": "https://m.blog.naver.com/plan-t?tab=1"
       }
     }
   ]

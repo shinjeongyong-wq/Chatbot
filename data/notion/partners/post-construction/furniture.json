@@ -2,7 +2,7 @@
   "category": "partners",
   "subCategory": "post-construction/furniture",
   "itemCount": 6,
-  "lastUpdated": "2026-01-21T07:46:36.585Z",
+  "lastUpdated": "2026-01-22T01:19:03.890Z",
   "items": [
     {
       "id": "notion-2ed62aded336",
@@ -19,7 +19,19 @@
         "parentType": "database_id",
         "parentDbName": "붙박이가구",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/furniture"
+        "structuredSubCategory": "post-construction/furniture",
+        "specialties": [
+          "전체"
+        ],
+        "features": [
+          "하이엔드",
+          "가성비",
+          "좋은품질",
+          "오랜업력",
+          "맞춤제작",
+          "붙박이가구"
+        ],
+        "website": "https://bauskitchen.co.kr/"
       }
     },
     {
@@ -37,7 +49,14 @@
         "parentType": "database_id",
         "parentDbName": "이동가구 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/furniture"
+        "structuredSubCategory": "post-construction/furniture",
+        "specialties": [
+          "전체"
+        ],
+        "features": [
+          "하이엔드"
+        ],
+        "website": "https://aurumncompany.com/"
       }
     },
     {
@@ -55,7 +74,16 @@
         "parentType": "database_id",
         "parentDbName": "이동가구 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/furniture"
+        "structuredSubCategory": "post-construction/furniture",
+        "specialties": [
+          "전체"
+        ],
+        "features": [
+          "하이엔드",
+          "브랜딩",
+          "다양한브랜드"
+        ],
+        "website": "https://unwind.kr/"
       }
     },
     {
@@ -73,7 +101,14 @@
         "parentType": "database_id",
         "parentDbName": "이동가구 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/furniture"
+        "structuredSubCategory": "post-construction/furniture",
+        "specialties": [
+          "전체"
+        ],
+        "features": [
+          "맞춤쇼파제작전문"
+        ],
+        "website": "http://www.dssofa.com/default/index.php"
       }
     },
     {
@@ -91,7 +126,18 @@
         "parentType": "database_id",
         "parentDbName": "이동가구 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/furniture"
+        "structuredSubCategory": "post-construction/furniture",
+        "specialties": [
+          "전체진료과"
+        ],
+        "features": [
+          "하이엔드",
+          "커스텀제작",
+          "병의원전문가구제작",
+          "높은업력",
+          "병의원포트폴리오다수"
+        ],
+        "website": "https://www.instagram.com/lieu_furniture_official?igsh=bTNkODB6MGtoZnNp"
       }
     },
     {
@@ -109,7 +155,17 @@
         "parentType": "database_id",
         "parentDbName": "이동가구 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "post-construction/furniture"
+        "structuredSubCategory": "post-construction/furniture",
+        "specialties": [
+          "전체"
+        ],
+        "features": [
+          "가성비",
+          "커스텀제작",
+          "맞춤쇼파제작전문",
+          "조약돌쇼파"
+        ],
+        "website": "https://maisonbfurniture.com/"
       }
     }
   ]

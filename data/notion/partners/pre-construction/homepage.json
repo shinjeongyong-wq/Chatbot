@@ -2,7 +2,7 @@
   "category": "partners",
   "subCategory": "pre-construction/homepage",
   "itemCount": 4,
-  "lastUpdated": "2026-01-21T07:46:36.595Z",
+  "lastUpdated": "2026-01-22T01:19:11.258Z",
   "items": [
     {
       "id": "notion-2ed62aded336",
@@ -19,7 +19,14 @@
         "parentType": "database_id",
         "parentDbName": "홈페이지 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/homepage"
+        "structuredSubCategory": "pre-construction/homepage",
+        "specialties": [
+          "피부과",
+          "미용",
+          "성형외과",
+          "검진센터"
+        ],
+        "website": "https://www.pdbud.com/"
       }
     },
     {
@@ -37,7 +44,13 @@
         "parentType": "database_id",
         "parentDbName": "홈페이지 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/homepage"
+        "structuredSubCategory": "pre-construction/homepage",
+        "specialties": [
+          "치과",
+          "통증",
+          "정형외과"
+        ],
+        "website": "http://oneframe.co.kr"
       }
     },
     {
@@ -55,7 +68,13 @@
         "parentType": "database_id",
         "parentDbName": "홈페이지 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/homepage"
+        "structuredSubCategory": "pre-construction/homepage",
+        "specialties": [
+          "피부과",
+          "치과",
+          "성형외과"
+        ],
+        "website": "https://www.fineappleptl.com/"
       }
     },
     {
@@ -73,7 +92,11 @@
         "parentType": "database_id",
         "parentDbName": "홈페이지 파트너사",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/homepage"
+        "structuredSubCategory": "pre-construction/homepage",
+        "specialties": [
+          "전체진료과"
+        ],
+        "website": "https://www.urdv.net/"
       }
     }
   ]

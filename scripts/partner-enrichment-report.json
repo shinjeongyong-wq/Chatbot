@@ -1,0 +1,411 @@
+{
+  "updatedAt": "2026-01-22T01:19:43.991Z",
+  "partners": [
+    {
+      "name": "베가스 CRM",
+      "specialties": [
+        "피부",
+        "미용",
+        "성형외과"
+      ],
+      "features": [],
+      "website": "https://www.vegas-solution.com/home/main"
+    },
+    {
+      "name": "스마트/우노 CRM",
+      "specialties": [
+        "피부",
+        "미용",
+        "성형외과"
+      ],
+      "features": [],
+      "website": "https://carecrm.co.kr/index"
+    },
+    {
+      "name": "KOS CRM",
+      "specialties": [
+        "피부",
+        "미용"
+      ],
+      "features": [],
+      "website": "https://kos-solution.com/"
+    },
+    {
+      "name": "스마트닥터CRM",
+      "specialties": [
+        "피부",
+        "미용",
+        "성형외과"
+      ],
+      "features": [],
+      "website": "https://smartdoctor.cc/"
+    },
+    {
+      "name": "바우스가구",
+      "specialties": [
+        "전체"
+      ],
+      "features": [
+        "하이엔드",
+        "가성비",
+        "좋은품질",
+        "오랜업력",
+        "맞춤제작",
+        "붙박이가구"
+      ],
+      "website": "https://bauskitchen.co.kr/"
+    },
+    {
+      "name": "오름앤컴퍼니",
+      "specialties": [
+        "전체"
+      ],
+      "features": [
+        "하이엔드"
+      ],
+      "website": "https://aurumncompany.com/"
+    },
+    {
+      "name": "UNWIND",
+      "specialties": [
+        "전체"
+      ],
+      "features": [
+        "하이엔드",
+        "브랜딩",
+        "다양한브랜드"
+      ],
+      "website": "https://unwind.kr/"
+    },
+    {
+      "name": "DS소파",
+      "specialties": [
+        "전체"
+      ],
+      "features": [
+        "맞춤쇼파제작전문"
+      ],
+      "website": "http://www.dssofa.com/default/index.php"
+    },
+    {
+      "name": "루벨루테",
+      "specialties": [
+        "전체진료과"
+      ],
+      "features": [
+        "하이엔드",
+        "커스텀제작",
+        "병의원전문가구제작",
+        "높은업력",
+        "병의원포트폴리오다수"
+      ],
+      "website": "https://www.instagram.com/lieu_furniture_official?igsh=bTNkODB6MGtoZnNp"
+    },
+    {
+      "name": "메종비퍼니처",
+      "specialties": [
+        "전체"
+      ],
+      "features": [
+        "가성비",
+        "커스텀제작",
+        "맞춤쇼파제작전문",
+        "조약돌쇼파"
+      ],
+      "website": "https://maisonbfurniture.com/"
+    },
+    {
+      "name": "플랜티",
+      "specialties": [
+        "전체",
+        "치과"
+      ],
+      "features": [
+        "오프라인마케팅",
+        "판촉마케팅"
+      ],
+      "website": "https://m.blog.naver.com/plan-t?tab=1"
+    },
+    {
+      "name": "BUD",
+      "specialties": [
+        "피부과",
+        "미용",
+        "성형외과",
+        "검진센터"
+      ],
+      "features": [],
+      "website": "https://www.pdbud.com/"
+    },
+    {
+      "name": "원프레임",
+      "specialties": [
+        "치과",
+        "통증",
+        "정형외과"
+      ],
+      "features": [],
+      "website": "http://oneframe.co.kr"
+    },
+    {
+      "name": "파인애플피티엘",
+      "specialties": [
+        "피부과",
+        "치과",
+        "성형외과"
+      ],
+      "features": [],
+      "website": "https://www.fineappleptl.com/"
+    },
+    {
+      "name": "YourDev:유어데브",
+      "specialties": [
+        "전체진료과"
+      ],
+      "features": [],
+      "website": "https://www.urdv.net/"
+    },
+    {
+      "name": "무아디자인",
+      "specialties": [
+        "통증",
+        "내과"
+      ],
+      "features": [
+        "병의원인테리어 최다진행",
+        "합리적비용",
+        "투명한견적"
+      ],
+      "website": "https://www.mooadesign.co.kr/"
+    },
+    {
+      "name": "JWC그룹",
+      "specialties": [
+        "미용",
+        "통증",
+        "치과",
+        "내과"
+      ],
+      "features": [],
+      "website": "http://jwcgroup.gamgakdesign.com/sub03/sub01.php"
+    },
+    {
+      "name": "플럭스",
+      "specialties": [
+        "치과",
+        "한의원"
+      ],
+      "features": [
+        "업계1위",
+        "오래된업력",
+        "포트폴리오최다"
+      ],
+      "website": "http://www.fluxdesign.co.kr/"
+    },
+    {
+      "name": "플랜디자인",
+      "specialties": [
+        "미용",
+        "피부",
+        "치과",
+        "내과"
+      ],
+      "features": [
+        "좋은후기",
+        "오래된업력",
+        "병의원인테리어 최다진행",
+        "포트폴리오최다"
+      ],
+      "website": "http://www.plananc.com/"
+    },
+    {
+      "name": "네스트디자인 ",
+      "specialties": [
+        "치과",
+        "미용",
+        "내과",
+        "성형"
+      ],
+      "features": [
+        "가성비",
+        "오래된업력",
+        "도면구성좋음"
+      ],
+      "website": "http://nestdesign.co.kr/"
+    },
+    {
+      "name": "톤앤무드",
+      "specialties": [
+        "미용",
+        "치과"
+      ],
+      "features": [
+        "트렌디한디자인",
+        "철저한A/S"
+      ],
+      "website": "https://www.toneandtones.co.kr/index.php"
+    },
+    {
+      "name": "인투익스",
+      "specialties": [
+        "피부",
+        "미용"
+      ],
+      "features": [
+        "하이엔드인테리어",
+        "좋은후기",
+        "트렌디한디자인"
+      ],
+      "website": "http://www.intoex.co.kr/"
+    },
+    {
+      "name": "씨투와이",
+      "specialties": [
+        "통증",
+        "내과"
+      ],
+      "features": [
+        "탄탄한재무",
+        "국보디자인"
+      ],
+      "website": "www.nayac2y.com"
+    },
+    {
+      "name": "써드스페이스",
+      "specialties": [
+        "정신과",
+        "내과",
+        "전체진료과"
+      ],
+      "features": [],
+      "website": "https://www.3rd-s.com/"
+    },
+    {
+      "name": "메이드바이",
+      "specialties": [
+        "통증",
+        "내과",
+        "정형외과"
+      ],
+      "features": [],
+      "website": "http://made-by.co.kr/"
+    },
+    {
+      "name": "더 코나 메디스페이스",
+      "specialties": [
+        "피부",
+        "치과",
+        "내과",
+        "정신과",
+        "미용"
+      ],
+      "features": [
+        "브랜딩가능",
+        "많은포트폴리오",
+        "화이트모던인테리어",
+        "미니멀인테리어"
+      ],
+      "website": "https://theconamedispace.co.kr/"
+    },
+    {
+      "name": "KT (내부용)",
+      "specialties": [
+        "전체"
+      ],
+      "features": [],
+      "website": "https://gigaeyes.kttelecop.co.kr/#/sfaLogin"
+    },
+    {
+      "name": "SK쉴더스(ADT캡스)",
+      "specialties": [
+        "전체"
+      ],
+      "features": [],
+      "website": null
+    },
+    {
+      "name": "덴탈컴넷",
+      "specialties": [
+        "치과"
+      ],
+      "features": [],
+      "website": null
+    },
+    {
+      "name": "중앙정보기술",
+      "specialties": [
+        "전체진료과"
+      ],
+      "features": [
+        "토탈솔루션",
+        "합리적가격",
+        "강력한A/S지원"
+      ],
+      "website": "https://www.jait.co.kr/"
+    },
+    {
+      "name": "LS디자인",
+      "specialties": [
+        "전체"
+      ],
+      "features": [
+        "병원간판",
+        "병의원간판",
+        "병원에 최적화된 시스템 제공",
+        "가심비"
+      ],
+      "website": "https://lsdesign.biz/"
+    },
+    {
+      "name": "더프라임",
+      "specialties": [
+        "전체"
+      ],
+      "features": [
+        "외부 간판",
+        "내부 사인물"
+      ],
+      "website": "blog.naver.com/fineledprime"
+    },
+    {
+      "name": "디온에이(D.on.A)",
+      "specialties": [
+        "전체"
+      ],
+      "features": [
+        "외부 간판",
+        "내부 사인물",
+        "인쇄물",
+        "LED전광판"
+      ],
+      "website": "https://donasign.co.kr/main/"
+    },
+    {
+      "name": "동부기업",
+      "specialties": [
+        "미용",
+        "통증",
+        "치과"
+      ],
+      "features": [
+        "병의원간판",
+        "병원에 최적화된 시스템 제공",
+        "하이엔드"
+      ],
+      "website": "http://www.feelthesign.com"
+    },
+    {
+      "name": "디자인캐프",
+      "specialties": [
+        "내과",
+        "통증"
+      ],
+      "features": [
+        "경쟁사대비동일조건하저렴함",
+        "트랜디한디자인",
+        "높은내구성"
+      ],
+      "website": null
+    }
+  ]
+}
