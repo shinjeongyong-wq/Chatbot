@@ -111,7 +111,11 @@ async function handleQueryPlanning(req, res, userQuery) {
                 })
             });
 
-            if (!response.ok) continue;
+            if (!response.ok) {
+                const errorText = await response.text().catch(() => 'No error body');
+                console.error(`Planner ${model.name} failed: ${response.status} - ${errorText}`);
+                continue;
+            }
 
             const data = await response.json();
             if (data.choices?.[0]?.message?.content) {
@@ -215,6 +219,11 @@ async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
 
     return res.status(500).json({
         success: false,
-        error: 'All models failed'
+        error: 'All models failed',
+        debug: {
+            apiKeyExists: !!process.env.OPENROUTER_API_KEY,
+            apiKeyLength: process.env.OPENROUTER_API_KEY?.length || 0,
+            message: 'OpenRouter API 호출이 모두 실패했습니다. API 키를 확인해주세요.'
+        }
     });
 }
