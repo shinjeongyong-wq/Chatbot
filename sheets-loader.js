@@ -460,18 +460,38 @@ class GoogleSheetsLoader {
         const question = (item.question || '').toLowerCase();
         const answer = (item.answer || '').toLowerCase();
         const field = (item.metadata?.field || '').toLowerCase();
-        const text = question + ' ' + answer + ' ' + field;
+
+        // 새로 추가: specialties와 features도 검색 대상에 포함
+        const specialties = (item.metadata?.specialties || []).join(' ').toLowerCase();
+        const features = (item.metadata?.features || []).join(' ').toLowerCase();
+        const website = (item.metadata?.website || '').toLowerCase();
+
+        // 전체 검색 대상 텍스트 (띄어쓰기 제거 버전도 준비)
+        const text = question + ' ' + answer + ' ' + field + ' ' + specialties + ' ' + features;
+        const textNoSpace = text.replace(/\s/g, ''); // 띄어쓰기 제거 버전
 
         let score = 0;
+
+        // 진료과/특화 관련 질문인지 감지
+        const isSpecialtyQuestion = coreKeywords?.some(kw =>
+            kw && (kw.includes('진료과') || kw.includes('특화') || kw.includes('전문'))
+        ) || expandedKeywords?.some(kw =>
+            kw && (kw.includes('진료과') || kw.includes('특화') || kw.includes('전문'))
+        );
 
         // 1. 핵심 키워드 매칭 (가장 중요 - 최대 0.6점)
         if (coreKeywords && coreKeywords.length > 0) {
             let coreHits = 0;
             for (const keyword of coreKeywords) {
-                if (keyword && text.includes(keyword.toLowerCase())) {
+                if (!keyword) continue;
+                const kw = keyword.toLowerCase();
+                const kwNoSpace = kw.replace(/\s/g, '');
+
+                // 일반 매칭 또는 띄어쓰기 무시 매칭
+                if (text.includes(kw) || textNoSpace.includes(kwNoSpace)) {
                     coreHits++;
                     // 질문/제목에 있으면 추가 보너스
-                    if (question.includes(keyword.toLowerCase())) {
+                    if (question.includes(kw) || question.replace(/\s/g, '').includes(kwNoSpace)) {
                         coreHits += 0.5;
                     }
                 }
@@ -483,7 +503,11 @@ class GoogleSheetsLoader {
         if (expandedKeywords && expandedKeywords.length > 0) {
             let expandHits = 0;
             for (const keyword of expandedKeywords) {
-                if (keyword && text.includes(keyword.toLowerCase())) {
+                if (!keyword) continue;
+                const kw = keyword.toLowerCase();
+                const kwNoSpace = kw.replace(/\s/g, '');
+
+                if (text.includes(kw) || textNoSpace.includes(kwNoSpace)) {
                     expandHits++;
                 }
             }
@@ -497,18 +521,37 @@ class GoogleSheetsLoader {
             }
         }
 
-        // 4. 검색 전략별 조정
+        // 4. 진료과/특화 질문일 때 specialties 매칭 보너스 (최대 0.35점)
+        if (isSpecialtyQuestion && specialties) {
+            // specialties 필드에 데이터가 있으면 관련성 높음
+            score += 0.2;
+
+            // 핵심 키워드가 specialties에 직접 매칭되면 추가 보너스
+            for (const keyword of (coreKeywords || [])) {
+                if (keyword && specialties.includes(keyword.toLowerCase())) {
+                    score += 0.15;
+                    break;
+                }
+            }
+        }
+
+        // 5. 검색 전략별 조정
         if (strategy === 'exact') {
             // exact 전략: 핵심 키워드 미매칭시 점수 대폭 감소
             if (coreKeywords && coreKeywords.length > 0) {
-                let hasCorMatch = coreKeywords.some(kw => kw && text.includes(kw.toLowerCase()));
-                if (!hasCorMatch) {
+                let hasCoreMatch = coreKeywords.some(kw => {
+                    if (!kw) return false;
+                    const kwLower = kw.toLowerCase();
+                    const kwNoSpace = kwLower.replace(/\s/g, '');
+                    return text.includes(kwLower) || textNoSpace.includes(kwNoSpace);
+                });
+                if (!hasCoreMatch) {
                     score *= 0.3;
                 }
             }
         }
 
-        // 5. 파트너사 검색 패턴 보너스 (의도가 파트너사 목록일 때)
+        // 6. 파트너사 검색 패턴 보너스 (의도가 파트너사 목록일 때)
         const isPartnerSearch = coreKeywords?.some(kw => kw && (kw.includes('파트너') || kw.includes('업체')));
         if (isPartnerSearch) {
             // "회사 소개", "예상 가격", "포트폴리오" 등 파트너사 상세 페이지 패턴
@@ -519,6 +562,11 @@ class GoogleSheetsLoader {
             if (answer.includes('년차') || answer.includes('설립') || answer.includes('진행 가능')) {
                 score += 0.2;
             }
+        }
+
+        // 7. features(특징) 보너스 - 특징이 있는 파트너사는 정보가 풍부함
+        if (features && features.length > 0) {
+            score += 0.05;
         }
 
         return score;
