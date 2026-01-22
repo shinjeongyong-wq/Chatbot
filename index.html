@@ -1118,6 +1118,34 @@
             font-size: 11px;
             opacity: 0.8;
         }
+
+        /* Inline Specialty Badge (Header) */
+        .specialty-badge-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 12px;
+            padding: 4px 10px;
+            background: var(--primary-light);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .specialty-badge-inline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .specialty-badge-inline .change-text {
+            font-size: 12px;
+            font-weight: 400;
+            opacity: 0.7;
+        }
     </style>
 </head>
 
@@ -1265,7 +1293,6 @@
                 </div>
             </div>
         </aside>
-
         <!-- Main Chat Interface -->
         <main class="chat-interface">
             <header class="header">
@@ -1277,15 +1304,13 @@
                         <circle cx="16" cy="16" r="3" fill="#536db1" />
                     </svg>
                     <span class="logo-text">개원 상담 챗봇</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div id="specialtyBadge" class="specialty-badge" onclick="openSpecialtyModal()"
+                    <div id="specialtyBadge" class="specialty-badge-inline" onclick="openSpecialtyModal()"
                         style="display: none;">
-                        <span id="specialtyBadgeText">통증의학과</span>
-                        <span class="change-text">변경</span>
+                        <span id="specialtyBadgeText">통증</span>
+                        <span class="change-text">[변경]</span>
                     </div>
-                    <div class="header-subtitle">오픈닥터 AI 컨설턴트</div>
                 </div>
+                <div class="header-subtitle">오픈닥터 AI 컨설턴트</div>
             </header>
 
             <div class="chat-container" id="chatContainer">
