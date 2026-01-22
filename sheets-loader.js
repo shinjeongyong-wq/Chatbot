@@ -389,7 +389,7 @@ class GoogleSheetsLoader {
     }
 
     // [Smart Search] - Query Plan 기반 지능형 검색
-    async smartSearch(queryPlan, maxResults = 10) {
+    async smartSearch(queryPlan, maxResults = 10, userSpecialty = null) {
         if (!this.cache) await this.loadData();
 
         const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory } = queryPlan;
@@ -401,6 +401,7 @@ class GoogleSheetsLoader {
         console.log('   제외 키워드:', excludeKeywords);
         console.log('   검색 전략:', searchStrategy);
         console.log('   타겟 카테고리:', targetCategory);
+        console.log('   👤 사용자 진료과:', userSpecialty ? userSpecialty.label : '미선택');
 
         // 0. 전체 검색 대상 (Q&A, FAQ, Notion 모두 포함)
         let candidates = this.cache;
@@ -440,6 +441,14 @@ class GoogleSheetsLoader {
                 }
             }
 
+            // ★ 사용자 진료과 기반 보너스 점수 ★
+            if (userSpecialty && userSpecialty.keywords) {
+                const specialtyBonus = this.calculateSpecialtyBonus(item, userSpecialty);
+                if (specialtyBonus > 0) {
+                    score = score + specialtyBonus;
+                }
+            }
+
             return { ...item, score };
         })
             .filter(r => r.score > 0.25)  // 임계값 - 관련 문서 포함
@@ -453,6 +462,43 @@ class GoogleSheetsLoader {
         console.log(`   최종 결과: ${Math.min(results.length, maxResults)}개`);
 
         return results.slice(0, maxResults);
+    }
+
+    // [진료과 보너스 점수 계산]
+    calculateSpecialtyBonus(item, userSpecialty) {
+        if (!userSpecialty || !userSpecialty.keywords) return 0;
+
+        const question = (item.question || '').toLowerCase();
+        const answer = (item.answer || '').toLowerCase();
+        const specialties = (item.metadata?.specialties || []).join(' ').toLowerCase();
+        const features = (item.metadata?.features || []).join(' ').toLowerCase();
+
+        // 모든 텍스트 합치기
+        const text = question + ' ' + answer + ' ' + specialties + ' ' + features;
+        const textNoSpace = text.replace(/\s/g, '');
+
+        let bonus = 0;
+        let matchCount = 0;
+
+        for (const keyword of userSpecialty.keywords) {
+            const kw = keyword.toLowerCase();
+            const kwNoSpace = kw.replace(/\s/g, '');
+
+            // 일반 매칭 또는 띄어쓰기 무시 매칭
+            if (text.includes(kw) || textNoSpace.includes(kwNoSpace)) {
+                matchCount++;
+            }
+        }
+
+        // specialties 필드에 사용자 진료과가 직접 매칭되면 큰 보너스
+        if (specialties && specialties.includes(userSpecialty.code.toLowerCase())) {
+            bonus += 0.4;
+        } else if (matchCount > 0) {
+            // 키워드 매칭 횟수에 따른 보너스 (최대 0.3)
+            bonus += Math.min(matchCount * 0.1, 0.3);
+        }
+
+        return bonus;
     }
 
     // Smart Score 계산 - Plan 기반

@@ -7,6 +7,16 @@ const CONFIG = {
     CHAT_ENDPOINT: '/api/chat'
 };
 
+// 진료과 설정
+const SPECIALTIES = {
+    '통증': { label: '통증의학과', emoji: '💪', keywords: ['통증', '정형외과', '재활', '물리치료', '도수치료', 'X-ray', '척추', '관절'] },
+    '내과': { label: '내과', emoji: '🩺', keywords: ['내과', '검진', '내시경', '초음파', '만성질환', '건강검진', '소화기'] },
+    '미용': { label: '피부/미용', emoji: '✨', keywords: ['피부', '미용', '성형', '레이저', '보톡스', '필러', '리프팅', '피부과', '성형외과'] },
+    '치과': { label: '치과', emoji: '🦷', keywords: ['치과', '임플란트', '교정', '보철', '스케일링', '덴탈'] }
+};
+
+let currentUserSpecialty = null; // 사용자가 선택한 진료과
+
 let sheetsLoader = null;
 let faqNavigationStack = [];
 
@@ -25,6 +35,15 @@ const faqBackBtn = document.getElementById('faqBackBtn');
 // 1. 초기화 및 이벤트
 // ==========================
 document.addEventListener('DOMContentLoaded', async () => {
+    // 진료과 확인 - 저장된 진료과가 없으면 모달 표시
+    const savedSpecialty = localStorage.getItem('userSpecialty');
+    if (savedSpecialty && SPECIALTIES[savedSpecialty]) {
+        currentUserSpecialty = savedSpecialty;
+        updateSpecialtyBadge();
+    } else {
+        openSpecialtyModal();
+    }
+
     sheetsLoader = new GoogleSheetsLoader(CONFIG.GOOGLE_API_KEY);
     try {
         await sheetsLoader.loadData();
@@ -195,8 +214,9 @@ async function getBotResponse(userMessage) {
         const maxResults = isPartnerListQuery ? 20 : 10;
 
         if (queryPlan) {
-            // Query Plan 기반 스마트 검색
-            relatedContexts = await sheetsLoader.smartSearch(queryPlan, maxResults);
+            // Query Plan 기반 스마트 검색 (사용자 진료과 정보 전달)
+            const userSpec = getUserSpecialty();
+            relatedContexts = await sheetsLoader.smartSearch(queryPlan, maxResults, userSpec);
         } else {
             // Fallback: 기존 키워드 검색
             relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, 10);
@@ -258,8 +278,15 @@ async function callOpenRouterAPI(userQuery, contexts) {
         ).join('\n\n');
     }
 
+    // 사용자 진료과 정보 구성
+    const userSpec = getUserSpecialty();
+    const specialtyInfo = userSpec
+        ? `사용자는 **${userSpec.label}** 개원을 준비 중입니다. 해당 진료과에 맞는 정보를 우선적으로 안내해주세요.`
+        : '';
+
     const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변해주세요.
 
+${specialtyInfo ? '# 사용자 진료과 정보\n' + specialtyInfo + '\n' : ''}
 # 이전 대화 내역 (맥락 참고용)
 ${historyText ? historyText : '(첫 대화입니다)'}
 
@@ -682,4 +709,64 @@ function closeSuccessModal() {
     if (modal) {
         modal.classList.remove('active');
     }
+}
+
+// ==========================
+// 진료과 선택 관련 함수
+// ==========================
+function openSpecialtyModal() {
+    const modal = document.getElementById('specialtyModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+function closeSpecialtyModal() {
+    const modal = document.getElementById('specialtyModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function selectSpecialty(specialty) {
+    if (!SPECIALTIES[specialty]) {
+        console.error('Invalid specialty:', specialty);
+        return;
+    }
+
+    currentUserSpecialty = specialty;
+    localStorage.setItem('userSpecialty', specialty);
+
+    updateSpecialtyBadge();
+    closeSpecialtyModal();
+
+    console.log(`✅ 진료과 선택됨: ${SPECIALTIES[specialty].label}`);
+
+    // 선택 완료 시 환영 메시지 업데이트 (선택사항)
+    const welcomeMsg = document.querySelector('.welcome-message h2');
+    if (welcomeMsg) {
+        welcomeMsg.textContent = `${SPECIALTIES[specialty].emoji} ${SPECIALTIES[specialty].label} 개원을 도와드릴게요!`;
+    }
+}
+
+function updateSpecialtyBadge() {
+    const badge = document.getElementById('specialtyBadge');
+    const badgeText = document.getElementById('specialtyBadgeText');
+
+    if (badge && badgeText && currentUserSpecialty && SPECIALTIES[currentUserSpecialty]) {
+        const spec = SPECIALTIES[currentUserSpecialty];
+        badgeText.textContent = `${spec.emoji} ${spec.label}`;
+        badge.style.display = 'inline-flex';
+    }
+}
+
+// 현재 사용자의 진료과와 관련 키워드 반환
+function getUserSpecialty() {
+    if (!currentUserSpecialty || !SPECIALTIES[currentUserSpecialty]) {
+        return null;
+    }
+    return {
+        code: currentUserSpecialty,
+        ...SPECIALTIES[currentUserSpecialty]
+    };
 }

@@ -1001,14 +1001,153 @@
             margin-bottom: 8px;
         }
 
-        .feedback-qa-label {
+        /* Specialty Selection Modal */
+        .specialty-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .specialty-modal.active {
+            display: flex;
+        }
+
+        .specialty-modal-content {
+            background: #fff;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            padding: 40px 32px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .specialty-modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .specialty-modal-subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .specialty-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .specialty-btn {
+            padding: 24px 16px;
+            background: var(--surface);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .specialty-btn:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(83, 109, 177, 0.15);
+        }
+
+        .specialty-btn .emoji {
+            font-size: 36px;
+        }
+
+        .specialty-btn .label {
+            font-size: 16px;
             font-weight: 600;
-            color: #475569;
+            color: var(--text-primary);
+        }
+
+        /* Current Specialty Badge */
+        .specialty-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--primary-light);
+            border: 1px solid var(--primary-color);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .specialty-badge:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .specialty-badge .change-text {
+            font-size: 11px;
+            opacity: 0.8;
         }
     </style>
 </head>
 
 <body>
+    <!-- Specialty Selection Modal -->
+    <div id="specialtyModal" class="specialty-modal">
+        <div class="specialty-modal-content">
+            <div class="specialty-modal-title">👋 안녕하세요!</div>
+            <div class="specialty-modal-subtitle">개원 예정 진료과를 선택해주세요.<br>맞춤형 상담을 제공해드립니다.</div>
+            <div class="specialty-grid">
+                <button class="specialty-btn" onclick="selectSpecialty('통증')">
+                    <span class="emoji">💪</span>
+                    <span class="label">통증의학과</span>
+                </button>
+                <button class="specialty-btn" onclick="selectSpecialty('내과')">
+                    <span class="emoji">🩺</span>
+                    <span class="label">내과</span>
+                </button>
+                <button class="specialty-btn" onclick="selectSpecialty('미용')">
+                    <span class="emoji">✨</span>
+                    <span class="label">피부/미용</span>
+                </button>
+                <button class="specialty-btn" onclick="selectSpecialty('치과')">
+                    <span class="emoji">🦷</span>
+                    <span class="label">치과</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Citation Modal -->
     <div id="citationModal" class="modal">
         <div class="modal-content">
@@ -1139,7 +1278,14 @@
                     </svg>
                     <span class="logo-text">개원 상담 챗봇</span>
                 </div>
-                <div class="header-subtitle">오픈닥터 AI 컨설턴트</div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div id="specialtyBadge" class="specialty-badge" onclick="openSpecialtyModal()"
+                        style="display: none;">
+                        <span id="specialtyBadgeText">통증의학과</span>
+                        <span class="change-text">변경</span>
+                    </div>
+                    <div class="header-subtitle">오픈닥터 AI 컨설턴트</div>
+                </div>
             </header>
 
             <div class="chat-container" id="chatContainer">
