@@ -1,4 +1,4 @@
-// Vercel Serverless Function - OpenRouter API Proxy
+// Vercel Serverless Function - Google Gemini API Proxy
 // API 키가 환경변수에 저장되어 노출되지 않음
 
 export default async function handler(req, res) {
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'userQuery is required' });
     }
 
-    // Query Planner 모드 - 빠른 모델로 쿼리 분석
+    // Query Planner 모드 - Gemini Flash로 쿼리 분석
     if (mode === 'plan') {
         return await handleQueryPlanning(req, res, userQuery);
     }
@@ -30,11 +30,56 @@ export default async function handler(req, res) {
     return await handleAnswerGeneration(req, res, userQuery, systemPrompt);
 }
 
-// Query Planner - 빠른 모델로 쿼리 의도 분석
-async function handleQueryPlanning(req, res, userQuery) {
-    const { userSpecialty } = req.body;  // ★ Phase 5: 사용자 진료과 정보 수신 ★
+// Gemini API 호출 함수
+async function callGeminiAPI(prompt, systemPrompt = '', model = 'gemini-1.5-flash') {
+    const apiKey = process.env.GEMINI_API_KEY;
 
-    // ★ Phase 5: Query Planner 프롬프트에 진료과 정보 추가 ★
+    if (!apiKey) {
+        throw new Error('GEMINI_API_KEY is not set');
+    }
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    // Gemini API 요청 형식
+    const requestBody = {
+        contents: [
+            {
+                role: 'user',
+                parts: [{ text: systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt }]
+            }
+        ],
+        generationConfig: {
+            temperature: 0.2,
+            maxOutputTokens: 4096
+        }
+    };
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text().catch(() => 'No error body');
+        throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    // Gemini 응답에서 텍스트 추출
+    if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        return data.candidates[0].content.parts[0].text;
+    }
+
+    throw new Error('No content in Gemini response');
+}
+
+// Query Planner - Gemini Flash로 쿼리 의도 분석
+async function handleQueryPlanning(req, res, userQuery) {
+    const { userSpecialty } = req.body;
+
+    // 사용자 진료과 정보 추가
     let userSpecialtyContext = '';
     if (userSpecialty && userSpecialty.label) {
         userSpecialtyContext = `
@@ -111,133 +156,76 @@ ${userSpecialtyContext}
 {"intent":"정보요청","topic":"간판","targetCategory":"all","specialtyRelevant":false,"coreKeywords":["간판","설치","고려사항"],"expandedKeywords":["사인","외관"],"excludeKeywords":[],"searchStrategy":"broad"}
 
 질문: "개설신고 절차 알려줘"
-{"intent":"절차안내","topic":"기타","targetCategory":"hospital-basics","specialtyRelevant":false,"coreKeywords":["개설신고","절차"],"expandedKeywords":["행정","서류"],"excludeKeywords":[],"searchStrategy":"broad"}`;
+{"intent":"절차안내","topic":"기타","targetCategory":"hospital-basics","specialtyRelevant":false,"coreKeywords":["개설신고","절차"],"expandedKeywords":["행정","서류"],"excludeKeywords":[],"searchStrategy":"broad"}
 
-    // Query Planner용 빠른 모델 (Claude 사용)
-    const fastModels = [
-        { id: 'anthropic/claude-3-haiku', name: 'Claude 3 Haiku' },
-        { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' }
-    ];
+반드시 JSON만 출력하세요.`;
 
-    for (const model of fastModels) {
+    try {
+        // Gemini Flash로 Query Planning (빠르고 무료)
+        const content = await callGeminiAPI(userQuery, plannerPrompt, 'gemini-1.5-flash');
+
+        // JSON 파싱 시도
         try {
-            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: model.id,
-                    messages: [
-                        { role: 'system', content: plannerPrompt },
-                        { role: 'user', content: userQuery }
-                    ],
-                    temperature: 0.1,
-                    max_tokens: 500
-                })
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text().catch(() => 'No error body');
-                console.error(`Planner ${model.name} failed: ${response.status} - ${errorText}`);
-                continue;
+            const jsonMatch = content.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const plan = JSON.parse(jsonMatch[0]);
+                return res.json({ success: true, plan, modelName: 'Gemini 1.5 Flash' });
             }
-
-            const data = await response.json();
-            if (data.choices?.[0]?.message?.content) {
-                const content = data.choices[0].message.content;
-                // JSON 파싱 시도
-                try {
-                    const jsonMatch = content.match(/\{[\s\S]*\}/);
-                    if (jsonMatch) {
-                        const plan = JSON.parse(jsonMatch[0]);
-                        return res.json({ success: true, plan, modelName: model.name });
-                    }
-                } catch (e) {
-                    console.error('JSON parse error:', e);
-                }
-                // 파싱 실패시 기본 플랜 반환
-                return res.json({
-                    success: true,
-                    plan: {
-                        intent: "정보요청",
-                        topic: "기타",
-                        coreKeywords: userQuery.split(/\s+/).filter(w => w.length >= 2),
-                        expandedKeywords: [],
-                        excludeKeywords: [],
-                        searchStrategy: "broad"
-                    },
-                    modelName: model.name
-                });
-            }
-        } catch (error) {
-            console.error(`Planner error with ${model.name}:`, error.message);
-            continue;
+        } catch (e) {
+            console.error('JSON parse error:', e);
         }
-    }
 
-    // 실패시 기본 플랜
-    return res.json({
-        success: true,
-        plan: {
-            intent: "정보요청",
-            topic: "기타",
-            coreKeywords: userQuery.split(/\s+/).filter(w => w.length >= 2),
-            expandedKeywords: [],
-            excludeKeywords: [],
-            searchStrategy: "broad"
-        },
-        modelName: 'fallback'
-    });
+        // 파싱 실패시 기본 플랜 반환
+        return res.json({
+            success: true,
+            plan: {
+                intent: "정보요청",
+                topic: "기타",
+                coreKeywords: userQuery.split(/\s+/).filter(w => w.length >= 2),
+                expandedKeywords: [],
+                excludeKeywords: [],
+                searchStrategy: "broad"
+            },
+            modelName: 'Gemini 1.5 Flash (fallback)'
+        });
+    } catch (error) {
+        console.error('Query Planner error:', error.message);
+
+        // 실패시 기본 플랜
+        return res.json({
+            success: true,
+            plan: {
+                intent: "정보요청",
+                topic: "기타",
+                coreKeywords: userQuery.split(/\s+/).filter(w => w.length >= 2),
+                expandedKeywords: [],
+                excludeKeywords: [],
+                searchStrategy: "broad"
+            },
+            modelName: 'fallback'
+        });
+    }
 }
 
-// 답변 생성 - 기존 로직
+// 답변 생성 - Gemini API 사용
 async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
-    const paidModels = [
-        { id: 'google/gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
-        { id: 'google/gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
-        { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' },
-        { id: 'anthropic/claude-3-haiku', name: 'Claude 3 Haiku' },
-        { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini' },
-        { id: 'openai/gpt-4o', name: 'GPT-4o' }
+    // 모델 우선순위: Flash (무료/빠름) → Pro (더 정교함)
+    const models = [
+        { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+        { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' }
     ];
 
-    for (const model of paidModels) {
+    for (const model of models) {
         try {
             console.log(`Trying model: ${model.name}`);
 
-            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: model.id,
-                    messages: [
-                        { role: 'system', content: systemPrompt || '' },
-                        { role: 'user', content: userQuery }
-                    ],
-                    temperature: 0.2,
-                    max_tokens: 4096
-                })
+            const content = await callGeminiAPI(userQuery, systemPrompt, model.id);
+
+            return res.json({
+                success: true,
+                text: content,
+                modelName: model.name
             });
-
-            if (!response.ok) {
-                console.log(`Model ${model.name} failed with status ${response.status}`);
-                continue;
-            }
-
-            const data = await response.json();
-
-            if (data.choices?.[0]?.message) {
-                return res.json({
-                    success: true,
-                    text: data.choices[0].message.content,
-                    modelName: model.name
-                });
-            }
         } catch (error) {
             console.error(`Error with model ${model.name}:`, error.message);
             continue;
@@ -248,9 +236,9 @@ async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
         success: false,
         error: 'All models failed',
         debug: {
-            apiKeyExists: !!process.env.OPENROUTER_API_KEY,
-            apiKeyLength: process.env.OPENROUTER_API_KEY?.length || 0,
-            message: 'OpenRouter API 호출이 모두 실패했습니다. API 키를 확인해주세요.'
+            apiKeyExists: !!process.env.GEMINI_API_KEY,
+            apiKeyLength: process.env.GEMINI_API_KEY?.length || 0,
+            message: 'Gemini API 호출이 모두 실패했습니다. API 키를 확인해주세요.'
         }
     });
 }
