@@ -161,15 +161,24 @@ ${userSpecialtyContext}
 반드시 JSON만 출력하세요.`;
 
     try {
-        // Gemini Flash로 Query Planning (빠르고 무료)
-        const content = await callGeminiAPI(userQuery, plannerPrompt, 'gemini-1.5-flash');
+        // Gemini Flash로 Query Planning (최신 모델 우선 시도)
+        let content;
+        let usedModel = 'Gemini 3 Flash';
+
+        try {
+            content = await callGeminiAPI(userQuery, plannerPrompt, 'gemini-3-flash');
+        } catch (e) {
+            console.error('Gemini 3 Flash planning failed, falling back to 1.5:', e.message);
+            content = await callGeminiAPI(userQuery, plannerPrompt, 'gemini-1.5-flash');
+            usedModel = 'Gemini 1.5 Flash';
+        }
 
         // JSON 파싱 시도
         try {
             const jsonMatch = content.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
                 const plan = JSON.parse(jsonMatch[0]);
-                return res.json({ success: true, plan, modelName: 'Gemini 1.5 Flash' });
+                return res.json({ success: true, plan, modelName: usedModel });
             }
         } catch (e) {
             console.error('JSON parse error:', e);
@@ -186,7 +195,7 @@ ${userSpecialtyContext}
                 excludeKeywords: [],
                 searchStrategy: "broad"
             },
-            modelName: 'Gemini 1.5 Flash (fallback)'
+            modelName: `${usedModel} (fallback)`
         });
     } catch (error) {
         console.error('Query Planner error:', error.message);
@@ -209,17 +218,20 @@ ${userSpecialtyContext}
 
 // 답변 생성 - Gemini API 사용
 async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
-    // 모델 우선순위: Gemini 3 Flash (최신) → 2.0 Flash → 1.5 Flash
+    // 모델 우선순위: Gemini 3 Flash -> Gemini 2.0 Flash -> Gemini 1.5 Flash
     const models = [
         { id: 'gemini-3-flash', name: 'Gemini 3 Flash' },
-        { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash' },
+        { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
+        { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+        { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash (Exp)' },
         { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' }
     ];
 
+    let lastError = null;
+
     for (const model of models) {
         try {
-            console.log(`Trying model: ${model.name}`);
-
+            console.log(`Trying model: ${model.name} (${model.id})`);
             const content = await callGeminiAPI(userQuery, systemPrompt, model.id);
 
             return res.json({
@@ -229,6 +241,7 @@ async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
             });
         } catch (error) {
             console.error(`Error with model ${model.name}:`, error.message);
+            lastError = error.message;
             continue;
         }
     }
@@ -239,7 +252,8 @@ async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
         debug: {
             apiKeyExists: !!process.env.GEMINI_API_KEY,
             apiKeyLength: process.env.GEMINI_API_KEY?.length || 0,
-            message: 'Gemini API 호출이 모두 실패했습니다. API 키를 확인해주세요.'
+            lastErrorMessage: lastError,
+            message: 'Gemini API 호출이 모두 실패했습니다. 마지막 에러: ' + lastError
         }
     });
 }
