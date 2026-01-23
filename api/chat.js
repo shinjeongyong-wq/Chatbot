@@ -162,26 +162,39 @@ ${userSpecialtyContext}
 
     try {
         // Gemini Flash로 Query Planning (최신 모델 우선 시도)
-        let content;
-        let usedModel = 'Gemini 3 Flash';
+        // 시도할 모델 목록 (고성능 모델 포함)
+        const models = [
+            { id: 'gemini-3-flash', name: 'Gemini 3 Flash' },
+            { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
+            { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+            { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' }
+        ];
 
-        try {
-            content = await callGeminiAPI(userQuery, plannerPrompt, 'gemini-3-flash');
-        } catch (e) {
-            console.error('Gemini 3 Flash planning failed, falling back to 1.5:', e.message);
-            content = await callGeminiAPI(userQuery, plannerPrompt, 'gemini-1.5-flash');
-            usedModel = 'Gemini 1.5 Flash';
+        let content = null;
+        let usedModelName = 'fallback';
+
+        for (const model of models) {
+            try {
+                console.log(`[Planner] Trying: ${model.name}`);
+                content = await callGeminiAPI(userQuery, plannerPrompt, model.id);
+                usedModelName = model.name;
+                if (content) break;
+            } catch (e) {
+                console.error(`[Planner] ${model.name} failed:`, e.message);
+                continue;
+            }
         }
 
-        // JSON 파싱 시도
         try {
+            if (!content) throw new Error('All planner models failed');
+
             const jsonMatch = content.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
                 const plan = JSON.parse(jsonMatch[0]);
-                return res.json({ success: true, plan, modelName: usedModel });
+                return res.json({ success: true, plan, modelName: usedModelName });
             }
         } catch (e) {
-            console.error('JSON parse error:', e);
+            console.error('Planner processing error:', e.message);
         }
 
         // 파싱 실패시 기본 플랜 반환
