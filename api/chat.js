@@ -146,14 +146,14 @@ ${userSpecialtyContext}
   예: 간판 설치, 세무, 법률, 개설신고 절차, 일반 운영
 
 [예시]
-질문: "인테리어 파트너사 뭐 있어?"
-{"intent":"파트너사목록","topic":"인테리어","targetCategory":"partners","specialtyRelevant":true,"coreKeywords":["인테리어","파트너사"],"expandedKeywords":["시공업체"],"excludeKeywords":[],"searchStrategy":"semantic"}
+질문: "인테리어 파트너사 추천해줘"
+{"intent":"파트너사목록","topic":"인테리어","targetCategory":"partners","specialtyRelevant":true,"coreKeywords":["인테리어","파트너"],"expandedKeywords":["시공","업체"],"excludeKeywords":[],"searchStrategy":"semantic"}
 
-질문: "의료기기 추천해줘"
-{"intent":"정보요청","topic":"의료기기","targetCategory":"advanced","specialtyRelevant":true,"coreKeywords":["의료기기","장비"],"expandedKeywords":["레이저","초음파"],"excludeKeywords":[],"searchStrategy":"semantic"}
+질문: "의료기기 장비 알려줘"
+{"intent":"정보요청","topic":"의료기기","targetCategory":"advanced","specialtyRelevant":true,"coreKeywords":["의료기기","장비"],"expandedKeywords":[],"excludeKeywords":[],"searchStrategy":"semantic"}
 
-질문: "간판 설치할 때 고려사항"
-{"intent":"정보요청","topic":"간판","targetCategory":"all","specialtyRelevant":false,"coreKeywords":["간판","설치","고려사항"],"expandedKeywords":["사인","외관"],"excludeKeywords":[],"searchStrategy":"broad"}
+질문: "간판 관련 정보"
+{"intent":"정보요청","topic":"간판","targetCategory":"partners","specialtyRelevant":false,"coreKeywords":["간판"],"expandedKeywords":["사인"],"excludeKeywords":[],"searchStrategy":"broad"}
 
 질문: "개설신고 절차 알려줘"
 {"intent":"절차안내","topic":"기타","targetCategory":"hospital-basics","specialtyRelevant":false,"coreKeywords":["개설신고","절차"],"expandedKeywords":["행정","서류"],"excludeKeywords":[],"searchStrategy":"broad"}

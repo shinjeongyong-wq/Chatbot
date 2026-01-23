@@ -438,11 +438,35 @@ class GoogleSheetsLoader {
         let results = candidates.map(item => {
             let score = this.calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
 
-            // Notion 데이터: 타겟 카테고리 매칭 시 보너스 점수
+            // 📘 Notion 데이터: 질문 주제(topic) 및 타겟 카테고리 매칭 시 강력한 보너스
+            const itemTopic = item.metadata?.topic || item.metadata?.category || '';
+            const itemField = (item.metadata?.field || '').toLowerCase();
+            const itemPath = item.metadata?.categoryPath || '';
+
+            if (topic && topic !== '기타') {
+                const searchTopic = topic.toLowerCase();
+
+                // 1. 노션 데이터의 상세 토픽 매칭
+                if (item.source === 'notion' && (itemTopic.includes(searchTopic) || itemPath.includes(searchTopic))) {
+                    score = score + 2.0; // 주제 일치 시 압도적 보너스
+                }
+                // 2. Q&A, FAQ의 필드 매칭
+                else if ((item.source === 'qa' || item.source === 'faq') && itemField.includes(searchTopic)) {
+                    score = score + 1.5; // 주제 일치 시 강력 보너스
+                }
+                // 3. 주제가 명확한데 다른 주제인 경우 (인테리어 질문에 간판 데이터 등)
+                else if (topic === '인테리어' && (itemTopic.includes('간판') || itemPath.includes('signage') || itemField.includes('간판'))) {
+                    score = score * 0.1; // 90% 감점 (사실상 배제)
+                }
+                else if (topic === '간판' && (itemTopic.includes('인테리어') || itemPath.includes('interior') || itemField.includes('인테리어'))) {
+                    score = score * 0.1; // 90% 감점
+                }
+            }
+
+            // 구 모델 호환성 유지: 타겟 카테고리 매칭 보너스
             if (targetCategory && targetCategory !== 'all' && item.source === 'notion') {
-                const categoryPath = item.metadata?.categoryPath || item.metadata?.category || '';
-                if (categoryPath.startsWith(targetCategory)) {
-                    score = score * 1.5; // 50% 보너스
+                if (itemPath.startsWith(targetCategory)) {
+                    score = score * 1.5;
                 }
             }
 
@@ -605,10 +629,11 @@ class GoogleSheetsLoader {
             score += Math.min((expandHits / expandedKeywords.length) * 0.25, 0.25);
         }
 
-        // 3. 토픽 매칭 보너스 (최대 0.15점)
+        // 3. 토픽 매칭 기초 보너스 (중복 검색 방지 위해 소폭 유지)
         if (topic && topic !== '기타') {
-            if (field.includes(topic.toLowerCase()) || question.includes(topic.toLowerCase())) {
-                score += 0.15;
+            const searchTopic = topic.toLowerCase();
+            if (field.includes(searchTopic) || question.includes(searchTopic)) {
+                score += 0.1;
             }
         }
 
