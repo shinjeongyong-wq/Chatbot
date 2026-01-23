@@ -469,8 +469,19 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
         });
 
         if (!response.ok) {
-            console.error(`API 에러: ${response.status}`);
-            return { text: '죄송합니다. AI 서버 연결에 문제가 발생했습니다.', modelName: null };
+            const errorData = await response.json().catch(() => ({}));
+            console.error(`API 에러: ${response.status}`, errorData);
+
+            let errorMsg = '죄송합니다. AI 서버 연결에 문제가 발생했습니다.';
+
+            // API Key 미설정 시 사용자에게 힌트 제공 (디버깅용)
+            if (errorData.debug && !errorData.debug.apiKeyExists) {
+                errorMsg += '\n(원인: Vercel 환경변수 GEMINI_API_KEY가 설정되지 않았습니다)';
+            } else if (errorData.error) {
+                errorMsg += `\n(원인: ${errorData.error})`;
+            }
+
+            return { text: errorMsg, modelName: null };
         }
 
         const data = await response.json();

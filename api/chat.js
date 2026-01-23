@@ -209,10 +209,11 @@ ${userSpecialtyContext}
 
 // 답변 생성 - Gemini API 사용
 async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
-    // 모델 우선순위: Flash (무료/빠름) → Pro (더 정교함)
+    // 모델 우선순위: Gemini 3 Flash (최신) → 2.0 Flash → 1.5 Flash
     const models = [
-        { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
-        { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' }
+        { id: 'gemini-3-flash', name: 'Gemini 3 Flash' },
+        { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash' },
+        { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' }
     ];
 
     for (const model of models) {
