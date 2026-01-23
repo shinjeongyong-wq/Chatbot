@@ -395,6 +395,9 @@ class GoogleSheetsLoader {
         const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory } = queryPlan;
         const allKeywords = [...(coreKeywords || []), ...(expandedKeywords || [])];
 
+        // ★ Phase 2: maxResults 확대 - 진료과 선택 시 50개 ★
+        const finalMaxResults = userSpecialty ? 50 : maxResults;
+
         console.log('🧠 Smart Search 시작');
         console.log('   핵심 키워드:', coreKeywords);
         console.log('   확장 키워드:', expandedKeywords);
@@ -402,6 +405,7 @@ class GoogleSheetsLoader {
         console.log('   검색 전략:', searchStrategy);
         console.log('   타겟 카테고리:', targetCategory);
         console.log('   👤 사용자 진료과:', userSpecialty ? userSpecialty.label : '미선택');
+        console.log('   📏 최대 결과 수:', finalMaxResults);
 
         // 0. 전체 검색 대상 (Q&A, FAQ, Notion 모두 포함)
         let candidates = this.cache;
@@ -430,7 +434,7 @@ class GoogleSheetsLoader {
         console.log(`   제외 필터링 후: ${candidates.length}개`);
 
         // 2. 검색 전략에 따른 스코어링 (모든 소스 대상)
-        const results = candidates.map(item => {
+        let results = candidates.map(item => {
             let score = this.calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
 
             // Notion 데이터: 타겟 카테고리 매칭 시 보너스 점수
@@ -454,14 +458,35 @@ class GoogleSheetsLoader {
             .filter(r => r.score > 0.25)  // 임계값 - 관련 문서 포함
             .sort((a, b) => b.score - a.score);
 
+        // ★ Phase 1: 진료과 태그 문서 강제 상위 배치 ★
+        if (userSpecialty && userSpecialty.code) {
+            // 1. specialties에 진료과가 있는 문서 필터
+            const taggedDocs = results.filter(item => {
+                const specs = item.metadata?.specialties || [];
+                return specs.some(s => s.toLowerCase() === userSpecialty.code.toLowerCase());
+            });
+
+            // 2. 나머지 문서
+            const untaggedDocs = results.filter(item => {
+                const specs = item.metadata?.specialties || [];
+                return !specs.some(s => s.toLowerCase() === userSpecialty.code.toLowerCase());
+            });
+
+            // 3. 태그 문서를 상위에 강제 배치
+            results = [...taggedDocs, ...untaggedDocs];
+
+            console.log(`   ✅ 진료과 태그 문서: ${taggedDocs.length}개 (우선 배치)`);
+            console.log(`   📄 일반 문서: ${untaggedDocs.length}개`);
+        }
+
         // 결과 소스별 현황
         const resultQa = results.filter(i => i.source === 'qa').length;
         const resultFaq = results.filter(i => i.source === 'faq').length;
         const resultNotion = results.filter(i => i.source === 'notion').length;
         console.log(`   📚 결과 소스: Q&A ${resultQa}개, FAQ ${resultFaq}개, Notion ${resultNotion}개`);
-        console.log(`   최종 결과: ${Math.min(results.length, maxResults)}개`);
+        console.log(`   최종 결과: ${Math.min(results.length, finalMaxResults)}개`);
 
-        return results.slice(0, maxResults);
+        return results.slice(0, finalMaxResults);
     }
 
     // [진료과 보너스 점수 계산]
@@ -490,12 +515,13 @@ class GoogleSheetsLoader {
             }
         }
 
-        // specialties 필드에 사용자 진료과가 직접 매칭되면 큰 보너스
+        // ★ Phase 1: 보너스 점수 대폭 상향 ★
+        // specialties 필드에 사용자 진료과가 직접 매칭되면 압도적 보너스
         if (specialties && specialties.includes(userSpecialty.code.toLowerCase())) {
-            bonus += 0.4;
+            bonus += 2.0;  // 기존 0.4 → 2.0으로 상향
         } else if (matchCount > 0) {
-            // 키워드 매칭 횟수에 따른 보너스 (최대 0.3)
-            bonus += Math.min(matchCount * 0.1, 0.3);
+            // 키워드 매칭 횟수에 따른 보너스 (최대 0.8)
+            bonus += Math.min(matchCount * 0.2, 0.8);  // 기존 0.3 → 0.8로 상향
         }
 
         return bonus;

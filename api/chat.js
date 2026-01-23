@@ -32,9 +32,26 @@ export default async function handler(req, res) {
 
 // Query Planner - 빠른 모델로 쿼리 의도 분석
 async function handleQueryPlanning(req, res, userQuery) {
+    const { userSpecialty } = req.body;  // ★ Phase 5: 사용자 진료과 정보 수신 ★
+
+    // ★ Phase 5: Query Planner 프롬프트에 진료과 정보 추가 ★
+    let userSpecialtyContext = '';
+    if (userSpecialty && userSpecialty.label) {
+        userSpecialtyContext = `
+
+# 📌 중요: 사용자 진료과
+사용자는 **${userSpecialty.label}** 개원을 준비 중입니다.
+
+**검색 키워드 생성 시 반드시 다음 규칙을 따르세요:**
+1. 질문에 진료과 특정 언급이 없어도, **${userSpecialty.label} 관련 키워드를 coreKeywords나 expandedKeywords에 추가**하세요.
+2. 예: "의료기기 추천해줘" → coreKeywords에 "의료기기", "레이저", "피부" 등 ${userSpecialty.label} 관련 장비 포함
+3. 예: "개원 비용 얼마야?" → expandedKeywords에 "${userSpecialty.label}", "개원비용" 추가
+`;
+    }
+
     const plannerPrompt = `당신은 병원 개원 상담 챗봇의 Query Planner입니다.
 사용자 질문을 분석하여 검색 전략을 JSON으로 출력하세요.
-
+${userSpecialtyContext}
 [데이터 소스 - 3가지]
 1. **Google Sheets Q&A** - 병원 개원 관련 일반 질문/답변
 2. **Google Sheets FAQ** - 자주 묻는 질문
@@ -65,7 +82,7 @@ async function handleQueryPlanning(req, res, userQuery) {
 - "체크리스트/점검" → intent: "체크리스트", targetCategory: "checklist"
 - 일반적인 질문/정보 요청 → intent: "정보요청", targetCategory: "all"
 
-[출력 형식 - JSON만 출력]
+[반환할 JSON 형식]
 {
   "intent": "파트너사목록|절차안내|비용|체크리스트|심화|정보요청|off_topic",
   "topic": "인테리어|간판|의료기기|세무|마케팅|개원비용|CI/BI|기타",

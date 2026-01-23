@@ -19,7 +19,10 @@
         "parentType": "page_id",
         "parentTitle": "플래너 AI",
         "structuredCategory": "advanced",
-        "structuredSubCategory": "medical-device-pain"
+        "structuredSubCategory": "medical-device-pain",
+        "specialties": [
+          "통증"
+        ]
       }
     }
   ]

@@ -19,7 +19,10 @@
         "parentType": "page_id",
         "parentTitle": "플래너 AI",
         "structuredCategory": "advanced",
-        "structuredSubCategory": "medical-device-internal"
+        "structuredSubCategory": "medical-device-internal",
+        "specialties": [
+          "내과"
+        ]
       }
     }
   ]
