@@ -821,6 +821,9 @@ function selectSpecialty(specialty) {
         return;
     }
 
+    // 기존 진료과와 다른 경우에만 초기화 (첫 선택이 아닌 경우)
+    const isChanging = currentUserSpecialty && currentUserSpecialty !== specialty;
+
     currentUserSpecialty = specialty;
     localStorage.setItem('userSpecialty', specialty);
 
@@ -829,7 +832,28 @@ function selectSpecialty(specialty) {
 
     console.log(`✅ 진료과 선택됨: ${SPECIALTIES[specialty].label}`);
 
-    // 선택 완료 시 환영 메시지 업데이트 (선택사항)
+    // 진료과 변경 시 대화 히스토리 초기화 및 채팅창 리셋
+    if (isChanging) {
+        // 대화 히스토리 초기화
+        conversationHistory = [];
+        console.log('🔄 진료과 변경으로 대화 히스토리 초기화됨');
+
+        // 채팅창 초기화 (환영 메시지만 유지)
+        if (chatContainer) {
+            chatContainer.innerHTML = '';
+        }
+
+        // 환영 메시지 표시
+        const welcomeMessage = document.querySelector('.welcome-message');
+        if (welcomeMessage) {
+            welcomeMessage.style.display = 'block';
+        }
+
+        // 알림 팝업 표시
+        showSuccessModal('진료과가 변경되어 새로운 대화가 시작됩니다.');
+    }
+
+    // 환영 메시지 텍스트 업데이트
     const welcomeMsg = document.querySelector('.welcome-message h2');
     if (welcomeMsg) {
         welcomeMsg.textContent = `${SPECIALTIES[specialty].emoji} ${SPECIALTIES[specialty].label} 개원을 도와드릴게요!`;
