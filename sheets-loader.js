@@ -395,8 +395,8 @@ class GoogleSheetsLoader {
         const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory, specialtyRelevant } = queryPlan;
         const allKeywords = [...(coreKeywords || []), ...(expandedKeywords || [])];
 
-        // ★ Phase 2: maxResults 확대 - 진료과 선택 시 50개 ★
-        const finalMaxResults = userSpecialty ? 50 : maxResults;
+        // ★ 검색 결과 제한 - 25개로 축소하여 LLM 참조 정확도 향상 ★
+        const finalMaxResults = userSpecialty ? 25 : maxResults;
 
         console.log('🧠 Smart Search 시작');
         console.log('   핵심 키워드:', coreKeywords);
