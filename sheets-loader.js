@@ -392,7 +392,7 @@ class GoogleSheetsLoader {
     async smartSearch(queryPlan, maxResults = 10, userSpecialty = null) {
         if (!this.cache) await this.loadData();
 
-        const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory } = queryPlan;
+        const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory, specialtyRelevant } = queryPlan;
         const allKeywords = [...(coreKeywords || []), ...(expandedKeywords || [])];
 
         // ★ Phase 2: maxResults 확대 - 진료과 선택 시 50개 ★
@@ -405,6 +405,7 @@ class GoogleSheetsLoader {
         console.log('   검색 전략:', searchStrategy);
         console.log('   타겟 카테고리:', targetCategory);
         console.log('   👤 사용자 진료과:', userSpecialty ? userSpecialty.label : '미선택');
+        console.log('   🎯 진료과 특화 질문:', specialtyRelevant ? '예 (다른 진료과 제외)' : '아니오 (공통 질문)');
         console.log('   📏 최대 결과 수:', finalMaxResults);
 
         // 0. 전체 검색 대상 (Q&A, FAQ, Notion 모두 포함)
@@ -458,25 +459,43 @@ class GoogleSheetsLoader {
             .filter(r => r.score > 0.25)  // 임계값 - 관련 문서 포함
             .sort((a, b) => b.score - a.score);
 
-        // ★ Phase 1: 진료과 태그 문서 강제 상위 배치 ★
+        // ★ 진료과 필터링: specialtyRelevant에 따라 전략 분기 ★
         if (userSpecialty && userSpecialty.code) {
-            // 1. specialties에 진료과가 있는 문서 필터
-            const taggedDocs = results.filter(item => {
+            const userSpecCode = userSpecialty.code.toLowerCase();
+
+            // 1. 사용자 진료과 태그가 있는 문서
+            const matchingDocs = results.filter(item => {
                 const specs = item.metadata?.specialties || [];
-                return specs.some(s => s.toLowerCase() === userSpecialty.code.toLowerCase());
+                return specs.some(s => s.toLowerCase() === userSpecCode);
             });
 
-            // 2. 나머지 문서
-            const untaggedDocs = results.filter(item => {
+            // 2. 태그가 없는 문서 (일반 정보)
+            const noTagDocs = results.filter(item => {
                 const specs = item.metadata?.specialties || [];
-                return !specs.some(s => s.toLowerCase() === userSpecialty.code.toLowerCase());
+                return specs.length === 0;
             });
 
-            // 3. 태그 문서를 상위에 강제 배치
-            results = [...taggedDocs, ...untaggedDocs];
+            // 3. 다른 진료과 태그만 있는 문서 (사용자 진료과 아님)
+            const otherSpecDocs = results.filter(item => {
+                const specs = item.metadata?.specialties || [];
+                return specs.length > 0 && !specs.some(s => s.toLowerCase() === userSpecCode);
+            });
 
-            console.log(`   ✅ 진료과 태그 문서: ${taggedDocs.length}개 (우선 배치)`);
-            console.log(`   📄 일반 문서: ${untaggedDocs.length}개`);
+            if (specialtyRelevant) {
+                // ★ 진료과 특화 질문: 다른 진료과 문서 완전 제외 ★
+                results = [...matchingDocs, ...noTagDocs];
+                console.log(`   🎯 진료과 특화 모드 적용`);
+                console.log(`   ✅ 사용자 진료과 문서: ${matchingDocs.length}개`);
+                console.log(`   📄 태그없는 문서: ${noTagDocs.length}개`);
+                console.log(`   ❌ 다른 진료과 문서 제외: ${otherSpecDocs.length}개`);
+            } else {
+                // ★ 공통 질문: 우선순위만 부여 (제외 안함) ★
+                results = [...matchingDocs, ...noTagDocs, ...otherSpecDocs];
+                console.log(`   📋 공통 질문 모드 (우선순위만 적용)`);
+                console.log(`   ✅ 사용자 진료과 문서: ${matchingDocs.length}개 (우선)`);
+                console.log(`   📄 태그없는 문서: ${noTagDocs.length}개`);
+                console.log(`   📄 다른 진료과 문서: ${otherSpecDocs.length}개`);
+            }
         }
 
         // 결과 소스별 현황

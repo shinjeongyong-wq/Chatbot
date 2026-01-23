@@ -87,21 +87,31 @@ ${userSpecialtyContext}
   "intent": "파트너사목록|절차안내|비용|체크리스트|심화|정보요청|off_topic",
   "topic": "인테리어|간판|의료기기|세무|마케팅|개원비용|CI/BI|기타",
   "targetCategory": "partners|hospital-basics|advanced|checklist|all",
+  "specialtyRelevant": true/false,
   "coreKeywords": ["핵심 키워드 1-3개"],
   "expandedKeywords": ["관련 확장 키워드"],
   "excludeKeywords": [],
   "searchStrategy": "semantic|broad|exact"
 }
 
+[specialtyRelevant 판단 기준]
+- **true**: 진료과별로 답변이 달라야 하는 질문
+  예: 의료기기 추천, 파트너사 추천, 진료과별 인테리어, 진료과별 비용
+- **false**: 모든 진료과에 공통으로 적용되는 질문
+  예: 간판 설치, 세무, 법률, 개설신고 절차, 일반 운영
+
 [예시]
 질문: "인테리어 파트너사 뭐 있어?"
-{"intent":"파트너사목록","topic":"인테리어","targetCategory":"partners","coreKeywords":["인테리어","파트너사"],"expandedKeywords":["시공업체"],"excludeKeywords":[],"searchStrategy":"semantic"}
+{"intent":"파트너사목록","topic":"인테리어","targetCategory":"partners","specialtyRelevant":true,"coreKeywords":["인테리어","파트너사"],"expandedKeywords":["시공업체"],"excludeKeywords":[],"searchStrategy":"semantic"}
 
-질문: "CI/BI 연계하지말고 보편적으로 알려줘"
-{"intent":"정보요청","topic":"CI/BI","targetCategory":"all","coreKeywords":["CI","BI","브랜딩"],"expandedKeywords":["로고","간판","디자인"],"excludeKeywords":["연계"],"searchStrategy":"broad"}
+질문: "의료기기 추천해줘"
+{"intent":"정보요청","topic":"의료기기","targetCategory":"advanced","specialtyRelevant":true,"coreKeywords":["의료기기","장비"],"expandedKeywords":["레이저","초음파"],"excludeKeywords":[],"searchStrategy":"semantic"}
 
-질문: "개원 비용 얼마나 들어?"
-{"intent":"비용","topic":"개원비용","targetCategory":"all","coreKeywords":["개원","비용","예산"],"expandedKeywords":["자금","투자"],"excludeKeywords":[],"searchStrategy":"broad"}`;
+질문: "간판 설치할 때 고려사항"
+{"intent":"정보요청","topic":"간판","targetCategory":"all","specialtyRelevant":false,"coreKeywords":["간판","설치","고려사항"],"expandedKeywords":["사인","외관"],"excludeKeywords":[],"searchStrategy":"broad"}
+
+질문: "개설신고 절차 알려줘"
+{"intent":"절차안내","topic":"기타","targetCategory":"hospital-basics","specialtyRelevant":false,"coreKeywords":["개설신고","절차"],"expandedKeywords":["행정","서류"],"excludeKeywords":[],"searchStrategy":"broad"}`;
 
     // Query Planner용 빠른 모델 (Claude 사용)
     const fastModels = [
