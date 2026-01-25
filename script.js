@@ -91,34 +91,58 @@ const MAX_HISTORY = 10;
 function extractMentionedKeywords() {
     if (conversationHistory.length === 0) return [];
 
-    const mentioned = [];
+    const mentioned = new Set();
 
     // 최근 답변들에서 키워드 추출
     conversationHistory.forEach(h => {
         if (!h.assistant) return;
         const text = h.assistant;
 
-        // 패턴 1: 번호로 시작하는 업체/장비명 (예: "1. 무이디자인", "**2. 체외충격파**")
-        const numberedItems = text.match(/(?:\d+\.\s*\*{0,2})([가-힣A-Za-z0-9\-\/]+(?:\s+[가-힣A-Za-z0-9]+)?)(?:\*{0,2})/g) || [];
+        // 패턴 1: 번호로 시작하는 항목 (예: "1. 무이디자인", "**2. 체외충격파**")
+        const numberedItems = text.match(/\d+\.\s*\*{0,2}([가-힣A-Za-z0-9\-\/]+)/g) || [];
         numberedItems.forEach(item => {
-            const cleaned = item.replace(/^\d+\.\s*\**/g, '').replace(/\*+$/g, '').trim();
-            if (cleaned.length >= 2 && cleaned.length <= 20) {
-                mentioned.push(cleaned);
+            const cleaned = item.replace(/^\d+\.\s*\**/g, '').trim();
+            if (cleaned.length >= 2 && cleaned.length <= 25) mentioned.add(cleaned);
+        });
+
+        // 패턴 2: 불렛 포인트 뒤의 첫 단어 (예: "* C-Arm", "- 체외충격파")
+        const bulletItems = text.match(/[*\-]\s+\*{0,2}([가-힣A-Za-z][가-힣A-Za-z0-9\-\/]*)/g) || [];
+        bulletItems.forEach(item => {
+            const cleaned = item.replace(/^[*\-]\s*\**/g, '').trim();
+            if (cleaned.length >= 2 && cleaned.length <= 25) mentioned.add(cleaned);
+        });
+
+        // 패턴 3: 괄호 안의 영문 약자 (예: "(ESWT)", "(RF)", "(HILT)")
+        const acronyms = text.match(/\(([A-Z][A-Za-z0-9\-\/]{1,15})\)/g) || [];
+        acronyms.forEach(item => {
+            const cleaned = item.replace(/[()]/g, '').trim();
+            if (cleaned.length >= 2 && cleaned.length <= 15) mentioned.add(cleaned);
+        });
+
+        // 패턴 4: 굵은 글씨로 강조된 단어 (예: "**전자기펄스기**", "**C-Arm**")
+        const boldItems = text.match(/\*\*([가-힣A-Za-z][^*]{1,25})\*\*/g) || [];
+        boldItems.forEach(item => {
+            const cleaned = item.replace(/\*\*/g, '').trim();
+            // 너무 긴 문장은 제외, 짧은 핵심 단어만
+            if (cleaned.length >= 2 && cleaned.length <= 25 && !cleaned.includes('규칙') && !cleaned.includes('중요')) {
+                mentioned.add(cleaned);
             }
         });
 
-        // 패턴 2: 굵은 글씨로 강조된 단어 (예: "**전자기펄스기**")
-        const boldItems = text.match(/\*\*([가-힣A-Za-z0-9\-\/]+(?:\s+[가-힣A-Za-z0-9]+)?)\*\*/g) || [];
-        boldItems.forEach(item => {
-            const cleaned = item.replace(/\*\*/g, '').trim();
-            if (cleaned.length >= 2 && cleaned.length <= 20 && !cleaned.match(/^\d+$/)) {
-                mentioned.push(cleaned);
-            }
+        // 패턴 5: 콜론 앞의 핵심 단어 (예: "체외충격파(ESWT):", "MRI 및 CT:")
+        const colonItems = text.match(/([가-힣A-Za-z][가-힣A-Za-z0-9\-\/\(\)]{2,20}):/g) || [];
+        colonItems.forEach(item => {
+            const cleaned = item.replace(/:/g, '').trim();
+            if (cleaned.length >= 2 && cleaned.length <= 25) mentioned.add(cleaned);
         });
     });
 
-    // 중복 제거 후 반환
-    return [...new Set(mentioned)];
+    // 일반적인 단어 제외 (노이즈 필터)
+    const noiseWords = ['예시', '참고', '안내', '설명', '정보', '내용', '경우', '관련', '추천', '소개'];
+    const result = [...mentioned].filter(word => !noiseWords.some(noise => word.includes(noise)));
+
+    console.log('🔍 추출된 키워드:', result);
+    return result;
 }
 
 const chatContainer = document.getElementById('chatContainer');
@@ -274,15 +298,24 @@ async function getBotResponse(userMessage) {
         let relatedContexts = [];
 
         try {
-            // ★ Phase 5: Query Planner에 사용자 진료과 정보 전달 ★
+            // ★ Phase 5: Query Planner에 사용자 진료과 정보 + 최근 대화 맥락 전달 ★
             const userSpec = getUserSpecialty();
+
+            // 최근 3턴의 대화 맥락 생성 (플래너용 경량 버전)
+            const recentContext = conversationHistory.slice(-3).map(h =>
+                `사용자: ${h.user}\nAI: ${(h.assistant || '').substring(0, 150)}...`
+            ).join('\n');
+
+            console.log('📝 플래너에게 전달할 맥락:', recentContext ? recentContext.substring(0, 200) + '...' : '(첫 대화)');
+
             const planResponse = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userQuery: userMessage,
                     mode: 'plan',
-                    userSpecialty: userSpec  // 진료과 정보 추가
+                    userSpecialty: userSpec,
+                    recentContext: recentContext  // 최근 대화 맥락 추가
                 })
             });
 
@@ -410,15 +443,26 @@ async function callOpenRouterAPI(userQuery, contexts) {
     let deduplicationRule = '';
     if (alreadyMentioned.length > 0) {
         deduplicationRule = `
-# ⚠️ 중복 답변 방지 규칙 (매우 중요!)
-다음 항목들은 **이전 대화에서 이미 안내한 정보**입니다:
-${alreadyMentioned.map(k => `- ${k}`).join('\n')}
+# ⛔ 절대 규칙: 중복 답변 금지 (최우선 적용!)
 
-**위 목록에 있는 항목은 다시 설명하지 마세요.**
-사용자가 "더 없어?", "추가로" 등 추가 정보를 요청하면:
-→ 위 목록에 없는 **새로운 정보만** 안내하세요.
-→ 이미 언급한 장비/업체는 "앞서 말씀드린 OO 외에도..." 정도로만 언급하고 상세 설명은 생략하세요.
-→ 새로운 정보가 없다면 솔직하게 "현재 보유한 정보 중에서는 추가로 안내드릴 내용이 없습니다"라고 답변하세요.
+다음 항목들은 **이전 대화에서 이미 상세히 설명한 정보**입니다:
+${alreadyMentioned.slice(0, 20).map(k => `- ${k}`).join('\n')}
+
+**⛔ 위 목록에 있는 항목을 다시 상세 설명하면 답변 실패입니다!**
+
+## 올바른 대응 방법:
+✅ 맞는 예: "앞서 말씀드린 C-Arm, 초음파 외에도 **[새로운 장비]**가 있습니다..."
+✅ 맞는 예: "추가로 **[새로운 정보]**를 안내드릴게요."
+✅ 맞는 예: "현재 보유한 정보 중에서는 추가로 안내드릴 내용이 없습니다."
+
+## 잘못된 대응 (절대 하지 마세요):
+❌ 틀린 예: "C-Arm은 실시간으로 확인하는 장비입니다..." (이미 설명한 내용 반복)
+❌ 틀린 예: "체외충격파(ESWT)는 통증 치료에..." (이미 설명한 것을 다시 설명)
+
+**사용자가 "더 없어?", "추가로" 등 후속 질문을 하면:**
+1. 위 목록에 없는 **완전히 새로운 정보만** 답변하세요.
+2. 새로운 정보가 없다면 솔직하게 "현재 추가 정보가 없습니다"라고 답변하세요.
+3. 절대로 이미 말한 내용을 다르게 표현해서 반복하지 마세요.
 `;
     }
 

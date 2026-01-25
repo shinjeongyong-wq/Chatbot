@@ -77,7 +77,7 @@ async function callGeminiAPI(prompt, systemPrompt = '', model = 'gemini-1.5-flas
 
 // Query Planner - Gemini Flash로 쿼리 의도 분석
 async function handleQueryPlanning(req, res, userQuery) {
-    const { userSpecialty } = req.body;
+    const { userSpecialty, recentContext } = req.body;
 
     // 사용자 진료과 정보 추가
     let userSpecialtyContext = '';
@@ -94,9 +94,23 @@ async function handleQueryPlanning(req, res, userQuery) {
 `;
     }
 
+    // ★ 최근 대화 맥락 (후속 질문 해석용) ★
+    let conversationContext = '';
+    if (recentContext && recentContext.trim()) {
+        conversationContext = `
+
+# 🔄 최근 대화 맥락 (매우 중요!)
+아래는 최근 대화 내용입니다. "더 없어?", "그거 말고", "또 뭐 있어?" 같은 후속 질문이 오면, 이 맥락을 참고하여 주제를 유지하세요.
+
+${recentContext}
+
+**규칙: 사용자가 "더", "또", "추가로" 같은 후속 질문을 하면, 위 대화의 주제(topic)를 그대로 유지하세요!**
+`;
+    }
+
     const plannerPrompt = `당신은 병원 개원 상담 챗봇의 Query Planner입니다.
 사용자 질문을 분석하여 검색 전략을 JSON으로 출력하세요.
-${userSpecialtyContext}
+${userSpecialtyContext}${conversationContext}
 [데이터 소스 - 3가지]
 1. **Google Sheets Q&A** - 병원 개원 관련 일반 질문/답변
 2. **Google Sheets FAQ** - 자주 묻는 질문
