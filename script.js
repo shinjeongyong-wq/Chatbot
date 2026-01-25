@@ -87,6 +87,40 @@ let faqNavigationStack = [];
 let conversationHistory = [];
 const MAX_HISTORY = 10;
 
+// ★ 지능형 중복 배제: 이전 답변에서 언급된 주요 키워드(업체명, 장비명) 추출 ★
+function extractMentionedKeywords() {
+    if (conversationHistory.length === 0) return [];
+
+    const mentioned = [];
+
+    // 최근 답변들에서 키워드 추출
+    conversationHistory.forEach(h => {
+        if (!h.assistant) return;
+        const text = h.assistant;
+
+        // 패턴 1: 번호로 시작하는 업체/장비명 (예: "1. 무이디자인", "**2. 체외충격파**")
+        const numberedItems = text.match(/(?:\d+\.\s*\*{0,2})([가-힣A-Za-z0-9\-\/]+(?:\s+[가-힣A-Za-z0-9]+)?)(?:\*{0,2})/g) || [];
+        numberedItems.forEach(item => {
+            const cleaned = item.replace(/^\d+\.\s*\**/g, '').replace(/\*+$/g, '').trim();
+            if (cleaned.length >= 2 && cleaned.length <= 20) {
+                mentioned.push(cleaned);
+            }
+        });
+
+        // 패턴 2: 굵은 글씨로 강조된 단어 (예: "**전자기펄스기**")
+        const boldItems = text.match(/\*\*([가-힣A-Za-z0-9\-\/]+(?:\s+[가-힣A-Za-z0-9]+)?)\*\*/g) || [];
+        boldItems.forEach(item => {
+            const cleaned = item.replace(/\*\*/g, '').trim();
+            if (cleaned.length >= 2 && cleaned.length <= 20 && !cleaned.match(/^\d+$/)) {
+                mentioned.push(cleaned);
+            }
+        });
+    });
+
+    // 중복 제거 후 반환
+    return [...new Set(mentioned)];
+}
+
 const chatContainer = document.getElementById('chatContainer');
 const userInput = document.getElementById('userInput');
 const sendButton = document.getElementById('sendButton');
@@ -371,9 +405,27 @@ async function callOpenRouterAPI(userQuery, contexts) {
 4. 파트너사/의료기기/비용 등의 질문에서도 **${userSpec.label}에 적합한 항목을 우선 추천**하세요.`;
     }
 
+    // ★ 지능형 중복 배제: 이미 언급된 항목 목록 생성 ★
+    const alreadyMentioned = extractMentionedKeywords();
+    let deduplicationRule = '';
+    if (alreadyMentioned.length > 0) {
+        deduplicationRule = `
+# ⚠️ 중복 답변 방지 규칙 (매우 중요!)
+다음 항목들은 **이전 대화에서 이미 안내한 정보**입니다:
+${alreadyMentioned.map(k => `- ${k}`).join('\n')}
+
+**위 목록에 있는 항목은 다시 설명하지 마세요.**
+사용자가 "더 없어?", "추가로" 등 추가 정보를 요청하면:
+→ 위 목록에 없는 **새로운 정보만** 안내하세요.
+→ 이미 언급한 장비/업체는 "앞서 말씀드린 OO 외에도..." 정도로만 언급하고 상세 설명은 생략하세요.
+→ 새로운 정보가 없다면 솔직하게 "현재 보유한 정보 중에서는 추가로 안내드릴 내용이 없습니다"라고 답변하세요.
+`;
+    }
+
     const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변해주세요.
 
 ${specialtyInfo ? '# 사용자 진료과 정보\n' + specialtyInfo + '\n' : ''}
+${deduplicationRule}
 # 이전 대화 내역 (맥락 참고용)
 ${historyText ? historyText : '(첫 대화입니다)'}
 
