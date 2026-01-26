@@ -1,6 +1,4 @@
 const CONFIG = {
-    GOOGLE_API_KEY: 'AIzaSyAwLe-EyxItXg8TSM37rWeDlYDQ63bxCdo',
-    SPREADSHEET_ID: '1-YZhxai1zHQOBspas4ivKBiNf8cFnq-JC7IXgFB0to4',
     USE_MOCK_DATA: false,
 
     // API 엔드포인트 (Vercel Serverless Function)
@@ -165,7 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         openSpecialtyModal();
     }
 
-    sheetsLoader = new GoogleSheetsLoader(CONFIG.GOOGLE_API_KEY);
+    sheetsLoader = new GoogleSheetsLoader();
     try {
         await sheetsLoader.loadData();
         renderFAQFields();

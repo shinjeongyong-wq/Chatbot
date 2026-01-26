@@ -2,9 +2,8 @@
 // Hybrid Loader: LocalStorage(우선) > 로컬파일 > Google API(최초 1회)
 
 // API 설정 (최초 1회 다운로드용)
+// API 설정 (Vercel 프록시 사용으로 인해 키는 서버측 환경변수로 관리됨)
 const SHEETS_CONFIG = {
-    SPREADSHEET_ID: '1-YZhxai1zHQOBspas4ivKBiNf8cFnq-JC7IXgFB0to4',
-    API_KEY: 'AIzaSyACzOZzF6Wb2ZUYGEf_7GDa96dJKJSZdP4',
     RANGES: { QA: 'Q&A!A:M', FAQ: '생성형 FAQ!A:F' },
     QA_COLUMNS: { QUESTION: 2, ANSWER: 3, FIELD: 7, CATEGORY: 8 },
     faq_columns: { TOPIC_PATH: 1, QUESTION: 2, ANSWER: 3 }
@@ -221,9 +220,16 @@ class GoogleSheetsLoader {
     }
 
     async fetchRange(range) {
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEETS_CONFIG.SPREADSHEET_ID}/values/${range}?key=${SHEETS_CONFIG.API_KEY}`;
+        // 보안을 위해 직접 호출(구글 서버) 대신 Vercel 프록시 서버를 거쳐서 호출합니다.
+        // 이를 통해 API KEY와 시트 ID가 브라우저에 노출되지 않습니다.
+        const url = `/api/sheets-proxy?range=${encodeURIComponent(range)}`;
         const response = await fetch(url);
-        if (!response.ok) throw new Error(`API Error ${response.status}`);
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `API Error ${response.status}`);
+        }
+
         const data = await response.json();
         return data.values || [];
     }
