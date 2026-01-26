@@ -1,5 +1,5 @@
 const CONFIG = {
-    GOOGLE_API_KEY: 'AIzaSyDT9DR8jDxOICDbWl3_YhC56d8h_5A-IuU',
+    GOOGLE_API_KEY: 'AIzaSyAwLe-EyxItXg8TSM37rWeDlYDQ63bxCdo',
     SPREADSHEET_ID: '1-YZhxai1zHQOBspas4ivKBiNf8cFnq-JC7IXgFB0to4',
     USE_MOCK_DATA: false,
 
