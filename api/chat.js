@@ -26,11 +26,6 @@ export default async function handler(req, res) {
         return await handleQueryPlanning(req, res, userQuery);
     }
 
-    // 문서 요약 모드 - 검색 결과 압축 (토큰 최적화)
-    if (mode === 'summarize') {
-        return await handleDocumentSummary(req, res, userQuery);
-    }
-
     // 일반 답변 모드
     return await handleAnswerGeneration(req, res, userQuery, systemPrompt);
 }
@@ -288,40 +283,4 @@ async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
             message: 'Gemini API 호출이 모두 실패했습니다. 마지막 에러: ' + lastError
         }
     });
-}
-
-// 문서 요약 핸들러 - 검색된 문서들을 핵심 정보만 추출하여 압축
-async function handleDocumentSummary(req, res, documents) {
-    const summaryPrompt = `당신은 문서 요약 전문가입니다. 아래 검색 결과들을 **각각 50자 이내로 핵심만 요약**해주세요.
-
-**요약 규칙:**
-1. 각 문서의 번호([1], [2]...)를 유지하세요.
-2. 업체명, 장비명, 가격, 핵심 특징만 추출하세요.
-3. 불필요한 설명이나 부연은 모두 제거하세요.
-4. JSON이 아닌 일반 텍스트로 출력하세요.
-
-**출력 형식 예시:**
-[1] C-Arm: 실시간 투시 장비, 통증의학과 필수, 1억 내외
-[2] 체외충격파(ESWT): 인대/근육 통증 치료, 외래 매출 효과
-[3] 무이디자인: 18년 업력, 3D 도면 제공, 정형외과 전문
-
----
-요약할 문서들:
-${documents}`;
-
-    try {
-        const summary = await callGeminiAPI(summaryPrompt, '', 'gemini-2.0-flash');
-
-        return res.json({
-            success: true,
-            summary: summary
-        });
-    } catch (error) {
-        console.error('Document summary error:', error.message);
-        return res.json({
-            success: false,
-            summary: null,
-            error: error.message
-        });
-    }
 }

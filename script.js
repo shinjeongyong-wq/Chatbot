@@ -357,42 +357,9 @@ async function getBotResponse(userMessage) {
 
         console.log(`📚 검색 결과: ${relatedContexts.length}개 문서`);
 
-        // ========== Stage 2.5: 문서 요약 (토큰 최적화) ==========
-        console.log('📝 Stage 2.5: 문서 요약 시작...');
-        let summarizedContexts = relatedContexts;
-
-        try {
-            if (relatedContexts.length > 0) {
-                // 검색된 문서들을 요약 요청
-                const docsForSummary = relatedContexts.map((item, idx) =>
-                    `[${idx + 1}] Q: ${item.question}\nA: ${item.answer.substring(0, 500)}`
-                ).join('\n\n');
-
-                const summaryResponse = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userQuery: docsForSummary,
-                        mode: 'summarize'
-                    })
-                });
-
-                if (summaryResponse.ok) {
-                    const summaryResult = await summaryResponse.json();
-                    if (summaryResult.success && summaryResult.summary) {
-                        // 요약된 텍스트를 사용
-                        summarizedContexts = summaryResult.summary;
-                        console.log('✅ 문서 요약 완료');
-                    }
-                }
-            }
-        } catch (summaryError) {
-            console.warn('문서 요약 실패, 원본 사용:', summaryError);
-        }
-
         // ========== Stage 3: Answer Generation ==========
         console.log('💬 Stage 3: 답변 생성 시작...');
-        const result = await callOpenRouterAPI(userMessage, relatedContexts, summarizedContexts);
+        const result = await callOpenRouterAPI(userMessage, relatedContexts);
 
         hideTypingIndicator();
 
@@ -427,17 +394,11 @@ async function getBotResponse(userMessage) {
     }
 }
 
-async function callOpenRouterAPI(userQuery, contexts, summarizedContexts = null) {
-    // ★ Phase 3-2: 참고문서 처리 ★
+async function callOpenRouterAPI(userQuery, contexts) {
+    // ★ Phase 3-2: 참고문서에 진료과 메타데이터 시각화 ★
     const userSpec = getUserSpecialty();
     let contextText = '';
-
-    // 요약된 컨텍스트가 있으면 우선 사용 (토큰 최적화)
-    if (summarizedContexts && typeof summarizedContexts === 'string') {
-        contextText = summarizedContexts;
-        console.log('📄 요약된 컨텍스트 사용 (토큰 절약)');
-    } else if (contexts && contexts.length > 0) {
-        // 요약 실패 시 원본 사용 (단, 길이 제한)
+    if (contexts && contexts.length > 0) {
         contextText = contexts.map((item, idx) => {
             let prefix = `[${idx + 1}]`;
 
@@ -449,27 +410,24 @@ async function callOpenRouterAPI(userQuery, contexts, summarizedContexts = null)
                     return `${emoji}${s}${match}`;
                 }).join(' ');
                 prefix += ` ${tags} |`;
+            } else {
+                prefix += ` (태그없음) |`;
             }
 
-            // 답변을 300자로 제한 (fallback용)
-            const truncatedAnswer = item.answer.length > 300
-                ? item.answer.substring(0, 300) + '...'
+            // 토큰 최적화: answer를 400자로 제한
+            const truncatedAnswer = item.answer.length > 400
+                ? item.answer.substring(0, 400) + '...(이하 생략)'
                 : item.answer;
             return `${prefix} Q: ${item.question}\nA: ${truncatedAnswer}`;
         }).join('\n\n');
     }
 
-    // ★ 대화 히스토리: 키워드 기반 압축 ★
+    // 대화 히스토리 구성 (토큰 최적화: 압축된 형태로 전달)
     let historyText = '';
     if (conversationHistory.length > 0) {
-        const mentionedKeywords = extractMentionedKeywords();
-        const recentQuestions = conversationHistory.slice(-3).map(h => h.user).join(' → ');
-
-        historyText = `[이전 대화 요약]
-- 최근 질문 흐름: ${recentQuestions}
-- AI가 이미 안내한 키워드: ${mentionedKeywords.slice(0, 15).join(', ') || '없음'}`;
-
-        console.log('📋 압축된 히스토리:', historyText.substring(0, 100) + '...');
+        historyText = conversationHistory.map(h =>
+            `Q: ${h.user.substring(0, 50)}${h.user.length > 50 ? '...' : ''}\nA: ${(h.assistant || '').substring(0, 100)}...`
+        ).join('\n');
     }
 
     // ★ Phase 3-1: 시스템 프롬프트에 진료과 우선순위 강화 ★
@@ -489,113 +447,33 @@ async function callOpenRouterAPI(userQuery, contexts, summarizedContexts = null)
     let deduplicationRule = '';
     if (alreadyMentioned.length > 0) {
         deduplicationRule = `
-# ⛔ 절대 규칙: 중복 답변 금지 (최우선 적용!)
+# ⛔ 중복 금지 (이미 설명한 항목)
+${alreadyMentioned.slice(0, 15).join(', ')}
 
-다음 항목들은 **이전 대화에서 이미 상세히 설명한 정보**입니다:
-${alreadyMentioned.slice(0, 20).map(k => `- ${k}`).join('\n')}
-
-**⛔ 위 목록에 있는 항목을 다시 상세 설명하면 답변 실패입니다!**
-
-## 올바른 대응 방법:
-✅ 맞는 예: "앞서 말씀드린 C-Arm, 초음파 외에도 **[새로운 장비]**가 있습니다..."
-✅ 맞는 예: "추가로 **[새로운 정보]**를 안내드릴게요."
-✅ 맞는 예: "현재 보유한 정보 중에서는 추가로 안내드릴 내용이 없습니다."
-
-## 잘못된 대응 (절대 하지 마세요):
-❌ 틀린 예: "C-Arm은 실시간으로 확인하는 장비입니다..." (이미 설명한 내용 반복)
-❌ 틀린 예: "체외충격파(ESWT)는 통증 치료에..." (이미 설명한 것을 다시 설명)
-
-**사용자가 "더 없어?", "추가로" 등 후속 질문을 하면:**
-1. 위 목록에 없는 **완전히 새로운 정보만** 답변하세요.
-2. 새로운 정보가 없다면 솔직하게 "현재 추가 정보가 없습니다"라고 답변하세요.
-3. 절대로 이미 말한 내용을 다르게 표현해서 반복하지 마세요.
+→ 위 항목은 다시 설명하지 마세요. 새로운 정보만 답변하거나, 없으면 "추가 정보가 없습니다"라고 하세요.
 `;
     }
 
     const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변해주세요.
 
-${specialtyInfo ? '# 사용자 진료과 정보\n' + specialtyInfo + '\n' : ''}
+${specialtyInfo ? '# 사용자 진료과\n' + specialtyInfo + '\n' : ''}
 ${deduplicationRule}
-# 이전 대화 내역 (맥락 참고용)
-${historyText ? historyText : '(첫 대화입니다)'}
+# 이전 대화
+${historyText ? historyText : '(첫 대화)'}
 
 # 참고문서
 ${contextText ? contextText : '(관련 데이터 없음)'}
 
-# 가장 중요한 규칙 ⚠️
+# 핵심 규칙
+1. 참고문서 내용 기반으로만 답변 (할루시네이션 금지)
+2. 병원 개원과 무관한 질문 → "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
+3. 관련 데이터 없음 → "[NO_DATA]죄송합니다. 현재 해당 질문에 대한 답변을 드리기 어렵습니다."
+4. "플래너에게 문의" 같은 표현 금지
 
-## 1. 참고문서에 관련 정보가 조금이라도 있으면
-→ 해당 내용을 기반으로 **최대한 도움이 되는 답변**을 작성하세요.
-→ 부분적인 정보만 있어도 그걸 활용해서 답변하세요.
-→ **플래너 언급 금지**: "플래너에게 문의", "플래너와 상담" 같은 문구는 절대 넣지 마세요!
-
-## 2. 질문이 병원 개원과 **전혀 무관**한 경우만
-예: "오늘 날씨 어때?", "파이썬 코딩 방법", "맛집 추천해줘"
-→ "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
-
-## 3. 병원 개원 관련인데 참고문서에 **전혀** 관련 내용이 없는 경우만
-→ "[NO_DATA]죄송합니다. 현재 해당 질문에 대한 답변을 드리기 어렵습니다. 빠른 시일 내에 답변할 수 있도록 업데이트하겠습니다."
-
-**핵심: 참고문서에 조금이라도 관련 내용이 있으면 [OFF_TOPIC]이나 [NO_DATA] 없이 바로 답변하세요!**
-**절대로 참고문서에 없는 내용을 지어내지 마세요. 할루시네이션은 금지입니다.**
-
-# ⭐ 파트너사/업체 목록 질문에 대한 응답 규칙
-"파트너사 알려줘", "업체 추천", "명단", "리스트" 같은 질문이면:
-
-→ 참고문서에 있는 **모든 업체**를 **아래 형식으로 나열**하세요:
-
-**1. [업체명] [1]**
-- 업력: (설립연도, 몇년차)
-- 주요 특징: (간략 설명)
-- 가격대: (있으면)
-
-**2. [업체명] [2]**
-- 업력: (설립연도, 몇년차)
-- 주요 특징: (간략 설명)
-- 가격대: (있으면)
-
-... (참고문서에 있는 모든 업체 나열)
-
-→ 업체 정보가 있으면 **가능한 많이** 나열 (3개 이상 권장)
-→ 업체명만 언급하고 설명 없이 끝내지 말 것
-
-# 답변 스타일 규칙 (참고문서에 관련 내용이 있을 때만)
-
-## 1. 말투
-- 모든 문장은 정중한 "~요", "~습니다", "~해요" 체로 작성
-- 딱딱한 명사형 종결("관리, 시공") 금지 → "관리해요", "시공해요"로 변환
-- 친근하면서도 전문적인 컨설턴트 느낌
-
-## 2. 첫 문장 (도입부)
-- 질문 주제를 자연스럽게 요약하며 시작
-- 예시: "[주제]에 대해 여러 요소를 종합적으로 고려해야 해요. 주요 내용을 안내해 드릴게요."
-- "참고문서에서 찾아보면:" 같은 어색한 표현 금지
-
-## 3. 본문 구조 (반드시 번호 라벨링!)
-**1. 첫 번째 주제**
-- **세부항목**: 상세 설명이에요.[1]
-
-**2. 두 번째 주제**
-- **세부항목**: 상세 설명이에요.[2]
-
-**3. 세 번째 주제**
-- **세부항목**: 상세 설명이에요.[3]
-
-## 4. ⚠️ 출처 표기 (매우 중요!)
-**반드시 아래 규칙을 따르세요:**
-- 참고문서의 [번호]와 내용을 **정확히 매칭**하세요
-- [1]의 내용을 참고했으면 반드시 [1]로 표기하세요
-- [2]의 내용을 [1]로 쓰거나, 번호를 바꿔서 쓰지 마세요
-- 참고문서에 없는 내용은 출처 번호를 붙이지 마세요
-- **잘못된 예**: [3]의 내용을 설명하면서 [1]을 붙임 ❌
-- **올바른 예**: [3]의 내용을 설명하면서 [3]을 붙임 ✅
-
-## 5. 금지 사항
-- 참고문서에 없는 내용 창작 금지
-- 딱딱한 명사형 종결 금지
-- 어색한 도입부 금지
-- 주제 번호 라벨링 누락 금지
-- **출처 번호 잘못 매칭 금지**`;
+# 답변 형식
+- 번호 라벨링 사용 (1. 2. 3...)
+- 출처 표기: 참고문서 [번호]와 정확히 매칭
+- 정중한 말투 (~요, ~습니다)`;
 
 
     try {
