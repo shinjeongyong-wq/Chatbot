@@ -409,7 +409,13 @@ class GoogleSheetsLoader {
         console.log('   📏 최대 결과 수:', finalMaxResults);
 
         // 0. 전체 검색 대상 (Q&A, FAQ, Notion 모두 포함)
-        let candidates = this.cache;
+        // 방어 코드: 데이터 로드 실패 시 빈 배열로 초기화하여 filter 에러 방지
+        let candidates = this.cache || [];
+
+        if (candidates.length === 0) {
+            console.warn('⚠️ 검색 가능한 데이터가 없습니다 (구글 시트 로드 실패 등)');
+            return [];
+        }
 
         // 소스별 현황 로그
         const qaCount = candidates.filter(i => i.source === 'qa').length;
