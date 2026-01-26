@@ -342,9 +342,9 @@ async function getBotResponse(userMessage) {
         // ========== Stage 2: Smart Search ==========
         console.log('🔍 Stage 2: Smart Search 시작...');
 
-        // 파트너사 목록 질문이면 더 많은 결과 검색
+        // 성능 최적화: 검색 결과 한도 하향 조정 (서버 부하 감소)
         const isPartnerListQuery = queryPlan?.intent === '파트너사목록' || queryPlan?.targetCategory === 'partners';
-        const maxResults = isPartnerListQuery ? 20 : 10;
+        const maxResults = isPartnerListQuery ? 15 : 8;
 
         if (queryPlan) {
             // Query Plan 기반 스마트 검색 (사용자 진료과 정보 전달)
@@ -352,14 +352,47 @@ async function getBotResponse(userMessage) {
             relatedContexts = await sheetsLoader.smartSearch(queryPlan, maxResults, userSpec);
         } else {
             // Fallback: 기존 키워드 검색
-            relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, 10);
+            relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, 8);
         }
 
         console.log(`📚 검색 결과: ${relatedContexts.length}개 문서`);
 
+        // ========== Stage 2.5: 문서 요약 (토큰 최적화) ==========
+        console.log('📝 Stage 2.5: 문서 요약 시작...');
+        let summarizedContexts = relatedContexts;
+
+        try {
+            if (relatedContexts.length > 0) {
+                // 검색된 문서들을 요약 요청
+                const docsForSummary = relatedContexts.map((item, idx) =>
+                    `[${idx + 1}] Q: ${item.question}\nA: ${item.answer.substring(0, 500)}`
+                ).join('\n\n');
+
+                const summaryResponse = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userQuery: docsForSummary,
+                        mode: 'summarize'
+                    })
+                });
+
+                if (summaryResponse.ok) {
+                    const summaryResult = await summaryResponse.json();
+                    if (summaryResult.success && summaryResult.summary) {
+                        // 요약된 텍스트를 사용
+                        summarizedContexts = summaryResult.summary;
+                        console.log('✅ 문서 요약 완료');
+                    }
+                }
+            }
+        } catch (summaryError) {
+            console.warn('문서 요약 실패, 원본 사용:', summaryError);
+        }
+
         // ========== Stage 3: Answer Generation ==========
         console.log('💬 Stage 3: 답변 생성 시작...');
-        const result = await callOpenRouterAPI(userMessage, relatedContexts);
+        const result = await callOpenRouterAPI(userMessage, relatedContexts, summarizedContexts);
 
         hideTypingIndicator();
 
@@ -394,11 +427,17 @@ async function getBotResponse(userMessage) {
     }
 }
 
-async function callOpenRouterAPI(userQuery, contexts) {
-    // ★ Phase 3-2: 참고문서에 진료과 메타데이터 시각화 ★
+async function callOpenRouterAPI(userQuery, contexts, summarizedContexts = null) {
+    // ★ Phase 3-2: 참고문서 처리 ★
     const userSpec = getUserSpecialty();
     let contextText = '';
-    if (contexts && contexts.length > 0) {
+
+    // 요약된 컨텍스트가 있으면 우선 사용 (토큰 최적화)
+    if (summarizedContexts && typeof summarizedContexts === 'string') {
+        contextText = summarizedContexts;
+        console.log('📄 요약된 컨텍스트 사용 (토큰 절약)');
+    } else if (contexts && contexts.length > 0) {
+        // 요약 실패 시 원본 사용 (단, 길이 제한)
         contextText = contexts.map((item, idx) => {
             let prefix = `[${idx + 1}]`;
 
@@ -410,20 +449,27 @@ async function callOpenRouterAPI(userQuery, contexts) {
                     return `${emoji}${s}${match}`;
                 }).join(' ');
                 prefix += ` ${tags} |`;
-            } else {
-                prefix += ` (태그없음) |`;
             }
 
-            return `${prefix} Q: ${item.question}\nA: ${item.answer}`;
+            // 답변을 300자로 제한 (fallback용)
+            const truncatedAnswer = item.answer.length > 300
+                ? item.answer.substring(0, 300) + '...'
+                : item.answer;
+            return `${prefix} Q: ${item.question}\nA: ${truncatedAnswer}`;
         }).join('\n\n');
     }
 
-    // 대화 히스토리 구성 (최근 대화 맥락)
+    // ★ 대화 히스토리: 키워드 기반 압축 ★
     let historyText = '';
     if (conversationHistory.length > 0) {
-        historyText = conversationHistory.map(h =>
-            `사용자: ${h.user}\n어시스턴트: ${h.assistant}`
-        ).join('\n\n');
+        const mentionedKeywords = extractMentionedKeywords();
+        const recentQuestions = conversationHistory.slice(-3).map(h => h.user).join(' → ');
+
+        historyText = `[이전 대화 요약]
+- 최근 질문 흐름: ${recentQuestions}
+- AI가 이미 안내한 키워드: ${mentionedKeywords.slice(0, 15).join(', ') || '없음'}`;
+
+        console.log('📋 압축된 히스토리:', historyText.substring(0, 100) + '...');
     }
 
     // ★ Phase 3-1: 시스템 프롬프트에 진료과 우선순위 강화 ★
