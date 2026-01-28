@@ -181,10 +181,10 @@ ${userSpecialtyContext}${conversationContext}
 반드시 JSON만 출력하세요.`;
 
     try {
-        // Gemini 3.0 Flash (사용자 지정 최신 모델)
+        // Gemini 3 Flash Preview (사용자 지정 모델 ID)
         const models = [
-            { id: 'gemini-3.0-flash', name: 'Gemini 3.0 Flash' },
-            { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' }
+            { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
+            { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash Exp' }
         ];
 
         let content = null;
@@ -280,7 +280,7 @@ async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(500).json({ success: false, error: 'GEMINI_API_KEY is not set' });
 
-    const modelId = 'gemini-3.0-flash'; // 최신 모델 사용
+    const modelId = 'gemini-3-flash-preview'; // 사용자 지정 모델 ID 사용
 
     // ★ 지능형 필터링 지침 주입 ★
     const finalSystemPrompt = `${systemPrompt}\n\n---\n**[AI 답변 생성 핵심 지침]**\n1. 제공된 정보 중 질문과 관련 없는 Noise는 무시하세요.\n2. 반드시 질문과 "의미적으로 일치하는" 정보만 선별하여 답변하세요.\n3. 정보가 불확실하면 사용하지 마세요.`.trim();
