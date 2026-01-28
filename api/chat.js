@@ -181,11 +181,10 @@ ${userSpecialtyContext}${conversationContext}
 반드시 JSON만 출력하세요.`;
 
     try {
-        // Gemini Flash로 Query Planning (최신 모델 우선 시도)
-        // 시도할 모델 목록 (고성능 모델 포함)
+        // Gemini 3.0 Flash (사용자 지정 최신 모델)
         const models = [
-            { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
-            { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' }
+            { id: 'gemini-3.0-flash', name: 'Gemini 3.0 Flash' },
+            { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' }
         ];
 
         let content = null;
@@ -268,7 +267,7 @@ async function handleContextSummary(req, res, contextHistory) {
     const formattedDialogue = contextHistory.map(turn => `Q: ${turn.question}\nA: ${turn.answer}`).join('\n\n');
 
     try {
-        const summary = await callGeminiAPI(formattedDialogue, systemPrompt, 'gemini-1.5-flash');
+        const summary = await callGeminiAPI(formattedDialogue, systemPrompt, 'gemini-2.5-flash');
         return res.status(200).json({ summary });
     } catch (error) {
         console.error('Summary Generation Error:', error);
@@ -281,7 +280,7 @@ async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(500).json({ success: false, error: 'GEMINI_API_KEY is not set' });
 
-    const modelId = 'gemini-1.5-flash';
+    const modelId = 'gemini-3.0-flash'; // 최신 모델 사용
 
     // ★ 지능형 필터링 지침 주입 ★
     const finalSystemPrompt = `${systemPrompt}\n\n---\n**[AI 답변 생성 핵심 지침]**\n1. 제공된 정보 중 질문과 관련 없는 Noise는 무시하세요.\n2. 반드시 질문과 "의미적으로 일치하는" 정보만 선별하여 답변하세요.\n3. 정보가 불확실하면 사용하지 마세요.`.trim();
