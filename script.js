@@ -483,6 +483,7 @@ async function getBotResponse(userMessage) {
         }
 
         // 대화 히스토리에 저장 (맥락 유지 + 요약 자동 트리거)
+        // 대화 히스토리에 저장 (맥락 유지 + 요약 자동 트리거)
         // 텍스트를 자르지 않고 저장하여 나중에 키워드 추출 시 누락이 없도록 함
         chatMemory.addTurn(userMessage, responseText);
 
@@ -609,9 +610,11 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 3. 참고문서 내용 기반으로만 답변 (할루시네이션 금지)
 4. 병원 개원과 무관한 질문 → "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
    - **중요**: [OFF_TOPIC] 사용 시 다른 긴 설명이나 인용을 절대 포함하지 마세요.
-5. 사용자가 요청한 **구체적인 정보(예: 금액, 수치, 리스트 등)**가 참고문서에 없거나 부족한 경우 → "[NO_DATA]죄송합니다. 요청하신 구체적인 정보가 현재 데이터에 충분하지 않습니다."
-   - **중요**: [NO_DATA] 사용 시 관련 없는 보조 정보나 인용([번호])을 넣지 마세요. 억지로 설명하지 말고 태그와 사과 문구만 간결하게 출력하세요.
-6. 답변 본문에 "플래너에게 문의/연락", "상담을 받아보라" 등의 문구를 직접 쓰지 마세요. [NO_DATA] 태그 시 시스템이 자동으로 버튼을 생성합니다.
+5. 사용자가 요청한 **구체적인 정보(예: 금액, 수치, 리스트 등)**가 참고문서에 없거나 부족한 경우 → `[NO_DATA]` 태그와 함께 다음 **3단계 구조**로 답변하세요.
+   - **1단계 (감사/사과)**: 좋은 질문에 대한 감사 인사와 함께, 구체적인 데이터가 부족하여 답변드리기 어려운 점에 대한 사과.
+   - **2단계 (질문 가이드)**: 현재 **# 참고문서**에 포함된 내용 중 사용자의 질문과 가장 맥락이 가까운 주제를 찾아 "대신 이러이러한 내용(예: 입지분석, 인테리어 절차 등)에 대해서는 제가 답변해 드릴 수 있습니다"라고 질문 가이드를 제공. (반드시 데이터베이스에 실존하는 내용이어야 함)
+   - **3단계 (플래너 유도)**: "추가적으로 궁금한 내용이 있으시면 전문 플래너에게 연락해 주세요"라고 마무리.
+6. 답변 본문에 "플래너에게 문의/연락", "상담을 받아보라" 등의 문구를 직접 쓰지 마세요. `[NO_DATA]` 태그 시 시스템이 자동으로 버튼을 생성합니다.
 
 # 출처 인용 규칙 (매우 중요!)
 1. **🔥 핵심 문서를 최우선으로 사용**하세요.
@@ -941,14 +944,19 @@ function addOffTopicMessage(text) {
 function addNoDataMessage(text) {
     const div = document.createElement('div');
     div.className = 'message bot';
+
+    // AI가 보내온 텍스트에서 줄바꿈 처리
+    const formattedText = text.replace(/\n/g, '<br>');
+
     div.innerHTML = `
         <div class="message-avatar">AI</div>
         <div class="message-content formatted-response">
-            <p>${text || '죄송합니다. 현재 해당 질문에 대한 답변을 드리기 어렵습니다. 빠른 시일 내에 답변할 수 있도록 업데이트하겠습니다.'}</p>
-            <p style="margin-top: 12px;">더 자세한 상담이 필요하시면 <strong>전문 플래너</strong>에게 문의해 주세요.</p>
-            <div style="margin-top: 16px;">
+            <div class="no-data-body">
+                ${formattedText}
+            </div>
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed #e2e8f0;">
                 <button onclick="openContactModal()" 
-                    style="padding: 12px 24px; background: #22c55e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                    style="padding: 12px 24px; background: #536db1; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px;">
                     ☎️ 플래너에게 연락하기
                 </button>
             </div>

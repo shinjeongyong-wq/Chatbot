@@ -193,8 +193,6 @@ ${userSpecialtyContext}${conversationContext}
 반드시 JSON만 출력하세요.`;
 
     try {
-        // Gemini Flash로 Query Planning (최신 모델 우선 시도)
-        // 시도할 모델 목록 (고성능 모델 포함)
         const models = [
             { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
             { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' }
@@ -303,7 +301,6 @@ async function handleContextSummary(req, res, contextHistory) {
 
 // 답변 생성 - Gemini API 사용
 async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
-    // 모델 우선순위: Gemini 3 Flash -> Gemini 2.0 Flash -> Gemini 1.5 Flash
     const models = [
         { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
         { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' }
@@ -315,8 +312,7 @@ async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
         try {
             console.log(`Trying model: ${model.name} (${model.id})`);
 
-            // ★ 지능형 필터링 지침 주입 (Wrapper) ★
-            // Broad Search로 가져온 50개 데이터 중 잡음을 제거하고 핵심만 쓰도록 유도
+            // ★ 지능형 필터링 지침 주입 ★
             const finalSystemPrompt = `
 ${systemPrompt}
 
@@ -347,9 +343,7 @@ ${systemPrompt}
         error: 'All models failed',
         debug: {
             apiKeyExists: !!process.env.GEMINI_API_KEY,
-            apiKeyLength: process.env.GEMINI_API_KEY?.length || 0,
-            lastErrorMessage: lastError,
-            message: 'Gemini API 호출이 모두 실패했습니다. 마지막 에러: ' + lastError
+            lastErrorMessage: lastError
         }
     });
 }
