@@ -26,6 +26,12 @@ export default async function handler(req, res) {
         return await handleQueryPlanning(req, res, userQuery);
     }
 
+    // Context Summary 모드 - Gemini Flash로 대화 요약 (봇 3)
+    if (mode === 'summary') {
+        const { contextHistory } = req.body;
+        return await handleContextSummary(req, res, contextHistory);
+    }
+
     // 일반 답변 모드
     return await handleAnswerGeneration(req, res, userQuery, systemPrompt);
 }
@@ -97,14 +103,20 @@ async function handleQueryPlanning(req, res, userQuery) {
     // ★ 최근 대화 맥락 (후속 질문 해석용) ★
     let conversationContext = '';
     if (recentContext && recentContext.trim()) {
+        const alreadyMentioned = req.body.alreadyMentioned || [];
+        const mentionedText = alreadyMentioned.length > 0 ? `\n\n# ⛔ 이미 언급된 항목 (중복 금지)\n${alreadyMentioned.join(', ')}` : '';
+
         conversationContext = `
 
 # 🔄 최근 대화 맥락 (매우 중요!)
-아래는 최근 대화 내용입니다. "더 없어?", "그거 말고", "또 뭐 있어?" 같은 후속 질문이 오면, 이 맥락을 참고하여 주제를 유지하세요.
+아래는 최근 대화 내용입니다. "더 없어?", "그거 말고", "또 뭐 있어?" 같은 후속 질문이 오면, 이 맥락을 적극 참고하세요.${mentionedText}
 
 ${recentContext}
 
-**규칙: 사용자가 "더", "또", "추가로" 같은 후속 질문을 하면, 위 대화의 주제(topic)를 그대로 유지하세요!**
+**[후속 질문 대응 규칙]**
+1. 사용자가 "더", "또", "추가로", "다른" 같은 추가 정보를 요청하면, 이전 대화의 **intent, topic, targetCategory를 그대로 유지**하세요.
+2. **중복 방지 (Exclusion)**: 이전 답변에서 이미 언급된 업체명이나 구체적인 항목이 있다면, 이를 **excludeKeywords** 리스트에 포함시키세요.
+3. **새로운 정보 유도**: expandedKeywords에 "추가적인", "다른", "나머지" 등을 추가하여 검색 결과가 확장되도록 하세요.
 `;
     }
 
@@ -134,22 +146,28 @@ ${userSpecialtyContext}${conversationContext}
 - 모든 검색은 Q&A, FAQ, Notion 3가지 소스 모두를 대상으로 합니다
 - targetCategory는 Notion 데이터 내에서 우선순위를 정하는 용도입니다
 - 일반적인 질문이면 targetCategory를 "all"로 설정하세요
+- 사용자가 '더', '또'라고 하면 **excludeKeywords**를 활용해 이미 본 정보를 제외하도록 쿼리를 짜세요.
 
-[의도 구분]
-- "파트너사 알려줘/뭐있어/추천해줘" → intent: "파트너사목록", targetCategory: "partners"
-- "어떻게 해/절차/과정/방법" → intent: "절차안내", targetCategory: "hospital-basics"
-- "체크리스트/점검" → intent: "체크리스트", targetCategory: "checklist"
-- 일반적인 질문/정보 요청 → intent: "정보요청", targetCategory: "all"
+[의도 구분 및 카테고리 매칭 규칙]
+1. **지식/방법론 요청 (How/What)**: "방법", "팁", "노하우", "잘 보이는 법", "절차" 등을 물으면 **intent: "정보요청"**, **targetCategory: "all"**로 설정하세요. (Google Sheets와 모든 Notion 폴더를 훑기 위함)
+2. **단순 업체/리스트 요청 (Who)**: "업체 추천", "명단", "리스트", "파트너사 알려줘"처럼 대상을 직접 찾을 때만 **intent: "파트너사목록"**, **targetCategory: "partners"**를 사용하세요.
+3. **심화 주제 요청**: 특정 분야의 깊은 내용(예: 의료기기 상세 스펙)은 **intent: "심화"**, **targetCategory: "advanced"**로 설정하세요.
+
+[매칭 예시]
+- "밤에 간판 잘 보이게 하고 싶어" → intent: "정보요청", topic: "간판", targetCategory: "all", targetSubCategory: "signage"
+- "인테리어 업체 명단 뽑아줘" → intent: "파트너사목록", topic: "인테리어", targetCategory: "partners", targetSubCategory: "interior"
+- "대출 받을 때 팁 알려줘" → intent: "정보요청", topic: "개원비용", targetCategory: "all", targetSubCategory: "finance"
 
 [반환할 JSON 형식]
 {
   "intent": "파트너사목록|절차안내|비용|체크리스트|심화|정보요청|off_topic",
   "topic": "인테리어|간판|의료기기|세무|마케팅|개원비용|CI/BI|기타",
   "targetCategory": "partners|hospital-basics|advanced|checklist|all",
+  "targetSubCategory": "interior|signage|homepage|medical-device|tax|finance|all",
   "specialtyRelevant": true/false,
   "coreKeywords": ["핵심 키워드 1-3개"],
   "expandedKeywords": ["관련 확장 키워드"],
-  "excludeKeywords": [],
+  "excludeKeywords": ["이전 대화에서 언급되어 제외할 키워드들"],
   "searchStrategy": "semantic|broad|exact"
 }
 
@@ -178,10 +196,8 @@ ${userSpecialtyContext}${conversationContext}
         // Gemini Flash로 Query Planning (최신 모델 우선 시도)
         // 시도할 모델 목록 (고성능 모델 포함)
         const models = [
-            { id: 'gemini-3-flash', name: 'Gemini 3 Flash' },
             { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
-            { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
-            { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' }
+            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' }
         ];
 
         let content = null;
@@ -222,7 +238,7 @@ ${userSpecialtyContext}${conversationContext}
                 excludeKeywords: [],
                 searchStrategy: "broad"
             },
-            modelName: `${usedModel} (fallback)`
+            modelName: `${usedModelName} (fallback)`
         });
     } catch (error) {
         console.error('Query Planner error:', error.message);
@@ -243,15 +259,54 @@ ${userSpecialtyContext}${conversationContext}
     }
 }
 
+// Context Summary - 대화 요약 (봇 3)
+async function handleContextSummary(req, res, contextHistory) {
+    if (!contextHistory) return res.status(400).json({ error: 'Context history is required' });
+
+    console.log('[Summary] Generating summary for', contextHistory.length, 'turns');
+
+    const systemPrompt = `
+당신은 '개원 상담 챗봇'의 기억 관리자(Context Manager)입니다.
+아래 제공되는 오래된 대화 기록(질문-답변 쌍)을 분석하여 핵심 내용을 요약하세요.
+
+**요약 규칙:**
+1. 사용자의 질문 주제(진료과, 찾고 있는 항목 등)를 명확히 기록하세요.
+2. 챗봇이 추천했던 업체명, 제품명, 가격 정보 등 **핵심 디테일**은 반드시 유지하세요.
+3. 전체 내용을 3~5문장 내외의 요약 노트(Summary Note) 형식으로 작성하세요.
+4. 이 요약문은 향후 챗봇이 이전 대화를 기억하는 데 사용됩니다.
+    `.trim();
+
+    // 대화 내역 포맷팅
+    const formattedDialogue = contextHistory.map(turn => `Q: ${turn.question}\nA: ${turn.answer}`).join('\n\n');
+
+    console.log('📝 [Summary Agent] 요약할 대화 대상:', formattedDialogue.substring(0, 100) + '...');
+
+    const models = [
+        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+        { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' }
+    ];
+
+    for (const model of models) {
+        try {
+            console.log(`[Summary Agent] Trying: ${model.name} (${model.id})`);
+            const summary = await callGeminiAPI(formattedDialogue, systemPrompt, model.id);
+            console.log('✅ [Summary Agent] 요약 완료:', summary.substring(0, 50) + '...');
+            return res.status(200).json({ summary });
+        } catch (error) {
+            console.error(`[Summary Agent] ${model.name} failed:`, error.message);
+            continue;
+        }
+    }
+
+    return res.status(500).json({ error: 'All summary models failed' });
+}
+
 // 답변 생성 - Gemini API 사용
 async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
     // 모델 우선순위: Gemini 3 Flash -> Gemini 2.0 Flash -> Gemini 1.5 Flash
     const models = [
-        { id: 'gemini-3-flash', name: 'Gemini 3 Flash' },
         { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
-        { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
-        { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash (Exp)' },
-        { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' }
+        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' }
     ];
 
     let lastError = null;
@@ -259,7 +314,21 @@ async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
     for (const model of models) {
         try {
             console.log(`Trying model: ${model.name} (${model.id})`);
-            const content = await callGeminiAPI(userQuery, systemPrompt, model.id);
+
+            // ★ 지능형 필터링 지침 주입 (Wrapper) ★
+            // Broad Search로 가져온 50개 데이터 중 잡음을 제거하고 핵심만 쓰도록 유도
+            const finalSystemPrompt = `
+${systemPrompt}
+
+---
+**[AI 답변 생성 핵심 지침]**
+1. 위 **[검색된 정보]** 섹션에는 사용자 질문과 **관련 없는 데이터(Noise)**가 다수 포함되어 있습니다. (검색 범위를 넓혔기 때문)
+2. **반드시 사용자 질문과 "의미적으로 일치하는" 정보만 선별**하여 답변에 사용하세요.
+3. 키워드만 겹치고 내용은 다른 정보(예: '인테리어' 질문에 '간판' 정보)는 철저히 무시하세요.
+4. 정보 퀄리티가 낮거나 불확실하면 사용하지 마세요.
+            `.trim();
+
+            const content = await callGeminiAPI(userQuery, finalSystemPrompt, model.id);
 
             return res.json({
                 success: true,

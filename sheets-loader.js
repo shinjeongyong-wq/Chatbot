@@ -304,8 +304,9 @@ class GoogleSheetsLoader {
 
     // [한국어 조사 제거] - "밤에" → "밤", "진료를" → "진료"
     normalizeWord(word) {
-        // 주요 조사 및 어미 제거
-        return word.replace(/[은는이가을를에에서으로로의와과도만?!\.]/g, '').trim();
+        // 주요 조사 및 어미 제거 (단어 끝에 붙은 경우만)
+        // 은, 는, 이, 가, 을, 를, 에, 에서, 으로, 로, 의, 와, 과, 도, 만, ?, !, .
+        return word.replace(/(은|는|이|가|을|를|에|에서|으로|로|의|와|과|도|만|\?|!|\.)$/, '').trim();
     }
 
     // [쿼리 확장] - 조사 제거 + 동의어 + 부분 매칭
@@ -398,18 +399,20 @@ class GoogleSheetsLoader {
     async smartSearch(queryPlan, maxResults = 10, userSpecialty = null) {
         if (!this.cache) await this.loadData();
 
-        const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory, specialtyRelevant } = queryPlan;
+        const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory, targetSubCategory, specialtyRelevant } = queryPlan;
         const allKeywords = [...(coreKeywords || []), ...(expandedKeywords || [])];
 
-        // ★ 검색 결과 제한 - 25개로 축소하여 LLM 참조 정확도 향상 ★
-        const finalMaxResults = userSpecialty ? 25 : maxResults;
+        // ★ AI 지능형 필터링(Context Expansion)을 위해 검색 범위 조정 ★
+        // 기존 50개 → 10~30개로 하향 조정하여 속도 향상
+        const finalMaxResults = maxResults || 30;
 
-        console.log('🧠 Smart Search 시작');
+        console.log('🧠 Smart Search 시작 (Broad Mode)');
         console.log('   핵심 키워드:', coreKeywords);
         console.log('   확장 키워드:', expandedKeywords);
         console.log('   제외 키워드:', excludeKeywords);
         console.log('   검색 전략:', searchStrategy);
         console.log('   타겟 카테고리:', targetCategory);
+        console.log('   타겟 세부 카테고리:', targetSubCategory);
         console.log('   👤 사용자 진료과:', userSpecialty ? userSpecialty.label : '미선택');
         console.log('   🎯 진료과 특화 질문:', specialtyRelevant ? '예 (다른 진료과 제외)' : '아니오 (공통 질문)');
         console.log('   📏 최대 결과 수:', finalMaxResults);
@@ -454,24 +457,56 @@ class GoogleSheetsLoader {
             const itemTopic = item.metadata?.topic || item.metadata?.category || '';
             const itemField = (item.metadata?.field || '').toLowerCase();
             const itemPath = item.metadata?.categoryPath || '';
+            const itemSubPath = item.metadata?.structuredSubCategory || '';
 
             if (topic && topic !== '기타') {
                 const searchTopic = topic.toLowerCase();
 
                 // 1. 노션 데이터의 상세 토픽 매칭
                 if (item.source === 'notion' && (itemTopic.includes(searchTopic) || itemPath.includes(searchTopic))) {
-                    score = score + 2.0; // 주제 일치 시 압도적 보너스
+                    score = score + 1.2; // 보너스 수치 하향 (2.0 -> 1.2)
                 }
                 // 2. Q&A, FAQ의 필드 매칭
                 else if ((item.source === 'qa' || item.source === 'faq') && itemField.includes(searchTopic)) {
-                    score = score + 1.5; // 주제 일치 시 강력 보너스
+                    score = score + 1.0; // 보너스 수치 하향 (1.5 -> 1.0)
                 }
-                // 3. 주제가 명확한데 다른 주제인 경우 (인테리어 질문에 간판 데이터 등)
+                // 3. 주제가 명확한데 다른 주제인 경우 (인테리어 질문에 간판 데이터 등) -> 페널티 대폭 완화
                 else if (topic === '인테리어' && (itemTopic.includes('간판') || itemPath.includes('signage') || itemField.includes('간판'))) {
-                    score = score * 0.1; // 90% 감점 (사실상 배제)
+                    score = score * 0.6; // 극단적 감점 제거 (0.1 -> 0.6)
                 }
                 else if (topic === '간판' && (itemTopic.includes('인테리어') || itemPath.includes('interior') || itemField.includes('인테리어'))) {
-                    score = score * 0.1; // 90% 감점
+                    score = score * 0.6; // 극단적 감점 제거 (0.1 -> 0.6)
+                }
+            }
+
+            // ★ 세부 카테고리(targetSubCategory) 매칭 시 완만한 보너스 ★
+            if (targetSubCategory && targetSubCategory !== 'all' && item.source === 'notion') {
+                if (itemSubPath.includes(targetSubCategory)) {
+                    score = score + 1.0; // 보너스 수치 하향 (3.0 -> 1.0)
+                } else if (targetSubCategory === 'interior' && itemSubPath.includes('signage')) {
+                    score = score * 0.5; // 감점 완화 (0.01 -> 0.5)
+                }
+            }
+
+            // 🎯 의도(Intent) 기반 완만한 가중치 부여 (정보 요청 vs 업체 추천)
+            const isHowToIntent = queryPlan.intent === '정보요청' || queryPlan.intent === '절차안내';
+            const isPartnerIntent = queryPlan.intent === '파트너사목록';
+
+            if (isHowToIntent) {
+                // 방법/노하우 질문이면 지식성 데이터(advanced, basics, qa) 선호
+                if (itemPath.startsWith('advanced') || itemPath.startsWith('hospital-basics') || item.source === 'qa' || item.source === 'faq') {
+                    score = score + 0.8; // 보너스 하향 (2.5 -> 0.8)
+                }
+                if (itemPath.startsWith('partners')) {
+                    score = score * 0.7; // 감점 완화 (0.3 -> 0.7)
+                }
+            } else if (isPartnerIntent) {
+                // 업체 추천 의도면 파트너사 데이터 선호
+                if (itemPath.startsWith('partners')) {
+                    score = score + 1.0; // 보너스 하향 (2.0 -> 1.0)
+                }
+                if (itemPath.startsWith('advanced')) {
+                    score = score * 0.8; // 감점 완화 (0.5 -> 0.8)
                 }
             }
 
@@ -492,7 +527,7 @@ class GoogleSheetsLoader {
 
             return { ...item, score };
         })
-            .filter(r => r.score > 0.25)  // 임계값 - 관련 문서 포함
+            .filter(r => r.score > 0.05)  // ★ Broad Search: 임계값 0.25 -> 0.05 대폭 완화
             .sort((a, b) => b.score - a.score);
 
         // ★ 진료과 필터링: specialtyRelevant에 따라 전략 분기 ★
