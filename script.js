@@ -81,18 +81,104 @@ let currentUserSpecialty = null; // 사용자가 선택한 진료과
 let sheetsLoader = null;
 let faqNavigationStack = [];
 
-// 대화 맥락 유지를 위한 히스토리 (최근 10개 메시지)
-let conversationHistory = [];
-const MAX_HISTORY = 10;
+// ==========================
+// 0. ChatMemory (클라이언트 메모리 관리자)
+// ==========================
+class ChatMemory {
+    constructor() {
+        this.recentBuffer = []; // {user:..., assistant:...}
+        this.contextSummary = "";
+        this.isSummarizing = false;
+    }
+
+    // 하위 호환성 (기존 conversationHistory 대체)
+    get history() {
+        return this.recentBuffer;
+    }
+
+    reset() {
+        this.recentBuffer = [];
+        this.contextSummary = "";
+    }
+
+    // Context for AI Input (Summary + Recent)
+    getContextPrompt() {
+        let prompt = "";
+        if (this.contextSummary) {
+            prompt += `[이전 대화 요약]:\n${this.contextSummary}\n\n`;
+        }
+        // 최근 메시지는 최신순이 아니라 시간순(과거->최신)으로 출력
+        if (this.recentBuffer.length > 0) {
+            prompt += `[최근 대화]:\n${this.recentBuffer.map(h => `Q: ${h.user}\nA: ${h.assistant}`).join('\n')}\n`;
+        }
+        return prompt || '(첫 대화)';
+    }
+
+    async addTurn(userMsg, botMsg) {
+        this.recentBuffer.push({ user: userMsg, assistant: botMsg });
+
+        // 3턴을 초과하면 가장 오래된 턴을 요약본으로 압축 (백그라운드)
+        if (this.recentBuffer.length > 3 && !this.isSummarizing) {
+            this.triggerSummaryLoop();
+        }
+    }
+
+    async triggerSummaryLoop() {
+        this.isSummarizing = true;
+        try {
+            while (this.recentBuffer.length > 3) {
+                const oldest = this.recentBuffer[0];
+
+                // 요약 대상: 기존 요약 + 가장 오래된 대화
+                const contextToSummarize = [];
+                if (this.contextSummary) {
+                    contextToSummarize.push({ question: "이전 요약", answer: this.contextSummary });
+                }
+                contextToSummarize.push({ question: oldest.user, answer: oldest.assistant });
+
+                console.log('🧹 [ChatMemory] 백그라운드 요약 시작...');
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'summary',
+                        contextHistory: contextToSummarize
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.summary) {
+                        this.contextSummary = data.summary;
+                        this.recentBuffer.shift(); // 성공 시 버퍼에서 제거
+                        console.log('✅ [ChatMemory] 요약 완료:', this.contextSummary.substring(0, 30) + '...');
+                    } else {
+                        break;
+                    }
+                } else {
+                    console.error('Summary API failed');
+                    break;
+                }
+            }
+        } catch (e) {
+            console.error('Summary Error:', e);
+        } finally {
+            this.isSummarizing = false;
+        }
+    }
+}
+
+let chatMemory = new ChatMemory(); // 인스턴스 생성
+const MAX_HISTORY = 10; // (더 이상 사용되지 않지만 호환성 위해 남김)
 
 // ★ 지능형 중복 배제: 이전 답변에서 언급된 주요 키워드(업체명, 장비명) 추출 ★
 function extractMentionedKeywords() {
-    if (conversationHistory.length === 0) return [];
+    if (chatMemory.history.length === 0) return [];
 
     const mentioned = new Set();
 
     // 최근 답변들에서 키워드 추출
-    conversationHistory.forEach(h => {
+    chatMemory.history.forEach(h => {
         if (!h.assistant) return;
         const text = h.assistant;
 
@@ -313,7 +399,10 @@ async function getBotResponse(userMessage) {
                     userQuery: userMessage,
                     mode: 'plan',
                     userSpecialty: userSpec,
-                    recentContext: recentContext  // 최근 대화 맥락 추가
+                    userQuery: userMessage,
+                    mode: 'plan',
+                    userSpecialty: userSpec,
+                    recentContext: chatMemory.getContextPrompt()  // 요약 + 최근 대화 전달
                 })
             });
 
@@ -376,14 +465,8 @@ async function getBotResponse(userMessage) {
             addFormattedMessage(result.text, relatedContexts, result.modelName);
         }
 
-        // 대화 히스토리에 저장 (맥락 유지)
-        conversationHistory.push({
-            user: userMessage,
-            assistant: responseText.substring(0, 500)
-        });
-        if (conversationHistory.length > MAX_HISTORY) {
-            conversationHistory.shift();
-        }
+        // 대화 히스토리에 저장 (맥락 유지 + 요약 자동 트리거)
+        chatMemory.addTurn(userMessage, responseText.substring(0, 500));
 
     } catch (error) {
         console.error('Bot Response Error:', error);
@@ -420,13 +503,8 @@ async function callOpenRouterAPI(userQuery, contexts) {
         }).join('\n\n');
     }
 
-    // 대화 히스토리 구성 (토큰 최적화: 압축된 형태로 전달)
-    let historyText = '';
-    if (conversationHistory.length > 0) {
-        historyText = conversationHistory.map(h =>
-            `Q: ${h.user.substring(0, 50)}${h.user.length > 50 ? '...' : ''}\nA: ${(h.assistant || '').substring(0, 100)}...`
-        ).join('\n');
-    }
+    // 대화 히스토리 구성 (ChatMemory 활용)
+    let historyText = chatMemory.getContextPrompt();
 
     // ★ Phase 3-1: 시스템 프롬프트에 진료과 우선순위 강화 ★
     let specialtyInfo = '';
@@ -870,7 +948,7 @@ function selectSpecialty(specialty) {
     // 진료과 변경 시 대화 히스토리 초기화 및 채팅창 리셋
     if (isChanging) {
         // 대화 히스토리 초기화
-        conversationHistory = [];
+        chatMemory.reset();
         console.log('🔄 진료과 변경으로 대화 히스토리 초기화됨');
 
         // 채팅창 초기화 (환영 메시지만 유지)

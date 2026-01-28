@@ -401,10 +401,11 @@ class GoogleSheetsLoader {
         const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory, specialtyRelevant } = queryPlan;
         const allKeywords = [...(coreKeywords || []), ...(expandedKeywords || [])];
 
-        // ★ 검색 결과 제한 - 25개로 축소하여 LLM 참조 정확도 향상 ★
-        const finalMaxResults = userSpecialty ? 25 : maxResults;
+        // ★ AI 지능형 필터링(Context Expansion)을 위해 검색 범위 대폭 확장 ★
+        // 기존 10~25개 → 50개로 늘려서 잡음이 섞이더라도 중요한 정보가 누락되지 않도록 함
+        const finalMaxResults = 50;
 
-        console.log('🧠 Smart Search 시작');
+        console.log('🧠 Smart Search 시작 (Broad Mode)');
         console.log('   핵심 키워드:', coreKeywords);
         console.log('   확장 키워드:', expandedKeywords);
         console.log('   제외 키워드:', excludeKeywords);
@@ -492,7 +493,7 @@ class GoogleSheetsLoader {
 
             return { ...item, score };
         })
-            .filter(r => r.score > 0.25)  // 임계값 - 관련 문서 포함
+            .filter(r => r.score > 0.05)  // ★ Broad Search: 임계값 0.25 -> 0.05 대폭 완화
             .sort((a, b) => b.score - a.score);
 
         // ★ 진료과 필터링: specialtyRelevant에 따라 전략 분기 ★

@@ -2,8 +2,18 @@
 // Vercel Serverless Function to proxy Google Sheets API requests for security
 
 export default async function handler(req, res) {
+    // CORS 헤더 추가 (브라우저 호출 허용)
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
     const { range } = req.query;
-    const apiKey = process.env.GOOGLE_API_KEY;
+    // GOOGLE_API_KEY가 없으면 GEMINI_API_KEY를 대신 시도 (보통 같은 프로젝트 키를 사용하므로)
+    const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
     const spreadsheetId = process.env.SPREADSHEET_ID;
 
     if (!range) {
@@ -11,7 +21,15 @@ export default async function handler(req, res) {
     }
 
     if (!apiKey || !spreadsheetId) {
-        return res.status(500).json({ error: 'Server environment variables not set' });
+        const missing = [];
+        if (!apiKey) missing.push('GOOGLE_API_KEY (or GEMINI_API_KEY)');
+        if (!spreadsheetId) missing.push('SPREADSHEET_ID');
+
+        return res.status(500).json({
+            error: 'Server environment variables not set',
+            details: `Missing: ${missing.join(', ')}`,
+            tip: 'Vercel Settings > Environment Variables에서 해당 값을 등록하고 Redeploy 해주세요.'
+        });
     }
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
