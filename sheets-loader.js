@@ -402,15 +402,9 @@ class GoogleSheetsLoader {
         const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory, targetSubCategory, specialtyRelevant } = queryPlan;
         const allKeywords = [...(coreKeywords || []), ...(expandedKeywords || [])];
 
-<<<<<<< HEAD
         // ★ AI 지능형 필터링(Context Expansion)을 위해 검색 범위 조정 ★
         // 기존 50개 → 10~30개로 하향 조정하여 속도 향상
         const finalMaxResults = maxResults || 30;
-=======
-        // ★ AI 지능형 필터링(Context Expansion)을 위해 검색 범위 대폭 확장 ★
-        // 기존 10~25개 → 50개로 늘려서 잡음이 섞이더라도 중요한 정보가 누락되지 않도록 함
-        const finalMaxResults = 50;
->>>>>>> af3cd6adadc7aaf31e96a32a21db840878c4f9da
 
         console.log('🧠 Smart Search 시작 (Broad Mode)');
         console.log('   핵심 키워드:', coreKeywords);
