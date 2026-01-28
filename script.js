@@ -851,66 +851,81 @@ function addOffTopicMessage(text) {
 
 // NO_DATA 응답 렌더링 (볼드체, 불렛 포인트 지원 + 플래너 연락 버튼)
 function addNoDataMessage(text) {
+    console.log('[DEBUG] addNoDataMessage 호출됨, 원본 텍스트:', text);
+
     const div = document.createElement('div');
     div.className = 'message bot';
 
-    // 1. 인용 번호 제거 및 불필요한 맺음말 제거
+    // 1. 인용 번호 제거
     let cleanedText = text.replace(/\[\d+\]/g, '').trim();
+    console.log('[DEBUG] 인용 번호 제거 후:', cleanedText);
 
-    // 리스트 이후의 상투적인 맺음말 제거
-    const lines = cleanedText.split('\n');
+    // 2. 줄 단위로 분리 (다양한 줄바꿈 형식 지원)
+    const lines = cleanedText.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+    console.log('[DEBUG] 줄 분리 결과:', lines);
+
+    // 3. 맺음말 제거 로직
     const filteredLines = [];
     let listStarted = false;
-    let listEnded = false;
 
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        // * - ● 모두 불렛으로 인식
-        if (line.match(/^[\*\-●]\s/)) {
+    for (const line of lines) {
+        // 불렛 포인트 감지: * 또는 - 또는 ● 로 시작 (공백 유무 무관)
+        const isBullet = /^[\*\-●]\s*.+/.test(line);
+
+        if (isBullet) {
             listStarted = true;
             filteredLines.push(line);
-        } else if (listStarted && line.length > 0 && !line.match(/^[\*\-●]\s/)) {
-            // 리스트가 시작된 후 다시 텍스트가 나오면 맺음말일 확률이 높음
-            if (!line.includes('원하시면')) {
-                listEnded = true;
-                continue; // 맺음말 건너뜀
+        } else if (listStarted && !isBullet) {
+            // 리스트가 시작된 후 일반 텍스트가 나오면 맺음말로 간주하고 중단
+            if (line.includes('성공') || line.includes('언제든') || line.includes('도움')) {
+                break; // 맺음말 이후 무시
             }
             filteredLines.push(line);
         } else {
-            if (!listEnded) filteredLines.push(line);
+            filteredLines.push(line);
         }
     }
 
-    cleanedText = filteredLines.join('\n');
+    console.log('[DEBUG] 필터링 후:', filteredLines);
 
-    // 2. 마크다운 → HTML 변환 (볼드체 및 불렛 포인트 적용)
-    // 중요: 불렛 포인트를 먼저 처리한 후 볼드체 처리 (순서 중요!)
-    let html = cleanedText
-        .replace(/^\s*[\*\-●]\s*(.+)$/gm, '<li>$1</li>') // 불렛 포인트 먼저 (*, -, ● 모두 인식)
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // 볼드체
-        .replace(/\n\n/g, '</p><p>')                      // 빈 줄은 문단 구분
-        .replace(/\n/g, ' ');                             // 일반 줄바꿈은 공백으로
+    // 4. 마크다운 → HTML 변환
+    let htmlParts = [];
+    let inList = false;
+    let listItems = [];
 
-    // <li> 태그들을 <ul>로 감싸기
-    if (html.includes('<li>')) {
-        // 연속된 <li> 태그들을 하나의 <ul>로 감싸기
-        html = html.replace(/(<li>.*?<\/li>)+/g, match => {
-            return `<ul class="response-list" style="margin: 16px 0; padding-left: 48px; list-style-type: disc;">${match}</ul>`;
-        });
-        // <ul> 내부 <li> 스타일 추가
-        html = html.replace(/<li>/g, '<li style="margin-bottom: 8px; line-height: 1.6;">');
+    for (const line of filteredLines) {
+        // 불렛 포인트 체크
+        const bulletMatch = line.match(/^[\*\-●]\s*(.+)$/);
+
+        if (bulletMatch) {
+            if (!inList) {
+                inList = true;
+                listItems = [];
+            }
+            // 불렛 내용에서 볼드체 변환
+            let content = bulletMatch[1].replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            listItems.push(`<li style="margin-bottom: 8px; line-height: 1.6;">${content}</li>`);
+        } else {
+            // 불렛이 아닌 경우
+            if (inList && listItems.length > 0) {
+                // 이전 리스트 마감
+                htmlParts.push(`<ul style="margin: 16px 0; padding-left: 48px; list-style-type: disc;">${listItems.join('')}</ul>`);
+                listItems = [];
+                inList = false;
+            }
+            // 일반 텍스트도 볼드체 변환
+            let content = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            htmlParts.push(`<p style="margin-bottom: 12px;">${content}</p>`);
+        }
     }
 
-    // 빈 <p> 태그 정리
-    html = html.replace(/<p>\s*<\/p>/g, '');
+    // 마지막 리스트 마감
+    if (inList && listItems.length > 0) {
+        htmlParts.push(`<ul style="margin: 16px 0; padding-left: 48px; list-style-type: disc;">${listItems.join('')}</ul>`);
+    }
 
-    // 시작/끝 <p> 태그 추가
-    if (!html.startsWith('<ul') && !html.startsWith('<p>')) {
-        html = '<p>' + html;
-    }
-    if (!html.endsWith('</ul>') && !html.endsWith('</p>')) {
-        html = html + '</p>';
-    }
+    const html = htmlParts.join('');
+    console.log('[DEBUG] 최종 HTML:', html);
 
     div.innerHTML = `
         <div class="message-avatar">AI</div>
