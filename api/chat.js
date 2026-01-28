@@ -184,10 +184,8 @@ ${userSpecialtyContext}${conversationContext}
         // Gemini Flash로 Query Planning (최신 모델 우선 시도)
         // 시도할 모델 목록 (고성능 모델 포함)
         const models = [
-            { id: 'gemini-3-flash', name: 'Gemini 3 Flash' },
-            { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
-            { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
-            { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' }
+            { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+            { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' }
         ];
 
         let content = null;
@@ -278,80 +276,30 @@ async function handleContextSummary(req, res, contextHistory) {
     }
 }
 
-// 답변 생성 - Gemini API 사용 (Streaming 지원)
+// 답변 생성 - Gemini API 사용 (비동기 JSON 반환)
 async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY is not set' });
+    if (!apiKey) return res.status(500).json({ success: false, error: 'GEMINI_API_KEY is not set' });
 
-    // 모델 우선순위
-    const modelId = 'gemini-1.5-flash'; // 스트리밍에 최적화된 빠른 모델 사용
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:streamGenerateContent?key=${apiKey}`;
+    const modelId = 'gemini-1.5-flash';
 
     // ★ 지능형 필터링 지침 주입 ★
     const finalSystemPrompt = `${systemPrompt}\n\n---\n**[AI 답변 생성 핵심 지침]**\n1. 제공된 정보 중 질문과 관련 없는 Noise는 무시하세요.\n2. 반드시 질문과 "의미적으로 일치하는" 정보만 선별하여 답변하세요.\n3. 정보가 불확실하면 사용하지 마세요.`.trim();
 
-    const requestBody = {
-        contents: [{
-            role: 'user',
-            parts: [{ text: `${finalSystemPrompt}\n\n질문: ${userQuery}` }]
-        }],
-        generationConfig: { temperature: 0.2, maxOutputTokens: 2048 }
-    };
-
-    // 스트리밍 응답 헤더 설정
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody)
+        console.log(`[Answer] Calling Gemini: ${modelId}`);
+        const text = await callGeminiAPI(userQuery, finalSystemPrompt, modelId);
+
+        return res.json({
+            success: true,
+            text: text,
+            modelName: 'Gemini 1.5 Flash'
         });
-
-        if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-
-            // Gemini API는 대괄호([])로 감싸진 JSON 배열 형태로 청크를 보냅니다.
-            // 각 청크를 파싱하여 텍스트만 추출합니다.
-            try {
-                // 단순한 구현: JSON 구조 내의 "text" 필드만 정규식으로 빠르게 추출
-                // 스트리밍 특성상 불완전한 JSON이 올 수 있으므로 정규식이 안정적입니다.
-                const matches = buffer.match(/"text":\s*"((?:[^"\\]|\\.)*)"/g);
-                if (matches) {
-                    for (const match of matches) {
-                        const text = JSON.parse(`{${match}}`).text;
-                        // SSE 형식으로 전송
-                        res.write(`data: ${JSON.stringify({ text })}\n\n`);
-                    }
-                    // 처리된 데이터는 버퍼에서 제거 (중복 전송 방지)
-                    // 각 청크를 구분하기 위해 간단히 초기화하거나, 텍스트가 완성될 때까지 누적할 수 있음
-                    // 여기서는 간단하게 보낸 문장들을 추적하지 않고 전체 텍스트 구조를 고려해야 함
-                    // 안정적인 처리를 위해 buffer를 청크 단위로 잘라야 하지만, 
-                    // 간단한 구현을 위해 파싱된 마지막 위치를 기억하거나 buffer를 비움
-                    buffer = '';
-                }
-            } catch (e) {
-                // 파싱 에러는 무시하고 다음 청크를 기다림
-            }
-        }
-
-        res.write('data: [DONE]\n\n');
-        res.end();
-
     } catch (error) {
-        console.error('Streaming Error:', error);
-        res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
-        res.end();
+        console.error('Answer Generation Error:', error);
+        return res.status(500).json({
+            success: false,
+            error: error.message
+        });
     }
 }

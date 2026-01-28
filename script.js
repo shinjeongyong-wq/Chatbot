@@ -386,7 +386,7 @@ async function getBotResponse(userMessage) {
             const userSpec = getUserSpecialty();
 
             // 최근 3턴의 대화 맥락 생성 (플래너용 경량 버전)
-            const recentContext = conversationHistory.slice(-3).map(h =>
+            const recentContext = chatMemory.history.slice(-3).map(h =>
                 `사용자: ${h.user}\nAI: ${(h.assistant || '').substring(0, 150)}...`
             ).join('\n');
 
@@ -396,9 +396,6 @@ async function getBotResponse(userMessage) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    userQuery: userMessage,
-                    mode: 'plan',
-                    userSpecialty: userSpec,
                     userQuery: userMessage,
                     mode: 'plan',
                     userSpecialty: userSpec,
