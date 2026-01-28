@@ -610,11 +610,15 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 3. 참고문서 내용 기반으로만 답변 (할루시네이션 금지)
 4. 병원 개원과 무관한 질문 → "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
    - **중요**: [OFF_TOPIC] 사용 시 다른 긴 설명이나 인용을 절대 포함하지 마세요.
-5. 사용자가 요청한 **구체적인 정보(예: 금액, 수치, 리스트 등)**가 참고문서에 없거나 부족한 경우 → `[NO_DATA]` 태그와 함께 다음 **3단계 구조**로 답변하세요.
-   - **1단계 (감사/사과)**: 좋은 질문에 대한 감사 인사와 함께, 구체적인 데이터가 부족하여 답변드리기 어려운 점에 대한 사과.
-   - **2단계 (질문 가이드)**: 현재 **# 참고문서**에 포함된 내용 중 사용자의 질문과 가장 맥락이 가까운 주제를 찾아 "대신 이러이러한 내용(예: 입지분석, 인테리어 절차 등)에 대해서는 제가 답변해 드릴 수 있습니다"라고 질문 가이드를 제공. (반드시 데이터베이스에 실존하는 내용이어야 함)
-   - **3단계 (플래너 유도)**: "추가적으로 궁금한 내용이 있으시면 전문 플래너에게 연락해 주세요"라고 마무리.
-6. 답변 본문에 "플래너에게 문의/연락", "상담을 받아보라" 등의 문구를 직접 쓰지 마세요. `[NO_DATA]` 태그 시 시스템이 자동으로 버튼을 생성합니다.
+5. 사용자가 요청한 **구체적인 정보(예: 금액, 수치, 리스트 등)**가 참고문서에 없거나 부족한 경우 → '[NO_DATA]' 태그와 함께 **아래 형식을 정확히** 따르세요:
+   - **형식**: (1) 감사/사과 문단 → (빈 줄) → (2) "원하시면, 아래 내용들을 더 자세히 알려드릴 수 있습니다" → (빈 줄) → (3) 불렛 리스트
+   - **규칙 1**: 감사/사과 문단과 "원하시면~" 사이에 반드시 **빈 줄 하나**를 넣으세요.
+   - **규칙 2**: "원하시면~" 문구와 불렛 리스트 사이에도 **빈 줄 하나**를 넣으세요.
+   - **규칙 3**: 불렛 항목에서 볼드체는 **사용자가 다음에 질문으로 입력할 핵심 키워드**만 감싸세요. 예: "통증의학과 **전문 인테리어 업체 추천**", "수익성을 높이는 **물리치료실 공간 효율화 방안**"
+   - **규칙 4**: 본문(감사/사과 문단)에는 볼드체를 사용하지 마세요.
+   - **규칙 5**: 리스트가 끝나면 즉시 답변을 종료하세요. "성공적인 개원~", "언제든 말씀해 주세요" 같은 맺음말 금지.
+   - **규칙 6**: '[NO_DATA]' 응답 시에는 '[번호]' 인용 주석을 절대 달지 마세요.
+6. 답변 본문에 "플래너에게 문의/연락", "상담을 받아보라" 등의 문구를 직접 쓰지 마세요. '[NO_DATA]' 태그 시 시스템이 자동으로 버튼을 생성합니다.
 
 # 출처 인용 규칙 (매우 중요!)
 1. **🔥 핵심 문서를 최우선으로 사용**하세요.
@@ -829,6 +833,111 @@ function hideTypingIndicator() {
 
 function scrollToBottom() {
     chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// OFF_TOPIC 응답 렌더링
+function addOffTopicMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'message bot';
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">
+            <p style="color: #64748b;">${text}</p>
+        </div>
+    `;
+    chatContainer.appendChild(div);
+    scrollToBottom();
+}
+
+// NO_DATA 응답 렌더링 (볼드체, 불렛 포인트 지원 + 플래너 연락 버튼)
+function addNoDataMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'message bot';
+
+    // 1. 인용 번호 제거 및 불필요한 맺음말 제거
+    let cleanedText = text.replace(/\[\d+\]/g, '').trim();
+
+    // 리스트 이후의 상투적인 맺음말 제거
+    const lines = cleanedText.split('\n');
+    const filteredLines = [];
+    let listStarted = false;
+    let listEnded = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        // * - ● 모두 불렛으로 인식
+        if (line.match(/^[\*\-●]\s/)) {
+            listStarted = true;
+            filteredLines.push(line);
+        } else if (listStarted && line.length > 0 && !line.match(/^[\*\-●]\s/)) {
+            // 리스트가 시작된 후 다시 텍스트가 나오면 맺음말일 확률이 높음
+            if (!line.includes('원하시면')) {
+                listEnded = true;
+                continue; // 맺음말 건너뜀
+            }
+            filteredLines.push(line);
+        } else {
+            if (!listEnded) filteredLines.push(line);
+        }
+    }
+
+    cleanedText = filteredLines.join('\n');
+
+    // 2. 마크다운 → HTML 변환 (볼드체 및 불렛 포인트 적용)
+    // 중요: 불렛 포인트를 먼저 처리한 후 볼드체 처리 (순서 중요!)
+    let html = cleanedText
+        .replace(/^\s*[\*\-●]\s*(.+)$/gm, '<li>$1</li>') // 불렛 포인트 먼저 (*, -, ● 모두 인식)
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // 볼드체
+        .replace(/\n\n/g, '</p><p>')                      // 빈 줄은 문단 구분
+        .replace(/\n/g, ' ');                             // 일반 줄바꿈은 공백으로
+
+    // <li> 태그들을 <ul>로 감싸기
+    if (html.includes('<li>')) {
+        // 연속된 <li> 태그들을 하나의 <ul>로 감싸기
+        html = html.replace(/(<li>.*?<\/li>)+/g, match => {
+            return `<ul class="response-list" style="margin: 16px 0; padding-left: 48px; list-style-type: disc;">${match}</ul>`;
+        });
+        // <ul> 내부 <li> 스타일 추가
+        html = html.replace(/<li>/g, '<li style="margin-bottom: 8px; line-height: 1.6;">');
+    }
+
+    // 빈 <p> 태그 정리
+    html = html.replace(/<p>\s*<\/p>/g, '');
+
+    // 시작/끝 <p> 태그 추가
+    if (!html.startsWith('<ul') && !html.startsWith('<p>')) {
+        html = '<p>' + html;
+    }
+    if (!html.endsWith('</ul>') && !html.endsWith('</p>')) {
+        html = html + '</p>';
+    }
+
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">
+            <div class="no-data-text" style="line-height: 1.7;">${html}</div>
+            <p style="margin: 20px 0 16px 0; color: #64748b; font-size: 14px;">
+                질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
+            </p>
+            <button class="contact-planner-btn" onclick="openContactModal()" style="
+                background-color: #536db1;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.2s;
+            ">
+                <span style="font-size: 16px;">☎️</span> 플래너에게 연락하기
+            </button>
+        </div>
+    `;
+    chatContainer.appendChild(div);
+    scrollToBottom();
 }
 
 // ========== 피드백 시스템 ==========
