@@ -82,13 +82,59 @@ let sheetsLoader = null;
 let faqNavigationStack = [];
 
 // ==========================
-// 0. ChatMemory (클라이언트 메모리 관리자)
+// 0. ChatMemory (클라이언트 메모리 관리자) - 세션별 분리
 // ==========================
 class ChatMemory {
     constructor() {
-        this.recentBuffer = []; // {user:..., assistant:...}
-        this.contextSummary = "";
-        this.isSummarizing = false;
+        this.sessionMemories = {};  // { sessionId: { recentBuffer, contextSummary, isSummarizing } }
+        this.currentSessionId = null;
+    }
+
+    // 세션 설정 (전환 시 호출)
+    setSession(sessionId) {
+        this.currentSessionId = sessionId;
+
+        // 해당 세션의 메모리가 없으면 새로 생성
+        if (!this.sessionMemories[sessionId]) {
+            this.sessionMemories[sessionId] = {
+                recentBuffer: [],
+                contextSummary: '',
+                isSummarizing: false
+            };
+            console.log(`🧠 [ChatMemory] 새 세션 메모리 생성: ${sessionId.substring(0, 8)}...`);
+        } else {
+            console.log(`🧠 [ChatMemory] 세션 전환: ${sessionId.substring(0, 8)}... (기존 대화 ${this.sessionMemories[sessionId].recentBuffer.length}턴 복원)`);
+        }
+    }
+
+    // 현재 세션의 메모리 getter
+    get currentMemory() {
+        if (!this.currentSessionId || !this.sessionMemories[this.currentSessionId]) {
+            return { recentBuffer: [], contextSummary: '', isSummarizing: false };
+        }
+        return this.sessionMemories[this.currentSessionId];
+    }
+
+    // 기존 API 호환 (recentBuffer, contextSummary, isSummarizing)
+    get recentBuffer() { return this.currentMemory.recentBuffer; }
+    set recentBuffer(val) {
+        if (this.currentSessionId && this.sessionMemories[this.currentSessionId]) {
+            this.sessionMemories[this.currentSessionId].recentBuffer = val;
+        }
+    }
+
+    get contextSummary() { return this.currentMemory.contextSummary; }
+    set contextSummary(val) {
+        if (this.currentSessionId && this.sessionMemories[this.currentSessionId]) {
+            this.sessionMemories[this.currentSessionId].contextSummary = val;
+        }
+    }
+
+    get isSummarizing() { return this.currentMemory.isSummarizing; }
+    set isSummarizing(val) {
+        if (this.currentSessionId && this.sessionMemories[this.currentSessionId]) {
+            this.sessionMemories[this.currentSessionId].isSummarizing = val;
+        }
     }
 
     // 하위 호환성 (기존 conversationHistory 대체)
@@ -96,9 +142,24 @@ class ChatMemory {
         return this.recentBuffer;
     }
 
+    // 현재 세션만 초기화
     reset() {
-        this.recentBuffer = [];
-        this.contextSummary = "";
+        if (this.currentSessionId && this.sessionMemories[this.currentSessionId]) {
+            this.sessionMemories[this.currentSessionId] = {
+                recentBuffer: [],
+                contextSummary: '',
+                isSummarizing: false
+            };
+            console.log(`🧠 [ChatMemory] 세션 초기화: ${this.currentSessionId.substring(0, 8)}...`);
+        }
+    }
+
+    // 특정 세션 삭제 (채팅 삭제 시)
+    deleteSession(sessionId) {
+        if (this.sessionMemories[sessionId]) {
+            delete this.sessionMemories[sessionId];
+            console.log(`🧠 [ChatMemory] 세션 삭제: ${sessionId.substring(0, 8)}...`);
+        }
     }
 
     // Context for AI Input (Summary + Recent)
@@ -115,9 +176,14 @@ class ChatMemory {
     }
 
     async addTurn(userMsg, botMsg) {
+        if (!this.currentSessionId) {
+            console.warn('⚠️ [ChatMemory] 세션이 설정되지 않음. 대화 저장 스킵.');
+            return;
+        }
+
         this.recentBuffer.push({ user: userMsg, assistant: botMsg });
 
-        console.log(`🧠 [ChatMemory] 대화 저장 완료 (${this.recentBuffer.length}/3 턴 쌓임)`);
+        console.log(`🧠 [ChatMemory] 대화 저장 완료 (${this.recentBuffer.length}/3 턴 쌓임, 세션: ${this.currentSessionId.substring(0, 8)}...)`);
 
         // 3턴을 초과하면 가장 오래된 턴을 요약본으로 압축 (백그라운드)
         if (this.recentBuffer.length > 3 && !this.isSummarizing) {
@@ -130,14 +196,16 @@ class ChatMemory {
 
     async triggerSummaryLoop() {
         this.isSummarizing = true;
+        const sessionId = this.currentSessionId; // 루프 중 세션 변경 방지
+
         try {
-            while (this.recentBuffer.length > 3) {
-                const oldest = this.recentBuffer[0];
+            while (this.sessionMemories[sessionId]?.recentBuffer.length > 3) {
+                const oldest = this.sessionMemories[sessionId].recentBuffer[0];
 
                 // 요약 대상: 기존 요약 + 가장 오래된 대화
                 const contextToSummarize = [];
-                if (this.contextSummary) {
-                    contextToSummarize.push({ question: "이전 요약", answer: this.contextSummary });
+                if (this.sessionMemories[sessionId].contextSummary) {
+                    contextToSummarize.push({ question: "이전 요약", answer: this.sessionMemories[sessionId].contextSummary });
                 }
                 contextToSummarize.push({ question: oldest.user, answer: oldest.assistant });
 
@@ -155,9 +223,9 @@ class ChatMemory {
                 if (response.ok) {
                     const data = await response.json();
                     if (data.summary) {
-                        this.contextSummary = data.summary;
-                        this.recentBuffer.shift(); // 성공 시 버퍼에서 제거
-                        console.log('✅ [ChatMemory] 요약 완료:', this.contextSummary.substring(0, 30) + '...');
+                        this.sessionMemories[sessionId].contextSummary = data.summary;
+                        this.sessionMemories[sessionId].recentBuffer.shift(); // 성공 시 버퍼에서 제거
+                        console.log('✅ [ChatMemory] 요약 완료:', data.summary.substring(0, 30) + '...');
                     } else {
                         break;
                     }
@@ -169,12 +237,15 @@ class ChatMemory {
         } catch (e) {
             console.error('Summary Error:', e);
         } finally {
-            this.isSummarizing = false;
+            if (this.sessionMemories[sessionId]) {
+                this.sessionMemories[sessionId].isSummarizing = false;
+            }
         }
     }
 }
 
 let chatMemory = new ChatMemory(); // 인스턴스 생성
+window.chatMemory = chatMemory; // 전역 접근 가능하도록 export
 const MAX_HISTORY = 10; // (더 이상 사용되지 않지만 호환성 위해 남김)
 
 // ★ 지능형 중복 배제: 이전 답변에서 언급된 주요 키워드(업체명, 장비명) 추출 ★

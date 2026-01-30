@@ -318,6 +318,11 @@ async function selectChatSession(sessionId) {
     currentSessionId = sessionId;
     localStorage.setItem('currentSessionId', sessionId);
 
+    // ★ ChatMemory에 세션 설정 (맥락 분리) ★
+    if (window.chatMemory) {
+        window.chatMemory.setSession(sessionId);
+    }
+
     // UI 업데이트
     document.querySelectorAll('.history-item').forEach(item => {
         item.classList.toggle('active', item.dataset.sessionId === sessionId);
@@ -358,6 +363,11 @@ async function createNewChat() {
         // 채팅 화면 초기화 및 웰컴 메시지 표시
         clearChatContainer();
         showWelcomeMessage();
+
+        // ★ ChatMemory에 새 세션 설정 (맥락 분리) ★
+        if (window.chatMemory) {
+            window.chatMemory.setSession(newSession.id);
+        }
 
         console.log('📝 새 채팅 생성:', newSession.id);
 
@@ -404,6 +414,11 @@ async function deleteSession(sessionId) {
             if (chatSessions.length > 0) {
                 await selectChatSession(chatSessions[0].id);
             }
+        }
+
+        // ★ ChatMemory에서도 해당 세션 삭제 (맥락 정리) ★
+        if (window.chatMemory) {
+            window.chatMemory.deleteSession(sessionId);
         }
 
         console.log('🗑️ 세션 삭제:', sessionId);
