@@ -36,8 +36,8 @@ export default async function handler(req, res) {
     return await handleAnswerGeneration(req, res, userQuery, systemPrompt);
 }
 
-// Gemini API 호출 함수
-async function callGeminiAPI(prompt, systemPrompt = '', model = 'gemini-1.5-flash') {
+// Gemini API 호출 함수 (finishReason 체크 + 자동 재시도)
+async function callGeminiAPI(prompt, systemPrompt = '', model = 'gemini-1.5-flash', maxRetries = 2) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -60,25 +60,67 @@ async function callGeminiAPI(prompt, systemPrompt = '', model = 'gemini-1.5-flas
         }
     };
 
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-    });
+    let lastError = null;
 
-    if (!response.ok) {
-        const errorText = await response.text().catch(() => 'No error body');
-        throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+    // 재시도 로직 (최대 maxRetries 번)
+    for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text().catch(() => 'No error body');
+                throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+            }
+
+            const data = await response.json();
+
+            // finishReason 확인
+            const finishReason = data.candidates?.[0]?.finishReason;
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (!text) {
+                throw new Error('No content in Gemini response');
+            }
+
+            // 정상 완료(STOP)가 아닌 경우 재시도
+            if (finishReason !== 'STOP') {
+                console.log(`⚠️ [Attempt ${attempt}] 비정상 종료 (finishReason: ${finishReason})`);
+
+                if (attempt <= maxRetries) {
+                    console.log(`🔄 재시도 중... (${attempt}/${maxRetries})`);
+                    // 잠시 대기 후 재시도 (exponential backoff)
+                    await new Promise(resolve => setTimeout(resolve, 500 * attempt));
+                    continue;
+                } else {
+                    // 최대 재시도 횟수 초과 - 그래도 있는 텍스트 반환
+                    console.log(`⚠️ 최대 재시도 횟수 초과, 현재 응답 반환 (finishReason: ${finishReason})`);
+                    return text;
+                }
+            }
+
+            // 정상 완료
+            if (attempt > 1) {
+                console.log(`✅ [Attempt ${attempt}] 재시도 성공 (finishReason: STOP)`);
+            }
+            return text;
+
+        } catch (error) {
+            lastError = error;
+            console.error(`❌ [Attempt ${attempt}] API 호출 실패:`, error.message);
+
+            if (attempt <= maxRetries) {
+                console.log(`🔄 재시도 중... (${attempt}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, 500 * attempt));
+                continue;
+            }
+        }
     }
 
-    const data = await response.json();
-
-    // Gemini 응답에서 텍스트 추출
-    if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        return data.candidates[0].content.parts[0].text;
-    }
-
-    throw new Error('No content in Gemini response');
+    throw lastError || new Error('All API attempts failed');
 }
 
 // Query Planner - Gemini Flash로 쿼리 의도 분석
@@ -302,8 +344,8 @@ async function handleContextSummary(req, res, contextHistory) {
 // 답변 생성 - Gemini API 사용
 async function handleAnswerGeneration(req, res, userQuery, systemPrompt) {
     const models = [
-        { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
-        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' }
+        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+        { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' }
     ];
 
     let lastError = null;

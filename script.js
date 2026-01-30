@@ -306,6 +306,66 @@ function extractMentionedKeywords() {
     return result;
 }
 
+// ★★★ 고유명사(업체명/엔티티) 강제 포함 함수 ★★★
+// 질문에 특정 고유명사가 언급되면 해당 문서를 강제로 포함시킴
+function findForcedDocsByCompanyName(userMessage, allDocs) {
+    if (!allDocs || allDocs.length === 0) {
+        return { forcedDocs: [], matchedCompanies: [] };
+    }
+
+    // 1. 데이터베이스에서 고유명사(엔티티) 목록 추출
+    // - DB 레코드: question 필드가 엔티티명 (예: "무아디자인", "JWC그룹")
+    // - 일반 문서: metadata.topic 필드 활용
+    const entityNames = new Set();
+
+    allDocs.forEach(doc => {
+        // DB 레코드인 경우 question이 엔티티명
+        if (doc.metadata?.category === 'DB 레코드' && doc.question) {
+            const name = doc.question.trim();
+            // 2글자 이상, 50글자 이하의 이름만 수집 (너무 긴 건 문장임)
+            if (name.length >= 2 && name.length <= 50) {
+                entityNames.add(name);
+            }
+        }
+        // metadata.topic도 엔티티명일 수 있음
+        if (doc.metadata?.topic) {
+            const topic = doc.metadata.topic.trim();
+            if (topic.length >= 2 && topic.length <= 50) {
+                entityNames.add(topic);
+            }
+        }
+    });
+
+    // 2. 질문에서 엔티티명 매칭
+    const matchedEntities = [];
+    const userMsgLower = userMessage.toLowerCase().replace(/\s/g, ''); // 띄어쓰기 무시
+
+    for (const entity of entityNames) {
+        const entityLower = entity.toLowerCase().replace(/\s/g, '');
+        // 엔티티명이 질문에 포함되어 있는지 확인
+        if (userMsgLower.includes(entityLower)) {
+            matchedEntities.push(entity);
+        }
+    }
+
+    // 3. 매칭된 엔티티의 문서 검색
+    const forcedDocs = [];
+    if (matchedEntities.length > 0) {
+        allDocs.forEach(doc => {
+            const docQuestion = doc.question?.trim();
+            const docTopic = doc.metadata?.topic?.trim();
+
+            // question 또는 topic이 매칭된 엔티티와 일치하면 포함
+            if ((docQuestion && matchedEntities.includes(docQuestion)) ||
+                (docTopic && matchedEntities.includes(docTopic))) {
+                forcedDocs.push({ ...doc }); // 복사본 추가
+            }
+        });
+    }
+
+    return { forcedDocs, matchedCompanies: matchedEntities };
+}
+
 const chatContainer = document.getElementById('chatContainer');
 const userInput = document.getElementById('userInput');
 const sendButton = document.getElementById('sendButton');
@@ -539,6 +599,28 @@ async function getBotResponse(userMessage) {
         }
 
         console.log(`📚 검색 결과: ${relatedContexts.length}개 문서`);
+
+        // ========== Stage 2.5: 고유명사(업체명) 강제 포함 ==========
+        // 질문에 특정 업체명이 언급되면 해당 문서를 강제로 포함
+        const forcedResult = findForcedDocsByCompanyName(userMessage, sheetsLoader.cache || []);
+
+        if (forcedResult.forcedDocs.length > 0) {
+            console.log(`🎯 고유명사 매칭: ${forcedResult.matchedCompanies.join(', ')}`);
+            console.log(`📌 강제 포함 문서: ${forcedResult.forcedDocs.length}개`);
+
+            // 중복 제거 후 병합 (강제 문서를 앞에 배치)
+            const regularQuestions = new Set(relatedContexts.map(d => d.question));
+            const uniqueForcedDocs = forcedResult.forcedDocs.filter(d => !regularQuestions.has(d.question));
+
+            // 강제 문서에 높은 점수 부여 (정렬 유지용)
+            uniqueForcedDocs.forEach(doc => {
+                doc.score = 100; // 강제 포함 문서는 최상위 점수
+                doc._forcedInclude = true; // 강제 포함 마커
+            });
+
+            relatedContexts = [...uniqueForcedDocs, ...relatedContexts];
+            console.log(`📚 병합 후 총 문서: ${relatedContexts.length}개 (강제 ${uniqueForcedDocs.length}개 + 일반 ${relatedContexts.length - uniqueForcedDocs.length}개)`);
+        }
 
         // ========== Stage 3: Answer Generation ==========
         updateTypingStatus('찾은 정보를 바탕으로 답변을 작성하고 있습니다...');
