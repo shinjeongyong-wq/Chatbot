@@ -28,13 +28,26 @@ export default async function handler(req, res) {
             body: JSON.stringify(req.body)
         });
 
-        if (response.ok) {
-            return res.status(200).json({ success: true });
-        } else {
-            return res.status(500).json({ error: 'Apps Script call failed' });
+        const text = await response.text();
+        console.log('GAS Response Text:', text);
+
+        try {
+            const data = JSON.parse(text);
+            return res.status(response.status).json(data);
+        } catch (parseError) {
+            console.error('JSON Parse Error from GAS:', parseError, 'Raw Text:', text);
+            return res.status(response.status).json({
+                success: false,
+                error: 'Google Apps Script가 JSON이 아닌 응답을 반환했습니다.',
+                rawResponse: text.substring(0, 500)
+            });
         }
+
     } catch (error) {
-        console.error('Apps Script error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error('Proxy Error:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Vercel Proxy 내에서 서버 오류가 발생했습니다: ' + error.message
+        });
     }
 }

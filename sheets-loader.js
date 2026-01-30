@@ -361,6 +361,7 @@ class GoogleSheetsLoader {
     calculateSimilarity(query, keywords, question, answer, field) {
         if (!question) return 0;
 
+        const queryLower = query.toLowerCase();
         const questionLower = question.toLowerCase();
         const answerLower = (answer || '').toLowerCase();
         const target = questionLower + ' ' + answerLower;
@@ -369,6 +370,16 @@ class GoogleSheetsLoader {
         const originalWords = query.split(/\s+/).map(w => this.normalizeWord(w)).filter(w => w.length >= 2);
 
         let score = 0;
+
+        // ★ 0. 업체명/제목 부분 매칭 보너스 (가장 우선 - 0.6점) ★
+        // "무아" → "무아디자인", "플랜" → "플랜디자인" 등 부분 매칭 지원
+        for (const word of originalWords) {
+            if (word.length >= 2 && questionLower.includes(word.toLowerCase())) {
+                score += 0.6;
+                console.log(`      🎯 업체명 부분매칭: "${word}" in "${question}" → +0.6점`);
+                break; // 한 번만 적용
+            }
+        }
 
         // 1. 원본 단어 매칭 (가장 중요 - 각 0.4점)
         let originalHits = 0;
@@ -553,12 +564,13 @@ class GoogleSheetsLoader {
             });
 
             if (specialtyRelevant) {
-                // ★ 진료과 특화 질문: 다른 진료과 문서 완전 제외 ★
-                results = [...matchingDocs, ...noTagDocs];
-                console.log(`   🎯 진료과 특화 모드 적용`);
-                console.log(`   ✅ 사용자 진료과 문서: ${matchingDocs.length}개`);
+                // ★ 진료과 특화 질문: 다른 진료과 문서도 포함하되 우선순위 낮춤 ★
+                // (파트너사 이름 직접 언급 시에도 정보 제공 가능하게)
+                results = [...matchingDocs, ...noTagDocs, ...otherSpecDocs];
+                console.log(`   🎯 진료과 특화 모드 적용 (다른 진료과도 포함)`);
+                console.log(`   ✅ 사용자 진료과 문서: ${matchingDocs.length}개 (우선)`);
                 console.log(`   📄 태그없는 문서: ${noTagDocs.length}개`);
-                console.log(`   ❌ 다른 진료과 문서 제외: ${otherSpecDocs.length}개`);
+                console.log(`   📄 다른 진료과 문서: ${otherSpecDocs.length}개 (후순위)`);
             } else {
                 // ★ 공통 질문: 우선순위만 부여 (제외 안함) ★
                 results = [...matchingDocs, ...noTagDocs, ...otherSpecDocs];

@@ -1,0 +1,805 @@
+/**
+ * Chat History Management (Frontend)
+ * Supabase 연동으로 사용자 인증 및 채팅 세션 관리
+ */
+
+// ============ Supabase Configuration ============
+const SUPABASE_URL = 'https://ebigoqusvopbmmutypgd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViaWdvcXVzdm9wYm1tdXR5cGdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1ODA5OTcsImV4cCI6MjA4NTE1Njk5N30.DHXJ3Fgdok01PKkmuhz2IB3ego03M3YWiYtfNObLtKM';
+
+// Supabase 클라이언트 초기화
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============ Global State ============
+let currentUser = null;         // { id, name, specialty }
+let currentSessionId = null;    // 현재 활성 세션 ID
+let chatSessions = [];          // 사용자의 모든 채팅 세션 목록
+
+// ============ DOM Elements ============
+const loginModal = document.getElementById('loginModal');
+const historySidebar = document.getElementById('historySidebar');
+const historyList = document.getElementById('historyList');
+const userAvatar = document.getElementById('userAvatar');
+const userName = document.getElementById('userName');
+const userSpecialty = document.getElementById('userSpecialty');
+
+// ============ Confirm Modal Helper ============
+
+/**
+ * 커스텀 확인 모달 표시
+ * @param {Object} options - { icon, title, message, confirmText, cancelText, isDanger }
+ * @returns {Promise<boolean>} - 사용자가 확인하면 true, 취소하면 false
+ */
+function showConfirmModal(options = {}) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('confirmModal');
+        const iconEl = document.getElementById('confirmModalIcon');
+        const titleEl = document.getElementById('confirmModalTitle');
+        const messageEl = document.getElementById('confirmModalMessage');
+        const confirmBtn = document.getElementById('confirmOkBtn');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+
+        // 옵션 적용
+        iconEl.textContent = options.icon || '⚠️';
+        titleEl.textContent = options.title || '확인';
+        messageEl.textContent = options.message || '정말 진행하시겠습니까?';
+        confirmBtn.textContent = options.confirmText || '확인';
+        cancelBtn.textContent = options.cancelText || '취소';
+
+        // 위험 스타일 적용
+        if (options.isDanger) {
+            confirmBtn.classList.add('danger');
+        } else {
+            confirmBtn.classList.remove('danger');
+        }
+
+        // 모달 표시
+        modal.classList.add('active');
+
+        // 이벤트 핸들러 (한 번만 실행되도록)
+        const handleConfirm = () => {
+            modal.classList.remove('active');
+            cleanup();
+            resolve(true);
+        };
+
+        const handleCancel = () => {
+            modal.classList.remove('active');
+            cleanup();
+            resolve(false);
+        };
+
+        const handleBackdrop = (e) => {
+            if (e.target === modal) {
+                handleCancel();
+            }
+        };
+
+        const cleanup = () => {
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+            modal.removeEventListener('click', handleBackdrop);
+        };
+
+        confirmBtn.addEventListener('click', handleConfirm);
+        cancelBtn.addEventListener('click', handleCancel);
+        modal.addEventListener('click', handleBackdrop);
+    });
+}
+
+// ============ Login Functions ============
+
+/**
+ * 로그인 폼에서 진료과 선택
+ */
+function selectLoginSpecialty(btn) {
+    // 기존 선택 해제
+    document.querySelectorAll('.specialty-select-btn').forEach(b => b.classList.remove('selected'));
+    // 새 선택 적용
+    btn.classList.add('selected');
+    document.getElementById('loginSpecialty').value = btn.dataset.specialty;
+
+    // 제출 버튼 활성화 확인
+    updateLoginButton();
+}
+
+/**
+ * 로그인 버튼 활성화 상태 업데이트
+ */
+function updateLoginButton() {
+    const name = document.getElementById('loginName').value.trim();
+    const specialty = document.getElementById('loginSpecialty').value;
+    const submitBtn = document.getElementById('loginSubmitBtn');
+
+    submitBtn.disabled = !(name && specialty);
+}
+
+/**
+ * 로그인 처리
+ */
+async function handleLogin(event) {
+    event.preventDefault();
+
+    const name = document.getElementById('loginName').value.trim();
+    const specialty = document.getElementById('loginSpecialty').value;
+
+    if (!name || !specialty) {
+        alert('이름과 진료과를 모두 입력해주세요.');
+        return;
+    }
+
+    const submitBtn = document.getElementById('loginSubmitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '로그인 중...';
+
+    try {
+        // 1. 사용자 조회 또는 생성
+        let { data: existingUser, error: selectError } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('name', name)
+            .eq('specialty', specialty)
+            .single();
+
+        if (selectError && selectError.code !== 'PGRST116') {
+            throw selectError;
+        }
+
+        if (existingUser) {
+            currentUser = existingUser;
+            console.log('✅ 기존 사용자 로그인:', currentUser.name);
+        } else {
+            // 신규 사용자 생성
+            const { data: newUser, error: insertError } = await supabaseClient
+                .from('users')
+                .insert([{ name, specialty }])
+                .select()
+                .single();
+
+            if (insertError) throw insertError;
+            currentUser = newUser;
+            console.log('🆕 신규 사용자 등록:', currentUser.name);
+        }
+
+        // 2. 로컬 스토리지에 저장
+        localStorage.setItem('chatUser', JSON.stringify(currentUser));
+
+        // 3. UI 업데이트
+        onLoginSuccess();
+
+    } catch (error) {
+        console.error('로그인 에러:', error);
+        alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = '시작하기';
+    }
+}
+
+/**
+ * 로그인 성공 후 UI 업데이트
+ */
+async function onLoginSuccess() {
+    // 로그인 모달 닫기
+    loginModal.classList.remove('active');
+
+    // 히스토리 사이드바 표시
+    historySidebar.classList.remove('hidden');
+
+    // 사용자 정보 표시
+    userAvatar.textContent = currentUser.name.charAt(0);
+    userName.textContent = currentUser.name;
+    userSpecialty.textContent = currentUser.specialty;
+
+    // 기존 진료과 선택 기능과 연동 (script.js의 함수)
+    if (typeof setUserSpecialty === 'function') {
+        setUserSpecialty(currentUser.specialty);
+    }
+
+    // 채팅 세션 목록 로드
+    await loadChatSessions();
+}
+
+/**
+ * 로그아웃 처리
+ */
+async function handleLogout() {
+    const confirmed = await showConfirmModal({
+        icon: '👋',
+        title: '로그아웃',
+        message: '정말 로그아웃 하시겠습니까?',
+        confirmText: '로그아웃',
+        cancelText: '취소',
+        isDanger: false
+    });
+
+    if (!confirmed) return;
+
+    // 상태 초기화
+    currentUser = null;
+    currentSessionId = null;
+    chatSessions = [];
+
+    // 로컬 스토리지 클리어
+    localStorage.removeItem('chatUser');
+    localStorage.removeItem('currentSessionId');
+
+    // UI 초기화
+    historySidebar.classList.add('hidden');
+    loginModal.classList.add('active');
+
+    // 채팅 화면 초기화
+    clearChatContainer();
+
+    // 폼 리셋
+    document.getElementById('loginForm').reset();
+    document.querySelectorAll('.specialty-select-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('loginSubmitBtn').disabled = true;
+    document.getElementById('loginSubmitBtn').textContent = '시작하기';
+}
+
+// ============ Chat Session Functions ============
+
+/**
+ * 채팅 세션 목록 로드
+ */
+async function loadChatSessions() {
+    if (!currentUser) return;
+
+    try {
+        const { data: sessions, error } = await supabaseClient
+            .from('chat_sessions')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        chatSessions = sessions || [];
+        renderChatSessions();
+
+        // 가장 최근 세션 자동 선택 (있으면)
+        if (chatSessions.length > 0) {
+            const savedSessionId = localStorage.getItem('currentSessionId');
+            const sessionToLoad = savedSessionId
+                ? chatSessions.find(s => s.id === savedSessionId) || chatSessions[0]
+                : chatSessions[0];
+            await selectChatSession(sessionToLoad.id);
+        }
+
+    } catch (error) {
+        console.error('세션 로드 에러:', error);
+    }
+}
+
+/**
+ * 채팅 세션 목록 렌더링
+ */
+function renderChatSessions() {
+    if (chatSessions.length === 0) {
+        historyList.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: #0369a1;">
+                <p style="font-size: 14px;">대화 기록이 없습니다</p>
+                <p style="font-size: 12px; margin-top: 8px;">새 채팅을 시작해보세요!</p>
+            </div>
+        `;
+        return;
+    }
+
+    historyList.innerHTML = chatSessions.map(session => {
+        // 날짜 포맷팅 (YYYY/MM/DD)
+        const date = new Date(session.created_at);
+        const formattedDate = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
+
+        return `
+        <div class="history-item ${session.id === currentSessionId ? 'active' : ''}" 
+             onclick="selectChatSession('${session.id}')"
+             data-session-id="${session.id}">
+            <svg class="history-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <div class="history-item-content">
+                <span class="history-item-text">${escapeHtml(session.title)}</span>
+                <span class="history-item-date">${formattedDate}</span>
+            </div>
+            <div class="history-item-delete" onclick="event.stopPropagation(); deleteSession('${session.id}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+            </div>
+        </div>
+    `;
+    }).join('');
+}
+
+/**
+ * 채팅 세션 선택
+ */
+async function selectChatSession(sessionId) {
+    currentSessionId = sessionId;
+    localStorage.setItem('currentSessionId', sessionId);
+
+    // UI 업데이트
+    document.querySelectorAll('.history-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.sessionId === sessionId);
+    });
+
+    // 메시지 로드
+    await loadSessionMessages(sessionId);
+}
+
+/**
+ * 새 채팅 생성
+ */
+async function createNewChat() {
+    if (!currentUser) return;
+
+    try {
+        const { data: newSession, error } = await supabaseClient
+            .from('chat_sessions')
+            .insert([{
+                user_id: currentUser.id,
+                title: '새로운 채팅'
+            }])
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // 목록 맨 앞에 추가
+        chatSessions.unshift(newSession);
+
+        // 새 세션 선택 (렌더링 전에 먼저 설정해야 active 상태가 적용됨)
+        currentSessionId = newSession.id;
+        localStorage.setItem('currentSessionId', newSession.id);
+
+        // 사이드바 렌더링 (currentSessionId가 이미 설정된 상태)
+        renderChatSessions();
+
+        // 채팅 화면 초기화 및 웰컴 메시지 표시
+        clearChatContainer();
+        showWelcomeMessage();
+
+        console.log('📝 새 채팅 생성:', newSession.id);
+
+    } catch (error) {
+        console.error('새 채팅 생성 에러:', error);
+        alert('새 채팅을 생성하지 못했습니다.');
+    }
+}
+
+/**
+ * 세션 삭제
+ */
+async function deleteSession(sessionId) {
+    const confirmed = await showConfirmModal({
+        icon: '🗑️',
+        title: '대화 삭제',
+        message: '이 대화를 삭제하시겠습니까?\n삭제된 대화는 복구할 수 없습니다.',
+        confirmText: '삭제',
+        cancelText: '취소',
+        isDanger: true
+    });
+
+    if (!confirmed) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('chat_sessions')
+            .delete()
+            .eq('id', sessionId);
+
+        if (error) throw error;
+
+        // 목록에서 제거
+        chatSessions = chatSessions.filter(s => s.id !== sessionId);
+        renderChatSessions();
+
+        // 현재 세션이 삭제된 경우
+        if (currentSessionId === sessionId) {
+            currentSessionId = null;
+            localStorage.removeItem('currentSessionId');
+            clearChatContainer();
+
+            // 다른 세션 선택
+            if (chatSessions.length > 0) {
+                await selectChatSession(chatSessions[0].id);
+            }
+        }
+
+        console.log('🗑️ 세션 삭제:', sessionId);
+
+    } catch (error) {
+        console.error('세션 삭제 에러:', error);
+        alert('대화를 삭제하지 못했습니다.');
+    }
+}
+
+/**
+ * 세션 제목 업데이트 (첫 질문 기반)
+ */
+async function updateSessionTitle(sessionId, firstMessage) {
+    if (!sessionId || !firstMessage) return;
+
+    // 첫 30자로 제목 생성
+    const title = firstMessage.length > 30
+        ? firstMessage.substring(0, 30) + '...'
+        : firstMessage;
+
+    try {
+        const { error } = await supabaseClient
+            .from('chat_sessions')
+            .update({ title })
+            .eq('id', sessionId);
+
+        if (error) throw error;
+
+        // 로컬 목록 업데이트
+        const session = chatSessions.find(s => s.id === sessionId);
+        if (session) {
+            session.title = title;
+            renderChatSessions();
+        }
+
+    } catch (error) {
+        console.error('세션 제목 업데이트 에러:', error);
+    }
+}
+
+// ============ Message Functions ============
+
+/**
+ * 세션의 메시지 로드
+ */
+async function loadSessionMessages(sessionId) {
+    clearChatContainer();
+
+    try {
+        const { data: messages, error } = await supabaseClient
+            .from('messages')
+            .select('*')
+            .eq('session_id', sessionId)
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        if (!messages || messages.length === 0) {
+            // 메시지가 없으면 웰컴 메시지 표시
+            showWelcomeMessage();
+            return;
+        }
+
+        // 메시지 렌더링
+        messages.forEach(msg => {
+            if (msg.role === 'user') {
+                addUserMessageToUI(msg.content);
+            } else {
+                addBotMessageToUI(msg.content);
+            }
+        });
+
+        scrollToBottom();
+
+    } catch (error) {
+        console.error('메시지 로드 에러:', error);
+    }
+}
+
+/**
+ * 메시지 저장
+ */
+async function saveMessage(role, content) {
+    if (!currentSessionId) {
+        // 세션이 없으면 새로 생성
+        await createNewChat();
+    }
+
+    try {
+        const { data: newMessage, error } = await supabaseClient
+            .from('messages')
+            .insert([{
+                session_id: currentSessionId,
+                role,
+                content
+            }])
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // 첫 사용자 메시지면 세션 제목 업데이트
+        if (role === 'user') {
+            const session = chatSessions.find(s => s.id === currentSessionId);
+            if (session && session.title === '새로운 채팅') {
+                await updateSessionTitle(currentSessionId, content);
+            }
+        }
+
+        return newMessage;
+
+    } catch (error) {
+        console.error('메시지 저장 에러:', error);
+        return null;
+    }
+}
+
+// ============ UI Helper Functions ============
+
+/**
+ * 채팅 컨테이너 초기화
+ */
+function clearChatContainer() {
+    const chatContainer = document.getElementById('chatContainer');
+    if (chatContainer) {
+        chatContainer.innerHTML = '';
+    }
+}
+
+/**
+ * 웰컴 메시지 표시
+ */
+function showWelcomeMessage() {
+    const chatContainer = document.getElementById('chatContainer');
+    if (!chatContainer) return;
+
+    chatContainer.innerHTML = `
+        <div class="welcome-message">
+            <div class="welcome-icon">
+                <svg viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="24" fill="#f0f4ff"/>
+                    <path d="M24 14C18.48 14 14 18.48 14 24C14 29.52 18.48 34 24 34C29.52 34 34 29.52 34 24C34 18.48 29.52 14 24 14ZM24 20C25.66 20 27 21.34 27 23C27 24.66 25.66 26 24 26C22.34 26 21 24.66 21 23C21 21.34 22.34 20 24 20ZM24 31.2C21.5 31.2 19.29 29.92 18 28C18.03 26 22 24.9 24 24.9C25.99 24.9 29.97 26 30 28C28.71 29.92 26.5 31.2 24 31.2Z" fill="#536db1"/>
+                </svg>
+            </div>
+            <h2>무엇을 도와드릴까요?</h2>
+            <p>AI 컨설턴트가 병원 개원의 모든 것을 답변해 드립니다.<br>우측 상단에서 자주 묻는 질문을 확인하거나, 직접 물어보세요.</p>
+        </div>
+    `;
+}
+
+/**
+ * 사용자 메시지 UI에 추가 (저장 없이)
+ */
+function addUserMessageToUI(content) {
+    const chatContainer = document.getElementById('chatContainer');
+    if (!chatContainer) return;
+
+    // 웰컴 메시지 제거
+    const welcomeMsg = chatContainer.querySelector('.welcome-message');
+    if (welcomeMsg) welcomeMsg.remove();
+
+    const div = document.createElement('div');
+    div.className = 'message user';
+    div.innerHTML = `
+        <div class="message-avatar">나</div>
+        <div class="message-content">${escapeHtml(content)}</div>
+    `;
+    chatContainer.appendChild(div);
+}
+
+/**
+ * 봇 메시지 UI에 추가 (저장 없이)
+ * 마크다운 → HTML 변환 적용
+ */
+function addBotMessageToUI(content) {
+    const chatContainer = document.getElementById('chatContainer');
+    if (!chatContainer) return;
+
+    // 마크다운 → HTML 변환 (script.js의 addFormattedMessage와 동일한 로직)
+    let html = content
+        .replace(/```[\s\S]*?```/g, '')  // 코드 블록 제거
+        .replace(/^### (.+)$/gm, '<h4 class="response-heading">$1</h4>')
+        .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^\* (.+)$/gm, '<li>$1</li>')
+        .replace(/^---[\s\S]*$/gm, '')   // 구분선 제거
+        .replace(/\[ID:\s*\d+\]/g, '')   // 인용 ID 제거 (기록에서는 불필요)
+        .replace(/\[\d+\]/g, '')         // 숫자 인용도 제거
+        .replace(/\n/g, '<br>');
+
+    // 리스트 정리
+    html = html.replace(/(<li>.*?<\/li>)(<br>)?/g, '$1');
+    html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul class="response-list">$1</ul>');
+    html = html.replace(/<\/ul><br>?<ul class="response-list">/g, '');
+
+    // 피드백 버튼 + 복사 버튼 추가
+    const messageId = Date.now() + Math.random();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사">📋</button>
+        </div>
+    `;
+
+    // 메시지 데이터 저장 (복사/피드백용)
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: '', // 기록에서는 질문 정보가 없음
+        answer: content.substring(0, 500)
+    };
+
+    const div = document.createElement('div');
+    div.className = 'message bot';
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">${html}${feedbackButtons}</div>
+    `;
+    chatContainer.appendChild(div);
+}
+
+/**
+ * 스크롤 맨 아래로
+ */
+function scrollToBottom() {
+    const chatContainer = document.getElementById('chatContainer');
+    if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+}
+
+/**
+ * HTML 이스케이프
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ============ Initialization ============
+
+/**
+ * 페이지 로드 시 초기화
+ */
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 Chat History 초기화 시작...');
+
+    // 이름 입력 필드에 이벤트 리스너 추가
+    const loginNameInput = document.getElementById('loginName');
+    if (loginNameInput) {
+        loginNameInput.addEventListener('input', updateLoginButton);
+    }
+
+    // 저장된 사용자 정보 확인
+    const savedUser = localStorage.getItem('chatUser');
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+            console.log('✅ 저장된 사용자 복원:', currentUser.name);
+
+            // 로그인 모달 숨기고 바로 진입
+            loginModal.classList.remove('active');
+            await onLoginSuccess();
+        } catch (e) {
+            console.error('저장된 사용자 파싱 에러:', e);
+            localStorage.removeItem('chatUser');
+        }
+    }
+
+    console.log('✅ Chat History 초기화 완료');
+});
+
+// ============ Export for script.js ============
+
+/**
+ * 현재 세션 제목 업데이트 (AI 토픽 기반)
+ */
+async function updateCurrentSessionTitle(newTitle) {
+    if (!currentSessionId || !newTitle) {
+        console.warn('⚠️ 세션 ID 또는 새 제목이 없습니다');
+        return;
+    }
+
+    // 현재 세션의 제목이 이미 변경되었는지 확인 (중복 업데이트 방지)
+    const currentSession = chatSessions.find(s => s.id === currentSessionId);
+    if (currentSession && currentSession.title !== '새로운 채팅') {
+        console.log('ℹ️ 세션 제목이 이미 설정되어 있음:', currentSession.title);
+        return;
+    }
+
+    try {
+        // Supabase 업데이트
+        const { error } = await supabaseClient
+            .from('chat_sessions')
+            .update({ title: newTitle })
+            .eq('id', currentSessionId);
+
+        if (error) throw error;
+
+        // 로컬 세션 목록 업데이트
+        if (currentSession) {
+            currentSession.title = newTitle;
+        }
+
+        // UI 업데이트
+        renderChatSessions();
+        console.log(`✅ 세션 제목 업데이트: ${newTitle}`);
+    } catch (error) {
+        console.error('세션 제목 업데이트 에러:', error);
+    }
+}
+
+/**
+ * 메시지 내용 검색 (Supabase)
+ * @param {string} query - 검색어
+ * @returns {Promise<Array>} - 검색 결과 (세션 + 매칭된 메시지)
+ */
+async function searchMessages(query) {
+    if (!currentUser || !query.trim()) return [];
+
+    try {
+        // 1. 세션 제목에서 검색
+        const titleMatches = chatSessions.filter(session =>
+            session.title?.toLowerCase().includes(query.toLowerCase())
+        );
+
+        // 현재 사용자의 세션 ID 목록
+        const sessionIds = chatSessions.map(s => s.id);
+        if (sessionIds.length === 0) {
+            return titleMatches.map(s => ({ session: s, matchedMessage: null }));
+        }
+
+        // 2. 메시지 내용에서 검색 (Supabase ilike 사용)
+        const { data: messageMatches, error } = await supabaseClient
+            .from('messages')
+            .select('session_id, content, role, created_at')
+            .in('session_id', sessionIds)
+            .ilike('content', `%${query}%`)
+            .order('created_at', { ascending: false })
+            .limit(50);
+
+        if (error) {
+            console.error('메시지 검색 에러:', error);
+            return titleMatches.map(s => ({ session: s, matchedMessage: null }));
+        }
+
+        // 3. 세션별로 그룹화하여 결과 생성
+        const resultMap = new Map();
+
+        // 제목 매칭 세션 추가
+        titleMatches.forEach(session => {
+            resultMap.set(session.id, {
+                session,
+                matchedMessage: null,
+                matchType: 'title'
+            });
+        });
+
+        // 메시지 매칭 세션 추가 (첫 번째 매칭 메시지만 미리보기로)
+        messageMatches.forEach(msg => {
+            const session = chatSessions.find(s => s.id === msg.session_id);
+            if (session && !resultMap.has(session.id)) {
+                resultMap.set(session.id, {
+                    session,
+                    matchedMessage: msg.content,
+                    matchType: 'message'
+                });
+            } else if (session && resultMap.get(session.id)?.matchType === 'title') {
+                // 제목 매칭이었는데 메시지도 있으면 메시지 미리보기 추가
+                resultMap.get(session.id).matchedMessage = msg.content;
+            }
+        });
+
+        // 결과를 배열로 변환하고 최신순 정렬
+        const results = Array.from(resultMap.values());
+        results.sort((a, b) => new Date(b.session.updated_at || b.session.created_at) - new Date(a.session.updated_at || a.session.created_at));
+
+        console.log(`🔍 검색 결과: ${results.length}개 세션 발견`);
+        return results;
+
+    } catch (error) {
+        console.error('검색 에러:', error);
+        return [];
+    }
+}
+
+// script.js에서 사용할 함수들을 전역으로 노출
+window.chatHistory = {
+    saveMessage,
+    getCurrentSessionId: () => currentSessionId,
+    getCurrentUser: () => currentUser,
+    createNewChat,
+    updateCurrentSessionTitle,
+    getAllSessions: () => chatSessions,
+    loadSession: selectChatSession,
+    searchMessages
+};

@@ -246,12 +246,15 @@ const faqBackBtn = document.getElementById('faqBackBtn');
 // 1. 초기화 및 이벤트
 // ==========================
 document.addEventListener('DOMContentLoaded', async () => {
-    // 진료과 확인 - 저장된 진료과가 없으면 모달 표시
+    // 진료과 확인 - 새 로그인 시스템(chat-history.js)이 없을 경우에만 기존 모달 표시
+    const loginModal = document.getElementById('loginModal');
     const savedSpecialty = localStorage.getItem('userSpecialty');
+
     if (savedSpecialty && SPECIALTIES[savedSpecialty]) {
         currentUserSpecialty = savedSpecialty;
         updateSpecialtyBadge();
-    } else {
+    } else if (!loginModal) {
+        // loginModal이 없을 때만 기존 진료과 모달 사용
         openSpecialtyModal();
     }
 
@@ -351,14 +354,32 @@ async function handleSendMessage() {
     sendUserMessage(message);
 }
 
-function sendUserMessage(message) {
+async function sendUserMessage(message) {
     userInput.value = '';
     userInput.style.height = 'auto';
     const welcome = document.querySelector('.welcome-message');
     if (welcome) welcome.style.display = 'none';
 
+    // ★ 세션이 없으면 먼저 생성 후 대기 ★
+    if (window.chatHistory) {
+        const sessionId = window.chatHistory.getCurrentSessionId();
+        if (!sessionId) {
+            console.log('📝 세션 없음 - 새 세션 생성 중...');
+            await window.chatHistory.createNewChat();
+            console.log('✅ 새 세션 생성 완료:', window.chatHistory.getCurrentSessionId());
+        }
+    }
+
     addMessage(message, 'user');
     showTypingIndicator();
+
+    // Supabase에 사용자 메시지 저장 (chat-history.js)
+    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+        window.chatHistory.saveMessage('user', message).catch(err => {
+            console.warn('사용자 메시지 DB 저장 실패:', err);
+        });
+    }
+
     getBotResponse(message);
 }
 
@@ -368,7 +389,7 @@ async function getBotResponse(userMessage) {
 
     // 사용자 질문을 Google Sheets에 수집 (비동기, 에러 무시)
     try {
-        await fetch('/api/collect', {
+        const response = await fetch('/api/collect', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -376,9 +397,13 @@ async function getBotResponse(userMessage) {
                 question: userMessage,
                 timestamp: new Date().toLocaleString('ko-KR')
             })
-        }).catch(() => { }); // 에러 무시
+        });
+        const result = await response.json();
+        if (!result.success) {
+            console.warn('⚠️ 질문 수집 실패:', result.error);
+        }
     } catch (e) {
-        console.log('질문 수집 오류 (무시됨):', e);
+        console.warn('질문 수집 중 시스템 오류:', e);
     }
 
     try {
@@ -454,14 +479,27 @@ async function getBotResponse(userMessage) {
         // AI 응답 태그 감지
         let responseText = result.text;
 
-        if (result.text.includes('[OFF_TOPIC]')) {
-            let cleanText = result.text.replace('[OFF_TOPIC]', '').trim();
+        // ★ 토픽 태그 파싱 및 세션 제목 업데이트 ★
+        const topicMatch = responseText.match(/\[TOPIC:\s*([^\]]+)\]/);
+        if (topicMatch && topicMatch[1]) {
+            const topic = topicMatch[1].trim();
+            console.log(`📌 토픽 감지: ${topic}`);
+            // chat-history.js의 updateCurrentSessionTitle 함수 호출
+            if (typeof updateCurrentSessionTitle === 'function') {
+                updateCurrentSessionTitle(topic);
+            }
+            // 토픽 태그 제거 (UI에 보이지 않도록)
+            responseText = responseText.replace(/\[TOPIC:\s*[^\]]+\]\n?/, '').trim();
+        }
+
+        if (responseText.includes('[OFF_TOPIC]')) {
+            let cleanText = responseText.replace('[OFF_TOPIC]', '').trim();
             // Rambling 방지: [번호] 인용이 포함되어 있다면 제거 (Off-topic엔 불필요)
             cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
             addOffTopicMessage(cleanText);
             responseText = cleanText;
-        } else if (result.text.includes('[NO_DATA]')) {
-            let cleanText = result.text.replace('[NO_DATA]', '').trim();
+        } else if (responseText.includes('[NO_DATA]')) {
+            let cleanText = responseText.replace('[NO_DATA]', '').trim();
             // 인용 번호 제거
             cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
 
@@ -470,7 +508,7 @@ async function getBotResponse(userMessage) {
             responseText = cleanText;
         } else {
             // 필터링된 컨텍스트를 사용하여 포매팅 (중요: 답변의 [번호]와 일치시키기 위함)
-            addFormattedMessage(result.text, result.filteredContexts || relatedContexts, result.modelName);
+            addFormattedMessage(responseText, result.filteredContexts || relatedContexts, result.modelName);
         }
 
         // 대화 히스토리에 저장 (맥락 유지 + 요약 자동 트리거)
@@ -585,10 +623,20 @@ ${alreadyMentioned.slice(0, 15).join(', ')}
 `;
     }
 
+    // 첫 대화인지 확인 (토픽 생성용)
+    const isFirstMessage = !historyText || historyText === '(첫 대화)' || chatMemory.recentBuffer.length === 0;
+    const topicGenerationRule = isFirstMessage ? `
+# ⭐ 토픽 생성 (첫 대화일 때만)
+- 이 대화의 주제를 한글 10자 이내로 요약하여 답변의 **맨 첫 줄**에 다음 형식으로 작성하세요: \`[TOPIC: 주제]\`
+- 예시: \`[TOPIC: 임플란트 장비]\`, \`[TOPIC: 인테리어 비용]\`, \`[TOPIC: 세무 상담]\`
+- 토픽 태그 다음 줄부터 실제 답변을 시작하세요.
+` : '';
+
     const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변해주세요.
 
 ${specialtyInfo ? '# 사용자 진료과\n' + specialtyInfo + '\n' : ''}
 ${deduplicationRule}
+${topicGenerationRule}
 # 이전 대화
 ${historyText ? historyText : '(첫 대화)'}
 
@@ -597,25 +645,31 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 
 # 핵심 규칙
 1. **[중복 답변 금지]**: 이미 **# ⛔ 중복 금지** 섹션에 있는 업체나 정보가 **# 참고문서**에 또 나오더라도, 이를 제외하고 **새로운 데이터 위주로** 답변하세요.
-2. **[주제 일관성 유지]**: 현재 대화의 주제(예: 인테리어)를 중심으로 답변하세요. 참고문서에 다른 주제가 섞여 있다면 사용자의 질문 의도에 부합하는 내용만 골라내어 자연스럽게 답변하세요. 만약 요청하신 주제에 대한 새로운 정보가 정말 없다면, 억지로 다른 주제를 꺼내기보다는 현재까지 안내해 드린 내용을 정리하거나 추가 확인이 필요함을 정직하게 전달하세요.
-3. 참고문서 내용 기반으로만 답변 (할루시네이션 금지)
-4. 병원 개원과 무관한 질문 → "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
+2. **[파트너사 특화 진료과 안내]**: 파트너사/업체 정보를 제공할 때, 해당 파트너사의 **특화 진료과(specialties)를 반드시 언급**하세요.
+   - 사용자가 질문한 진료과와 파트너사의 특화 진료과가 **다를 경우**: "해당 파트너사는 **[특화 진료과]에 특화**되어 있습니다. [사용자 질문 진료과] 관련 실적/사례는 별도로 확인이 필요할 수 있습니다."라고 안내하세요.
+   - 참고문서에 파트너사의 특화 진료과 정보(예: [통증✓], [내과✓] 태그)가 있으면 이를 참고하세요.
+3. **[주제 일관성 유지]**: 현재 대화의 주제(예: 인테리어)를 중심으로 답변하세요. 참고문서에 다른 주제가 섞여 있다면 사용자의 질문 의도에 부합하는 내용만 골라내어 자연스럽게 답변하세요. 만약 요청하신 주제에 대한 새로운 정보가 정말 없다면, 억지로 다른 주제를 꺼내기보다는 현재까지 안내해 드린 내용을 정리하거나 추가 확인이 필요함을 정직하게 전달하세요.
+4. 참고문서 내용 기반으로만 답변 (할루시네이션 금지)
+5. 병원 개원과 무관한 질문 → "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
    - **중요**: [OFF_TOPIC] 사용 시 다른 긴 설명이나 인용을 절대 포함하지 마세요.
-5. 사용자가 요청한 **구체적인 정보(예: 금액, 수치, 리스트 등)**가 참고문서에 없거나 부족한 경우 → '[NO_DATA]' 태그와 함께 **아래 형식을 정확히** 따르세요:
+6. 사용자가 요청한 **구체적인 정보(예: 금액, 수치, 리스트 등)**가 참고문서에 없거나 부족한 경우 → '[NO_DATA]' 태그와 함께 **아래 형식을 정확히** 따르세요:
    - **형식**: (1) 감사/사과 문단 → (빈 줄) → (2) "원하시면, 아래 내용들을 더 자세히 알려드릴 수 있습니다" → (빈 줄) → (3) 불렛 리스트 → (빈 줄) → (4) 아래의 고정 안내 문구
    - **고정 안내 문구**: "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
    - **규칙**:
-     - 인용 번호([1], [2] 등) 및 상투적인 맺음말("성공적인 개원~")을 절대 사용하지 마세요.
+     - **[NO_DATA] 응답에서는 [ID: n] 인용을 절대 사용하지 마세요.** 불렛 리스트에도 인용 금지입니다.
+     - **고정 안내 문구는 답변에서 딱 1번만 사용하세요.** 시스템이 버튼을 별도로 추가하므로 중복되지 않게 주의하세요.
+     - 인용 번호 수동 생성 금지 및 상투적인 맺음말("성공적인 개원~")을 절대 사용하지 마세요.
      - 리스트 항목(* 키워드)과 고정 안내 문구 사이에는 반드시 빈 줄을 하나 넣으세요.
      - 불렛 기호(*) 뒤에는 반드시 공백 한 칸을 두세요. 
-     - 답변 본문에 "플래너에게 직접 문의하세요" 같은 다른 변형 문구는 쓰지 말고 위의 고정 안내 문구만 쓰세요. 시스템이 버튼을 별도로 추가합니다.
+     - 답변 본문에 "플래너에게 직접 문의하세요" 같은 다른 변형 문구는 쓰지 말고 위의 고정 안내 문구만 쓰세요.
 
 # 출처 인용 규칙 (매우 중요!)
 1. **🔥 핵심 문서를 최우선으로 사용**하세요.
 2. **📄 보조 문서는 핵심 문서를 보완할 때만** 사용하세요.
-3. **인용 최소화 (Clean UI)**: 동일한 출처에서 가져온 내용이 연속될 경우, 문장마다 '[번호]'를 붙이지 마세요. 대신 **해당 단락(Paragraph)이나 리스트 항목의 가장 끝에 한 번만** 표시하세요.
-4. **번호 중복 금지**: 한 단락 내에서 같은 번호가 3회 이상 반복되어 가독성을 해치지 않도록 하세요. 
-5. **하단 요약 금지 (CRITICAL)**: 답변 가장 아랫부분에 별도로 '참고문서' 리스트를 만들거나 인용 번호를 모아서 나열하지 마세요. 주석은 본문 안에만 존재해야 합니다.
+3. **인용 방식 (ID 필수)**: 답변의 각 사실 정보 뒤에는 해당 정보의 출처인 참고문서의 ID를 **[ID: n]** 형식으로 반드시 표시하세요. (예: 닥터사이클린은 환경부 공식 지정 업체입니다 [ID: 0]). 
+4. **인용 최소화 (Clean UI)**: 동일한 출처에서 가져온 내용이 연속될 경우, 문장마다 붙이지 말고 해당 단락(Paragraph)이나 리스트 항목의 끝에 한 번만 표시하세요.
+5. **ID 중복 금지**: 한 단락 내에서 같은 ID가 반복되어 가독성을 해치지 않도록 하세요. 
+6. **하단 요약 금지 (CRITICAL)**: 답변 가장 아랫부분에 별도로'참고문서' 리스트를 만들거나 ID를 모아서 나열하지 마세요. 주석은 본문 안에만 존재해야 합니다.
 
 # 답변 형식
 - **가독성 최우선**: 각 리스트 항목(1. 2. 3...) 사이와 주요 섹션 사이에는 반드시 **빈 줄(Double Line Break)**을 추가하여 답변이 빽빽해 보이지 않게 하세요.
@@ -683,52 +737,38 @@ function addFormattedMessage(text, contexts, modelName = null) {
     const div = document.createElement('div');
     div.className = 'message bot';
 
-    // 1. 주석 파싱 및 재정렬 (복수 인용 [1, 2, 3] 및 오름차순 지원)
+    // 1. [ID: n] 형식의 주석 파싱 및 재정렬
     let processedText = text;
-    const complexCitationRegex = /\[([\d,\s]+)\]/g;
-    const foundCitations = []; // 원본 번호 리스트 (등장 순서대로)
+    // [ID: 0], [ID: 1] 혹은 [ID:0] 형식을 모두 잡는 정규식
+    const idCitationRegex = /\[ID:\s*(\d+)\]/g;
+    const foundIds = []; // 실제 사용된 원본 ID들 (등장 순서대로)
     let match;
 
-    // 텍스트 전체를 스캔하여 언급된 모든 원본 번호를 등장 순서대로 수집
-    while ((match = complexCitationRegex.exec(text)) !== null) {
-        const nums = match[1].split(',')
-            .map(n => parseInt(n.trim()))
-            .filter(n => !isNaN(n));
-
-        nums.forEach(num => {
-            if (!foundCitations.includes(num)) {
-                foundCitations.push(num);
-            }
-        });
+    // 텍스트 전체를 스캔하여 언급된 모든 소스 ID를 등장 순서대로 수집
+    while ((match = idCitationRegex.exec(text)) !== null) {
+        const id = parseInt(match[1]);
+        if (!isNaN(id) && !foundIds.includes(id)) {
+            foundIds.push(id);
+        }
     }
 
-    // 원본 번호 -> 새 번호 매핑 (1, 2, 3...)
-    const citationMap = {};
-    foundCitations.forEach((origNum, idx) => {
-        citationMap[origNum] = idx + 1;
+    // 소스 ID -> 사용자용 새 번호 매핑 (ID: 4 -> [1], ID: 0 -> [2] 등)
+    const idToNewNumMap = {};
+    foundIds.forEach((sourceId, idx) => {
+        idToNewNumMap[sourceId] = idx + 1;
     });
 
-    // 텍스트 본문의 [1, 2] -> [1][2] 형태로 변환하며 번호 재할당 및 오름차순 정렬
-    processedText = text.replace(complexCitationRegex, (match, content) => {
-        const nums = content.split(',')
-            .map(n => parseInt(n.trim()))
-            .filter(n => !isNaN(n))
-            .map(n => ({ original: n, new: citationMap[n] }))
-            .filter(n => n.new); // 매핑된 것만 유지
-
-        if (nums.length === 0) return match;
-
-        // 새 번호 기준으로 오름차순 정렬 (사용자 요청 반영)
-        nums.sort((a, b) => a.new - b.new);
-
-        // [1][2][3] 형식으로 변환
-        return nums.map(n => `[${n.new}]`).join('');
-    });
-
-    // 컨텍스트 배열을 등장 순서대로 재배치
-    const reorderedContexts = foundCitations.map(origNum => {
-        return contexts[origNum - 1]; // 0-indexed
+    // 실제 표시될 컨텍스트 데이터를 ID 기반으로 정확히 추출 (인덱스 에러 방지)
+    const activeContexts = foundIds.map(sourceId => {
+        return contexts[sourceId];
     }).filter(ctx => ctx);
+
+    // 텍스트 본문의 [ID: n] -> [1] 형태로 변환
+    processedText = text.replace(idCitationRegex, (match, idStr) => {
+        const id = parseInt(idStr);
+        const newNum = idToNewNumMap[id];
+        return newNum ? `[${newNum}]` : ''; // 매핑 실패 시 공백 처리 (할루시네이션 방지)
+    });
 
     // 2. 마크다운 → HTML 변환 (processedText 기반)
     let html = processedText
@@ -745,17 +785,18 @@ function addFormattedMessage(text, contexts, modelName = null) {
     html = html.replace(/<\/ul><br>?<ul class="response-list">/g, '');
 
     // 3. [1], [2] 주석을 툴팁 HTML로 최종 변환
-    // 번호가 큰 것부터 치환하여 중복 매칭 방지 (예: [10]과 [1])
-    const sortedNewNums = Object.values(citationMap).sort((a, b) => b - a);
+    // 번호가 큰 것부터 치환하여 중복 매칭 방지
+    const sortedNewNums = Object.values(idToNewNumMap).sort((a, b) => b - a);
 
     sortedNewNums.forEach(num => {
-        const ctx = reorderedContexts[num - 1];
+        const ctx = activeContexts[num - 1]; // activeContexts는 foundIds 순서대로 담겨 있음
         if (!ctx) return;
 
         const answerPreview = ctx.answer.length > 200 ? ctx.answer.substring(0, 200) + '...' : ctx.answer;
         const tooltip = `<strong>Q:</strong> ${escapeHtml(ctx.question)}<br><br><strong>A:</strong> ${escapeHtml(answerPreview)}`;
         const citationHtml = `<span class="cite-ref">[${num}]<span class="cite-tooltip">${tooltip}</span></span>`;
 
+        // [번호] 형식을 찾아서 치환
         const regex = new RegExp(`\\[${num}\\]`, 'g');
         html = html.replace(regex, citationHtml);
     });
@@ -763,12 +804,13 @@ function addFormattedMessage(text, contexts, modelName = null) {
     // 4. 사용한 모델명 표시
     const modelInfo = modelName ? `<div class="model-info">🤖 ${modelName}</div>` : '';
 
-    // 5. 피드백 버튼 추가
+    // 5. 피드백 버튼 + 복사 버튼 추가
     const messageId = Date.now();
     const feedbackButtons = `
         <div class="feedback-buttons" data-message-id="${messageId}">
             <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
             <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사">📋</button>
         </div>
     `;
 
@@ -786,6 +828,13 @@ function addFormattedMessage(text, contexts, modelName = null) {
 
     chatContainer.appendChild(div);
     scrollToBottom();
+
+    // Supabase에 AI 응답 저장 (chat-history.js)
+    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+        window.chatHistory.saveMessage('assistant', text).catch(err => {
+            console.warn('AI 응답 DB 저장 실패:', err);
+        });
+    }
 }
 
 function escapeHtml(text) {
@@ -829,14 +878,36 @@ function scrollToBottom() {
 function addOffTopicMessage(text) {
     const div = document.createElement('div');
     div.className = 'message bot';
+
+    // 피드백 버튼용 ID 생성 및 데이터 저장
+    const messageId = Date.now();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+        </div>
+    `;
+
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: window.currentQuestion || '',
+        answer: text.substring(0, 500)
+    };
+
     div.innerHTML = `
         <div class="message-avatar">AI</div>
         <div class="message-content formatted-response">
             <p style="color: #64748b;">${text}</p>
+            ${feedbackButtons}
         </div>
     `;
     chatContainer.appendChild(div);
     scrollToBottom();
+
+    // Supabase 저장
+    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+        window.chatHistory.saveMessage('assistant', text).catch(() => { });
+    }
 }
 
 // NO_DATA 응답 렌더링 (볼드체, 불렛 포인트 지원 + 플래너 연락 버튼)
@@ -846,15 +917,18 @@ function addNoDataMessage(text) {
     const div = document.createElement('div');
     div.className = 'message bot';
 
-    // 1. 인용 번호 제거
-    let cleanedText = text.replace(/\[\d+\]/g, '').trim();
-    console.log('[DEBUG] 인용 번호 제거 후:', cleanedText);
+    // 1. 인용 번호 제거 ([숫자], [ID: 숫자] 형식 모두)
+    let cleanedText = text.replace(/\[\d+\]/g, '').replace(/\[ID:\s*\d+\]/gi, '').trim();
 
-    // 2. 줄 단위로 분리 (다양한 줄바꿈 형식 지원)
+    // 2. 고정 안내 문구 제거 (UI에서 별도로 표시하므로 LLM 출력에서 제거)
+    cleanedText = cleanedText.replace(/질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다\.?/g, '').trim();
+    console.log('[DEBUG] 인용 및 안내문구 제거 후:', cleanedText);
+
+    // 3. 줄 단위로 분리 (다양한 줄바꿈 형식 지원)
     const lines = cleanedText.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
     console.log('[DEBUG] 줄 분리 결과:', lines);
 
-    // 3. 맺음말 제거 로직
+    // 4. 맺음말 제거 로직
     const filteredLines = [];
     let listStarted = false;
 
@@ -878,7 +952,7 @@ function addNoDataMessage(text) {
 
     console.log('[DEBUG] 필터링 후:', filteredLines);
 
-    // 4. 마크다운 → HTML 변환
+    // 5. 마크다운 → HTML 변환
     let htmlParts = [];
     let inList = false;
     let listItems = [];
@@ -917,6 +991,21 @@ function addNoDataMessage(text) {
     const html = htmlParts.join('');
     console.log('[DEBUG] 최종 HTML:', html);
 
+    // 피드백 버튼용 ID 생성 및 데이터 저장
+    const messageId = Date.now();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+        </div>
+    `;
+
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: window.currentQuestion || '',
+        answer: text.substring(0, 500)
+    };
+
     div.innerHTML = `
         <div class="message-avatar">AI</div>
         <div class="message-content formatted-response">
@@ -936,13 +1025,47 @@ function addNoDataMessage(text) {
                 align-items: center;
                 gap: 8px;
                 transition: background 0.2s;
+                margin-bottom: 16px;
             ">
                 <span style="font-size: 16px;">☎️</span> 플래너에게 연락하기
             </button>
+            ${feedbackButtons}
         </div>
     `;
     chatContainer.appendChild(div);
     scrollToBottom();
+
+    // Supabase 저장
+    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+        window.chatHistory.saveMessage('assistant', text).catch(() => { });
+    }
+}
+
+// ========== 답변 복사 기능 ==========
+async function copyMessageToClipboard(messageId, buttonElement) {
+    const messageData = window.lastMessages?.[messageId];
+    if (!messageData) {
+        console.warn('복사할 메시지를 찾을 수 없습니다:', messageId);
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(messageData.answer);
+
+        // 시각적 피드백
+        const originalText = buttonElement.textContent;
+        buttonElement.textContent = '✅';
+        buttonElement.classList.add('copied');
+
+        setTimeout(() => {
+            buttonElement.textContent = originalText;
+            buttonElement.classList.remove('copied');
+        }, 2000);
+
+    } catch (error) {
+        console.error('클립보드 복사 실패:', error);
+        alert('복사에 실패했습니다. 브라우저 권한을 확인해주세요.');
+    }
 }
 
 // ========== 피드백 시스템 ==========
@@ -976,8 +1099,12 @@ function closeFeedbackModal() {
 }
 
 async function submitFeedback() {
-    const content = document.getElementById('feedbackTextarea').value.trim();
-    const messageData = window.lastMessages?.[currentFeedbackMessageId] || {};
+    const feedbackTextarea = document.getElementById('feedbackTextarea');
+    const submitBtn = document.querySelector('#feedbackModal .feedback-submit-btn');
+
+    const content = feedbackTextarea.value.trim();
+    const messageId = currentFeedbackMessageId;
+    const messageData = window.lastMessages?.[messageId] || {};
 
     const feedback = {
         type: currentFeedbackType === 'good' ? 'Good' : 'Bad',
@@ -987,27 +1114,45 @@ async function submitFeedback() {
         timestamp: new Date().toLocaleString('ko-KR')
     };
 
-    closeFeedbackModal();
+    console.log('📤 피드백 전송 시도:', feedback);
 
-    // Google Sheets에 저장 (Vercel API 경유)
+    // 버튼 비활성화로 중복 방지
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '전송 중...';
+    }
+
     try {
+        const requestBody = {
+            sheetName: 'Feedback',
+            ...feedback
+        };
+
         const response = await fetch('/api/collect', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                sheetName: 'Feedback',
-                ...feedback
-            })
+            body: JSON.stringify(requestBody)
         });
 
-        if (response.ok) {
-            showSuccessModal('피드백 전달이 완료되었습니다. 빠른 시일 내에 수정해서 이용하시는데에 불편함 없도록 하겠습니다.');
+        const result = await response.json();
+        console.log('📥 API 응답 데이터:', result);
+
+        if (response.ok && result.success) {
+            closeFeedbackModal();
+            showSuccessModal('피드백 전달이 완료되었습니다. 감사합니다.');
         } else {
-            throw new Error('Feedback save failed');
+            const errorMsg = result.error || '저장 중 문제가 발생했습니다.';
+            console.error('⚠️ 피드백 저장 실패:', result);
+            alert(`피드백 저장 실패\n\n상태: ${response.status}\n메시지: ${errorMsg}\n\n이 메시지를 캡처해서 전달해주세요.`);
         }
     } catch (error) {
-        console.error('피드백 저장 오류:', error);
-        alert('피드백 제출 중 오류가 발생했습니다.');
+        console.error('❌ 피드백 저장 오류:', error);
+        alert('피드백 제출 중 시스템 오류가 발생했습니다: ' + error.message);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '제출';
+        }
     }
 }
 
@@ -1039,46 +1184,8 @@ function renderFeedbackList() {
     `;
 }
 
-// ========== 데이터 없음 + 플래너 연락 ==========
-// 병원 개원 무관 질문 - 플래너 버튼 없음
-function addOffTopicMessage(text) {
-    const div = document.createElement('div');
-    div.className = 'message bot';
-    div.innerHTML = `
-        <div class="message-avatar">AI</div>
-        <div class="message-content formatted-response">
-            <p>${text || '죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다.'}</p>
-        </div>
-    `;
-    chatContainer.appendChild(div);
-    scrollToBottom();
-}
+// (기존 중복 함수 삭제됨 - 상단 정의 사용)
 
-// 병원 개원 관련이지만 데이터 없음 - 플래너 버튼 있음
-function addNoDataMessage(text) {
-    const div = document.createElement('div');
-    div.className = 'message bot';
-
-    // AI가 보내온 텍스트에서 줄바꿈 처리
-    const formattedText = text.replace(/\n/g, '<br>');
-
-    div.innerHTML = `
-        <div class="message-avatar">AI</div>
-        <div class="message-content formatted-response">
-            <div class="no-data-body">
-                ${formattedText}
-            </div>
-            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed #e2e8f0;">
-                <button onclick="openContactModal()" 
-                    style="padding: 12px 24px; background: #536db1; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px;">
-                    ☎️ 플래너에게 연락하기
-                </button>
-            </div>
-        </div>
-    `;
-    chatContainer.appendChild(div);
-    scrollToBottom();
-}
 
 function openContactModal() {
     const modal = document.getElementById('contactModal');
@@ -1219,4 +1326,428 @@ function getUserSpecialty() {
         code: currentUserSpecialty,
         ...SPECIALTIES[currentUserSpecialty]
     };
+}
+
+// chat-history.js에서 호출하기 위한 진료과 설정 함수
+function setUserSpecialty(specialty) {
+    if (!SPECIALTIES[specialty]) {
+        console.error('Invalid specialty:', specialty);
+        return;
+    }
+    currentUserSpecialty = specialty;
+    localStorage.setItem('userSpecialty', specialty);
+    updateSpecialtyBadge();
+    console.log(`✅ 진료과 설정됨 (login 연동): ${SPECIALTIES[specialty].label}`);
+}
+
+// ==========================
+// 다크/라이트 모드 토글
+// ==========================
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+
+    console.log(`🎨 테마 변경: ${newTheme}`);
+}
+
+// 저장된 테마 또는 시스템 테마 적용
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    } else {
+        // 시스템 다크 모드 감지
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    }
+}
+
+// 페이지 로드 전에 테마 적용 (깜빡임 방지)
+initTheme();
+
+// ============ 공유/내보내기 기능 ============
+
+/**
+ * 내보내기 드롭다운 메뉴 토글
+ */
+function toggleExportMenu() {
+    const menu = document.getElementById('exportMenu');
+    if (menu) {
+        menu.classList.toggle('active');
+    }
+}
+
+// 드롭다운 외부 클릭 시 닫기
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('exportDropdown');
+    const menu = document.getElementById('exportMenu');
+    if (dropdown && menu && !dropdown.contains(e.target)) {
+        menu.classList.remove('active');
+    }
+});
+
+/**
+ * 채팅 내용을 텍스트로 추출
+ */
+function extractChatText() {
+    const chatContainer = document.getElementById('chatContainer');
+    if (!chatContainer) return '';
+
+    const messages = chatContainer.querySelectorAll('.message');
+    let text = '=== 개원 상담 챗봇 대화 내용 ===\n';
+    text += `내보내기 시간: ${new Date().toLocaleString('ko-KR')}\n`;
+    text += '━'.repeat(40) + '\n\n';
+
+    messages.forEach((msg) => {
+        const isUser = msg.classList.contains('user');
+        const role = isUser ? '👤 사용자' : '🤖 AI 컨설턴트';
+        const content = msg.querySelector('.message-content')?.textContent || msg.textContent || '';
+
+        text += `${role}:\n${content.trim()}\n\n`;
+    });
+
+    text += '━'.repeat(40) + '\n';
+    text += '© 오픈닥터 AI 컨설턴트';
+
+    return text;
+}
+
+/**
+ * 클립보드에 복사
+ */
+async function exportToClipboard() {
+    const text = extractChatText();
+
+    if (!text || text.includes('대화 내용이 없습니다')) {
+        showSuccessModal('내보낼 대화가 없습니다.');
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(text);
+        showSuccessModal('대화 내용이 클립보드에 복사되었습니다!');
+    } catch (error) {
+        console.error('클립보드 복사 실패:', error);
+        showSuccessModal('클립보드 복사에 실패했습니다.');
+    }
+
+    // 메뉴 닫기
+    document.getElementById('exportMenu')?.classList.remove('active');
+}
+
+/**
+ * TXT 파일로 저장
+ */
+function exportToTxt() {
+    const text = extractChatText();
+
+    if (!text || text.includes('대화 내용이 없습니다')) {
+        showSuccessModal('내보낼 대화가 없습니다.');
+        return;
+    }
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `개원상담_${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showSuccessModal('TXT 파일이 다운로드되었습니다!');
+
+    // 메뉴 닫기
+    document.getElementById('exportMenu')?.classList.remove('active');
+}
+
+/**
+ * PDF 파일로 저장
+ */
+function exportToPdf() {
+    const chatContainer = document.getElementById('chatContainer');
+
+    if (!chatContainer || chatContainer.querySelectorAll('.message').length === 0) {
+        showSuccessModal('내보낼 대화가 없습니다.');
+        return;
+    }
+
+    // PDF 생성용 임시 컨테이너
+    const pdfContent = document.createElement('div');
+    pdfContent.style.cssText = 'padding: 20px; font-family: sans-serif; max-width: 800px;';
+
+    // 헤더
+    const header = document.createElement('div');
+    header.innerHTML = `
+        <h1 style="color: #536db1; margin-bottom: 10px;">📋 개원 상담 챗봇 대화록</h1>
+        <p style="color: #666; font-size: 12px; margin-bottom: 20px;">내보내기 시간: ${new Date().toLocaleString('ko-KR')}</p>
+        <hr style="border: 1px solid #e5e7eb; margin-bottom: 20px;">
+    `;
+    pdfContent.appendChild(header);
+
+    // 메시지 복사
+    const messages = chatContainer.querySelectorAll('.message');
+    messages.forEach((msg) => {
+        const isUser = msg.classList.contains('user');
+        const content = msg.querySelector('.message-content')?.innerHTML || msg.innerHTML || '';
+
+        const msgDiv = document.createElement('div');
+        msgDiv.style.cssText = `
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 12px;
+            background: ${isUser ? '#f0f4ff' : '#f8f9fa'};
+            border-left: 4px solid ${isUser ? '#536db1' : '#22c55e'};
+        `;
+        msgDiv.innerHTML = `
+            <strong style="color: ${isUser ? '#536db1' : '#22c55e'};">${isUser ? '👤 사용자' : '🤖 AI 컨설턴트'}</strong>
+            <div style="margin-top: 8px; color: #1e293b;">${content}</div>
+        `;
+        pdfContent.appendChild(msgDiv);
+    });
+
+    // 푸터
+    const footer = document.createElement('div');
+    footer.innerHTML = `
+        <hr style="border: 1px solid #e5e7eb; margin-top: 20px;">
+        <p style="color: #666; font-size: 11px; text-align: center; margin-top: 10px;">© 오픈닥터 AI 컨설턴트</p>
+    `;
+    pdfContent.appendChild(footer);
+
+    // PDF 생성
+    const opt = {
+        margin: 10,
+        filename: `개원상담_${new Date().toISOString().slice(0, 10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(pdfContent).save().then(() => {
+        showSuccessModal('PDF 파일이 다운로드되었습니다!');
+    });
+
+    // 메뉴 닫기
+    document.getElementById('exportMenu')?.classList.remove('active');
+}
+
+// ============================================
+// 사이드바 토글 (접기/펼치기)
+// ============================================
+
+/**
+ * 사이드바 접기/펼치기 토글
+ */
+function toggleSidebar() {
+    const sidebar = document.getElementById('historySidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('collapsed');
+
+        // 상태 저장
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        localStorage.setItem('sidebarCollapsed', isCollapsed);
+    }
+}
+
+/**
+ * 사이드바 초기 상태 설정
+ */
+function initSidebarState() {
+    const sidebar = document.getElementById('historySidebar');
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+    if (sidebar && isCollapsed) {
+        sidebar.classList.add('collapsed');
+    }
+}
+
+// 페이지 로드 시 사이드바 상태 초기화
+document.addEventListener('DOMContentLoaded', initSidebarState);
+
+// ============================================
+// 검색 패널
+// ============================================
+
+/**
+ * 검색 패널 토글
+ */
+function toggleSearchPanel() {
+    const searchPanel = document.getElementById('searchPanel');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput = document.getElementById('chatSearchInput');
+
+    if (searchPanel && searchOverlay) {
+        const isActive = searchPanel.classList.contains('active');
+
+        if (isActive) {
+            searchPanel.classList.remove('active');
+            searchOverlay.classList.remove('active');
+        } else {
+            searchPanel.classList.add('active');
+            searchOverlay.classList.add('active');
+            // 포커스 설정
+            setTimeout(() => searchInput?.focus(), 100);
+        }
+    }
+}
+
+/**
+ * 채팅 검색 기능 (세션 제목 + 메시지 내용 검색)
+ */
+async function searchChats(query) {
+    const resultsContainer = document.getElementById('searchResults');
+    if (!resultsContainer) return;
+
+    // 검색어가 없으면 최근 대화 표시
+    if (!query.trim()) {
+        displayRecentChats();
+        return;
+    }
+
+    // 로딩 표시
+    resultsContainer.innerHTML = `
+        <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+            검색 중...
+        </div>
+    `;
+
+    // Supabase에서 메시지 검색
+    const searchResults = await window.chatHistory?.searchMessages?.(query) || [];
+
+    // 결과 표시
+    if (searchResults.length === 0) {
+        resultsContainer.innerHTML = `
+            <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                검색 결과가 없습니다.
+            </div>
+        `;
+        return;
+    }
+
+    resultsContainer.innerHTML = searchResults.slice(0, 10).map(result => {
+        const { session, matchedMessage } = result;
+        const title = escapeHtml(session.title || '새 대화');
+        const date = formatSearchDate(session.created_at);
+
+        // 매칭된 메시지 미리보기 (최대 50자)
+        let preview = '';
+        if (matchedMessage) {
+            const cleanMessage = matchedMessage.replace(/<[^>]*>/g, '').trim();
+            const highlighted = highlightSearchTerm(cleanMessage.substring(0, 80), query);
+            preview = `<div class="search-result-preview">"${highlighted}${cleanMessage.length > 80 ? '...' : ''}"</div>`;
+        }
+
+        return `
+            <div class="search-result-item" onclick="loadSearchedChat('${session.id}')">
+                <div class="search-result-header">
+                    <span class="search-result-title">📁 ${title}</span>
+                    <span class="search-result-date">${date}</span>
+                </div>
+                ${preview}
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * 검색어 하이라이트
+ */
+function highlightSearchTerm(text, query) {
+    if (!query) return escapeHtml(text);
+    const escaped = escapeHtml(text);
+    const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+    return escaped.replace(regex, '<mark style="background: rgba(0, 112, 243, 0.2); padding: 0 2px; border-radius: 2px;">$1</mark>');
+}
+
+/**
+ * 정규식 특수문자 이스케이프
+ */
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * 최근 대화 목록 표시
+ */
+function displayRecentChats() {
+    const resultsContainer = document.getElementById('searchResults');
+    if (!resultsContainer) return;
+
+    const sessions = window.chatHistory?.getAllSessions?.() || [];
+    const recentSessions = sessions.slice(0, 5);
+
+    if (recentSessions.length === 0) {
+        resultsContainer.innerHTML = `
+            <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                대화 기록이 없습니다.
+            </div>
+        `;
+        return;
+    }
+
+    resultsContainer.innerHTML = recentSessions.map(session => `
+        <div class="search-result-item" onclick="loadSearchedChat('${session.id}')">
+            <span class="search-result-title">${escapeHtml(session.title || '새 대화')}</span>
+            <span class="search-result-date">${formatSearchDate(session.created_at)}</span>
+        </div>
+    `).join('');
+}
+
+/**
+ * 검색된 채팅 로드
+ */
+function loadSearchedChat(sessionId) {
+    toggleSearchPanel(); // 패널 닫기
+
+    // chat-history.js의 로드 함수 호출
+    if (window.chatHistory?.loadSession) {
+        window.chatHistory.loadSession(sessionId);
+    }
+}
+
+/**
+ * 검색 날짜 포맷
+ */
+function formatSearchDate(dateString) {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return '오늘';
+    if (diffDays === 1) return '어제';
+    if (diffDays < 7) return `${diffDays}일 전`;
+
+    return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+}
+
+/**
+ * HTML 이스케이프
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ============================================
+// FAQ 패널
+// ============================================
+/**
+ * FAQ 패널 토글 (화면 오른쪽에서 슬라이드)
+ */
+function toggleFaqPanel() {
+    const faqPanel = document.getElementById('faqPanel');
+    if (faqPanel) {
+        faqPanel.classList.toggle('active');
+    }
 }
