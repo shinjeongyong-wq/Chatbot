@@ -503,7 +503,6 @@ async function getBotResponse(userMessage) {
             // 인용 번호 제거
             cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
 
-            console.log('[DEBUG] addNoDataMessage 호출 직전, 데이터 전달함');
             addNoDataMessage(cleanText);
             responseText = cleanText;
         } else {
@@ -530,30 +529,16 @@ async function callOpenRouterAPI(userQuery, contexts) {
 
     let filteredContexts = []; // 선언 이동 및 스코프 확장
     if (contexts && contexts.length > 0) {
-        // ★ 동적 임계값 적용: 1위 문서 대비 30% 미만 스코어는 제외 ★
-        const topScore = contexts[0]?.score || 1;
-        const threshold = topScore * 0.3;
-        filteredContexts = contexts.filter(c => c.score >= threshold);
+        // ★ Step 6: Top N 선택 (10~30개) - sheets-loader.js에서 이미 동적 컷오프 수행됨 ★
+        const maxDocs = Math.min(contexts.length, 30);
+        const minDocs = Math.min(contexts.length, 10);
+        filteredContexts = contexts.slice(0, maxDocs);
 
-        console.log(`📊 스코어 필터링: ${contexts.length}개 → ${filteredContexts.length}개 (임계값: ${threshold.toFixed(2)})`);
-
-        // ★ 스코어 기반 3단계 계층화 ★
-        const highRelevance = filteredContexts.filter(c => c.score > 2.0);
-        const mediumRelevance = filteredContexts.filter(c => c.score > 0.5 && c.score <= 2.0);
-        const lowRelevance = filteredContexts.filter(c => c.score <= 0.5);
-
-        console.log(`   🔥 핵심 문서: ${highRelevance.length}개`);
-        console.log(`   📄 보조 문서: ${mediumRelevance.length}개`);
-        console.log(`   📋 참고 문서: ${lowRelevance.length}개`);
+        console.log(`   📚 최종 문서: ${filteredContexts.length}개 (범위: ${minDocs}~${maxDocs})`);
 
         // 문서 포맷팅 함수
-        const formatDoc = (item, idx, showScore = false) => {
+        const formatDoc = (item, idx) => {
             let prefix = `[${idx + 1}]`;
-
-            // 스코어 표시 (디버깅용, 선택적)
-            if (showScore && item.score) {
-                prefix += ` (관련도: ${item.score.toFixed(2)})`;
-            }
 
             // 진료과 태그 시각화
             if (item.metadata?.specialties && item.metadata.specialties.length > 0) {
@@ -564,7 +549,7 @@ async function callOpenRouterAPI(userQuery, contexts) {
                 }).join(' ');
                 prefix += ` ${tags} |`;
             } else {
-                prefix += ` (태그없음) |`;
+                prefix += ` (공통) |`;
             }
 
             // 토큰 최적화: answer를 400자로 제한
@@ -574,26 +559,8 @@ async function callOpenRouterAPI(userQuery, contexts) {
             return `${prefix} Q: ${item.question}\nA: ${truncatedAnswer}`;
         };
 
-        // 계층별로 문서 구성
-        let docIndex = 0;
-        const sections = [];
-
-        if (highRelevance.length > 0) {
-            sections.push('## 🔥 핵심 문서 (최우선 참조)');
-            sections.push(highRelevance.map(item => formatDoc(item, docIndex++)).join('\n\n'));
-        }
-
-        if (mediumRelevance.length > 0) {
-            sections.push('\n## 📄 보조 문서 (필요시 참조)');
-            sections.push(mediumRelevance.map(item => formatDoc(item, docIndex++)).join('\n\n'));
-        }
-
-        if (lowRelevance.length > 0) {
-            sections.push('\n## 📋 참고 문서 (관련성 낮음, 신중히 사용)');
-            sections.push(lowRelevance.map(item => formatDoc(item, docIndex++)).join('\n\n'));
-        }
-
-        contextText = sections.join('\n');
+        // 단순 문서 목록 구성 (계층화 없음)
+        contextText = filteredContexts.map((item, idx) => formatDoc(item, idx)).join('\n\n');
     }
 
     // 대화 히스토리 구성 (ChatMemory 활용)
@@ -645,13 +612,21 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 
 # 핵심 규칙
 1. **[중복 답변 금지]**: 이미 **# ⛔ 중복 금지** 섹션에 있는 업체나 정보가 **# 참고문서**에 또 나오더라도, 이를 제외하고 **새로운 데이터 위주로** 답변하세요.
-2. **[파트너사 특화 진료과 안내]**: 파트너사/업체 정보를 제공할 때, 해당 파트너사의 **특화 진료과(specialties)를 반드시 언급**하세요.
-   - 사용자가 질문한 진료과와 파트너사의 특화 진료과가 **다를 경우**: "해당 파트너사는 **[특화 진료과]에 특화**되어 있습니다. [사용자 질문 진료과] 관련 실적/사례는 별도로 확인이 필요할 수 있습니다."라고 안내하세요.
-   - 참고문서에 파트너사의 특화 진료과 정보(예: [통증✓], [내과✓] 태그)가 있으면 이를 참고하세요.
+
+2. **[진료과 기반 정보 제공 및 주의사항 안내]**:
+   - 제공된 참고문서에 포함된 업체/정보는 검색 엔진이 사용자의 질문 의도에 맞춰 선별한 것이므로 **숨기지 말고 적극적으로 소개**하세요.
+   - **[CASE A: 진료과 일치]**: 파트너사의 특화 진료과가 사용자의 진료과와 일치하는 경우, 적극 추천하고 상세히 설명하세요.
+   - **[CASE B: 진료과 불일치 (주의사항 필수)]**: 참고문서에는 있지만 특화 진료과가 사용자와 다른 경우(예: 사용자 '미용', 파트너 '통증'), **정보를 누락하지 말고 상세히 답변하되, 반드시 아래 주의사항을 덧붙이세요.**
+     - **안내 멘트 예시**: "해당 파트너사는 주로 **[참고문서의 진료과]**에 특화되어 있습니다. 원장님의 진료과인 **[사용자 진료과]** 관련 시공/납품 사례는 별도 확인이 필요할 수 있음을 안내해 드립니다."
+   - 참고문서에 있는 [통증✓], [내과✓] 등의 태그 정보를 기준으로 판단하세요.
+
 3. **[주제 일관성 유지]**: 현재 대화의 주제(예: 인테리어)를 중심으로 답변하세요. 참고문서에 다른 주제가 섞여 있다면 사용자의 질문 의도에 부합하는 내용만 골라내어 자연스럽게 답변하세요. 만약 요청하신 주제에 대한 새로운 정보가 정말 없다면, 억지로 다른 주제를 꺼내기보다는 현재까지 안내해 드린 내용을 정리하거나 추가 확인이 필요함을 정직하게 전달하세요.
+
 4. 참고문서 내용 기반으로만 답변 (할루시네이션 금지)
+
 5. 병원 개원과 무관한 질문 → "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
    - **중요**: [OFF_TOPIC] 사용 시 다른 긴 설명이나 인용을 절대 포함하지 마세요.
+
 6. 사용자가 요청한 **구체적인 정보(예: 금액, 수치, 리스트 등)**가 참고문서에 없거나 부족한 경우 → '[NO_DATA]' 태그와 함께 **아래 형식을 정확히** 따르세요:
    - **형식**: (1) 감사/사과 문단 → (빈 줄) → (2) "원하시면, 아래 내용들을 더 자세히 알려드릴 수 있습니다" → (빈 줄) → (3) 불렛 리스트 → (빈 줄) → (4) 아래의 고정 안내 문구
    - **고정 안내 문구**: "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
@@ -664,12 +639,10 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
      - 답변 본문에 "플래너에게 직접 문의하세요" 같은 다른 변형 문구는 쓰지 말고 위의 고정 안내 문구만 쓰세요.
 
 # 출처 인용 규칙 (매우 중요!)
-1. **🔥 핵심 문서를 최우선으로 사용**하세요.
-2. **📄 보조 문서는 핵심 문서를 보완할 때만** 사용하세요.
-3. **인용 방식 (ID 필수)**: 답변의 각 사실 정보 뒤에는 해당 정보의 출처인 참고문서의 ID를 **[ID: n]** 형식으로 반드시 표시하세요. (예: 닥터사이클린은 환경부 공식 지정 업체입니다 [ID: 0]). 
-4. **인용 최소화 (Clean UI)**: 동일한 출처에서 가져온 내용이 연속될 경우, 문장마다 붙이지 말고 해당 단락(Paragraph)이나 리스트 항목의 끝에 한 번만 표시하세요.
-5. **ID 중복 금지**: 한 단락 내에서 같은 ID가 반복되어 가독성을 해치지 않도록 하세요. 
-6. **하단 요약 금지 (CRITICAL)**: 답변 가장 아랫부분에 별도로'참고문서' 리스트를 만들거나 ID를 모아서 나열하지 마세요. 주석은 본문 안에만 존재해야 합니다.
+1. **인용 방식 (ID 필수)**: 답변의 각 사실 정보 뒤에는 해당 정보의 출처인 참고문서의 ID를 **[ID: n]** 형식으로 반드시 표시하세요. (예: 닥터사이클린은 환경부 공식 지정 업체입니다 [ID: 0]). 
+2. **인용 최소화 (Clean UI)**: 동일한 출처에서 가져온 내용이 연속될 경우, 문장마다 붙이지 말고 해당 단락(Paragraph)이나 리스트 항목의 끝에 한 번만 표시하세요.
+3. **ID 중복 금지**: 한 단락 내에서 같은 ID가 반복되어 가독성을 해치지 않도록 하세요. 
+4. **하단 요약 금지 (CRITICAL)**: 답변 가장 아랫부분에 별도로 '참고문서' 리스트를 만들거나 ID를 모아서 나열하지 마세요. 주석은 본문 안에만 존재해야 합니다.
 
 # 답변 형식
 - **가독성 최우선**: 각 리스트 항목(1. 2. 3...) 사이와 주요 섹션 사이에는 반드시 **빈 줄(Double Line Break)**을 추가하여 답변이 빽빽해 보이지 않게 하세요.
@@ -912,8 +885,6 @@ function addOffTopicMessage(text) {
 
 // NO_DATA 응답 렌더링 (볼드체, 불렛 포인트 지원 + 플래너 연락 버튼)
 function addNoDataMessage(text) {
-    console.log('[DEBUG] addNoDataMessage 호출됨, 원본 텍스트:', text);
-
     const div = document.createElement('div');
     div.className = 'message bot';
 
@@ -922,11 +893,9 @@ function addNoDataMessage(text) {
 
     // 2. 고정 안내 문구 제거 (UI에서 별도로 표시하므로 LLM 출력에서 제거)
     cleanedText = cleanedText.replace(/질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다\.?/g, '').trim();
-    console.log('[DEBUG] 인용 및 안내문구 제거 후:', cleanedText);
 
     // 3. 줄 단위로 분리 (다양한 줄바꿈 형식 지원)
     const lines = cleanedText.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
-    console.log('[DEBUG] 줄 분리 결과:', lines);
 
     // 4. 맺음말 제거 로직
     const filteredLines = [];
@@ -949,8 +918,6 @@ function addNoDataMessage(text) {
             filteredLines.push(line);
         }
     }
-
-    console.log('[DEBUG] 필터링 후:', filteredLines);
 
     // 5. 마크다운 → HTML 변환
     let htmlParts = [];
@@ -989,7 +956,6 @@ function addNoDataMessage(text) {
     }
 
     const html = htmlParts.join('');
-    console.log('[DEBUG] 최종 HTML:', html);
 
     // 피드백 버튼용 ID 생성 및 데이터 저장
     const messageId = Date.now();

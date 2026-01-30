@@ -425,8 +425,6 @@ class GoogleSheetsLoader {
         console.log('   타겟 카테고리:', targetCategory);
         console.log('   타겟 세부 카테고리:', targetSubCategory);
         console.log('   👤 사용자 진료과:', userSpecialty ? userSpecialty.label : '미선택');
-        console.log('   🎯 진료과 특화 질문:', specialtyRelevant ? '예 (다른 진료과 제외)' : '아니오 (공통 질문)');
-        console.log('   📏 최대 결과 수:', finalMaxResults);
 
         // 0. 전체 검색 대상 (Q&A, FAQ, Notion 모두 포함)
         // 방어 코드: 데이터 로드 실패 시 빈 배열로 초기화하여 filter 에러 방지
@@ -541,44 +539,50 @@ class GoogleSheetsLoader {
             .filter(r => r.score > 0.05)  // ★ Broad Search: 임계값 0.25 -> 0.05 대폭 완화
             .sort((a, b) => b.score - a.score);
 
-        // ★ 진료과 필터링: specialtyRelevant에 따라 전략 분기 ★
+        // ★ Step 4: 카테고리 인식 가중치 적용 (Soft Penalty) ★
+        // 진료과 민감 카테고리에서 타 진료과 문서에 페널티 적용 (재정렬 대신)
+        const specialtySensitiveCategories = ['partners', 'medical_device'];
+        const isSpecialtySensitive = specialtySensitiveCategories.includes(targetCategory);
+
         if (userSpecialty && userSpecialty.code) {
             const userSpecCode = userSpecialty.code.toLowerCase();
+            let penaltyCount = 0;
 
-            // 1. 사용자 진료과 태그가 있는 문서
-            const matchingDocs = results.filter(item => {
-                const specs = item.metadata?.specialties || [];
-                return specs.some(s => s.toLowerCase() === userSpecCode);
+            results = results.map(item => {
+                const itemSpecs = item.metadata?.specialties || [];
+                const hasSpecTag = itemSpecs.length > 0;
+                const matchesUserSpec = itemSpecs.some(s => s.toLowerCase() === userSpecCode);
+
+                let finalScore = item.score;
+
+                // CASE A: 일반 카테고리 OR 태그 없음 OR 내 진료과 → 점수 100% 보존
+                if (!isSpecialtySensitive || !hasSpecTag || matchesUserSpec) {
+                    finalScore = item.score * 1.0;
+                }
+                // CASE B: 진료과 민감 카테고리 + 타 진료과 문서 → 40% 페널티
+                else if (isSpecialtySensitive && hasSpecTag && !matchesUserSpec) {
+                    finalScore = item.score * 0.6;
+                    penaltyCount++;
+                    console.log(`   ⚠️ 타 진료과 페널티: "${item.question?.substring(0, 20)}..." (${item.score.toFixed(2)} → ${finalScore.toFixed(2)})`);
+                }
+
+                return { ...item, score: finalScore };
             });
 
-            // 2. 태그가 없는 문서 (일반 정보)
-            const noTagDocs = results.filter(item => {
-                const specs = item.metadata?.specialties || [];
-                return specs.length === 0;
-            });
+            // 페널티 적용 후 재정렬
+            results.sort((a, b) => b.score - a.score);
 
-            // 3. 다른 진료과 태그만 있는 문서 (사용자 진료과 아님)
-            const otherSpecDocs = results.filter(item => {
-                const specs = item.metadata?.specialties || [];
-                return specs.length > 0 && !specs.some(s => s.toLowerCase() === userSpecCode);
-            });
+            console.log(`   📐 가중치 적용 완료 (카테고리: ${targetCategory}, 민감: ${isSpecialtySensitive ? '예' : '아니오'})`);
+            console.log(`   ⚠️ 페널티 적용 문서: ${penaltyCount}개`);
+        }
 
-            if (specialtyRelevant) {
-                // ★ 진료과 특화 질문: 다른 진료과 문서도 포함하되 우선순위 낮춤 ★
-                // (파트너사 이름 직접 언급 시에도 정보 제공 가능하게)
-                results = [...matchingDocs, ...noTagDocs, ...otherSpecDocs];
-                console.log(`   🎯 진료과 특화 모드 적용 (다른 진료과도 포함)`);
-                console.log(`   ✅ 사용자 진료과 문서: ${matchingDocs.length}개 (우선)`);
-                console.log(`   📄 태그없는 문서: ${noTagDocs.length}개`);
-                console.log(`   📄 다른 진료과 문서: ${otherSpecDocs.length}개 (후순위)`);
-            } else {
-                // ★ 공통 질문: 우선순위만 부여 (제외 안함) ★
-                results = [...matchingDocs, ...noTagDocs, ...otherSpecDocs];
-                console.log(`   📋 공통 질문 모드 (우선순위만 적용)`);
-                console.log(`   ✅ 사용자 진료과 문서: ${matchingDocs.length}개 (우선)`);
-                console.log(`   📄 태그없는 문서: ${noTagDocs.length}개`);
-                console.log(`   📄 다른 진료과 문서: ${otherSpecDocs.length}개`);
-            }
+        // ★ Step 5: 동적 컷오프 (1위 점수의 25% 미만 제거) ★
+        const beforeCutoff = results.length;
+        if (results.length > 0) {
+            const topScore = results[0].score;
+            const cutoffThreshold = topScore * 0.25;
+            results = results.filter(r => r.score >= cutoffThreshold);
+            console.log(`   📉 동적 컷오프: ${beforeCutoff}개 → ${results.length}개 (임계값: ${cutoffThreshold.toFixed(2)})`);
         }
 
         // 결과 소스별 현황
