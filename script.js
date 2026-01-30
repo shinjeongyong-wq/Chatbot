@@ -525,9 +525,9 @@ async function getBotResponse(userMessage) {
         updateTypingStatus('데이터베이스에서 최적의 정보를 검색하고 있습니다...');
         console.log('🔍 Stage 2: Smart Search 시작...');
 
-        // 성능 최적화: 검색 결과 한도 하향 조정 (사용자 요청 반영)
+        // 성능 최적화: 검색 결과 한도 조정 (파트너사 15개로 확대)
         const isPartnerListQuery = queryPlan?.intent === '파트너사목록' || queryPlan?.targetCategory === 'partners';
-        const maxResults = isPartnerListQuery ? 10 : 30;
+        const maxResults = isPartnerListQuery ? 15 : 30;
 
         if (queryPlan) {
             // Query Plan 기반 스마트 검색 (사용자 진료과 정보 전달)

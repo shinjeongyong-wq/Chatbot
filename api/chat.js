@@ -56,7 +56,7 @@ async function callGeminiAPI(prompt, systemPrompt = '', model = 'gemini-1.5-flas
         ],
         generationConfig: {
             temperature: 0.2,
-            maxOutputTokens: 4096
+            maxOutputTokens: 8192
         }
     };
 

@@ -576,6 +576,59 @@ class GoogleSheetsLoader {
             console.log(`   ⚠️ 페널티 적용 문서: ${penaltyCount}개`);
         }
 
+        // ★★★ [DEBUG] 전체 순위 로컬 확인용 (A+C 옵션) ★★★
+        if (typeof window !== 'undefined') {
+            // 콘솔 테이블용 데이터 정리
+            const debugData = results.map((item, idx) => ({
+                순위: idx + 1,
+                점수: item.score?.toFixed(2) || '0.00',
+                소스: item.source || '-',
+                카테고리: item.metadata?.category || item.metadata?.topic || '-',
+                질문: (item.question || '').substring(0, 40) + '...',
+                업체명: item.metadata?.company || '-',
+                세부분류: item.metadata?.structuredSubCategory || '-'
+            }));
+
+            // 콘솔 테이블 출력 (상위 50개)
+            console.log('\n📊 ========== [전체 순위 테이블 (상위 50개)] ==========');
+            console.table(debugData.slice(0, 50));
+            console.log(`   📋 전체 ${debugData.length}개 중 상위 50개 표시`);
+
+            // 전체 데이터를 window 객체에 저장 (JSON 다운로드용)
+            window.lastSearchDebug = {
+                timestamp: new Date().toISOString(),
+                query: coreKeywords.join(', '),
+                totalCount: results.length,
+                data: results.map((item, idx) => ({
+                    rank: idx + 1,
+                    score: item.score?.toFixed(4) || '0',
+                    source: item.source,
+                    category: item.metadata?.category || item.metadata?.topic || '',
+                    subCategory: item.metadata?.structuredSubCategory || '',
+                    company: item.metadata?.company || '',
+                    question: item.question || '',
+                    answer: (item.answer || '').substring(0, 200) + '...'
+                }))
+            };
+
+            // JSON 다운로드 함수 등록
+            window.downloadSearchDebug = function () {
+                const dataStr = JSON.stringify(window.lastSearchDebug, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `search_debug_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                console.log('✅ JSON 파일 다운로드 완료!');
+            };
+
+            console.log('💡 전체 결과 JSON 다운로드: 콘솔에서 downloadSearchDebug() 실행');
+        }
+
         // ★ Step 5: 동적 컷오프 (1위 점수의 25% 미만 제거) ★
         const beforeCutoff = results.length;
         if (results.length > 0) {
