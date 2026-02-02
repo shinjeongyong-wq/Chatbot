@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -43,7 +43,7 @@
             --history-user-bg: #f5f5f5;
         }
 
-        /* Design System - Dark Mode (Premium Tech) */
+        /* Design System - Dark Mode (Premium Tech) - 라이트 모드 고정 정책으로 비활성화
         [data-theme="dark"] {
             --primary-color: #ededed;
             --primary-hover: #d4d4d4;
@@ -58,11 +58,9 @@
             --shadow-sm: none;
             --shadow-md: none;
 
-            /* Premium Tech Accent - Dark */
             --accent-color: #0070f3;
             --accent-hover: #1a8cff;
 
-            /* History Sidebar - Dark Premium */
             --history-bg: #0a0a0a;
             --history-border: #262626;
             --history-text: #ededed;
@@ -71,6 +69,7 @@
             --history-active: rgba(0, 112, 243, 0.15);
             --history-user-bg: #171717;
         }
+        */
 
         * {
             margin: 0;
@@ -513,6 +512,7 @@
             transform: scale(1.02);
         }
 
+        /* 라이트 모드 고정으로 사용하지 않는 스타일
         .theme-toggle-btn {
             width: 40px;
             height: 40px;
@@ -533,7 +533,6 @@
             transform: scale(1.1);
         }
 
-        /* 라이트 모드: 해 아이콘 숨기고 달 아이콘 표시 */
         .theme-icon-light {
             display: none;
         }
@@ -542,7 +541,6 @@
             display: inline;
         }
 
-        /* 다크 모드: 달 아이콘 숨기고 해 아이콘 표시 */
         [data-theme="dark"] .theme-icon-light {
             display: inline;
         }
@@ -550,6 +548,7 @@
         [data-theme="dark"] .theme-icon-dark {
             display: none;
         }
+        */
 
         /* Export Dropdown */
         .export-dropdown {

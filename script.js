@@ -567,9 +567,46 @@ async function getBotResponse(userMessage) {
                     queryPlan = planResult.plan;
                     console.log('✅ Query Plan 수신:', queryPlan);
                     console.log('   Intent:', queryPlan.intent);
+                    console.log('   RequiresSearch:', queryPlan.requiresSearch);
                     console.log('   Planner:', planResult.modelName);
 
-                    // Off-topic 체크
+                    // ★ MECE 6분류 기반 분기 처리 ★
+                    if (queryPlan.requiresSearch === false && queryPlan.directAnswer) {
+                        // 검색 불필요: 즉시 답변 출력 후 종료
+                        hideTypingIndicator();
+
+                        // Intent별 스타일 적용
+                        const intentStyles = {
+                            'GREETING': { icon: '👋', style: 'greeting' },
+                            'ABUSE': { icon: '🚫', style: 'warning' },
+                            'OFF_TOPIC': { icon: '💬', style: 'info' },
+                            'OUT_OF_SCOPE': { icon: '📞', style: 'referral' },
+                            'AMBIGUOUS': { icon: '❓', style: 'clarification' }
+                        };
+
+                        const intentInfo = intentStyles[queryPlan.intent] || { icon: '💡', style: 'default' };
+                        console.log(`🎯 [${queryPlan.intent}] 검색 스킵, 즉시 답변 출력`);
+
+                        // ★ OUT_OF_SCOPE 전용 처리: 플래너 연결 버튼 포함 UI ★
+                        if (queryPlan.intent === 'OUT_OF_SCOPE') {
+                            addOutOfScopeMessage(queryPlan.directAnswer);
+                        } else {
+                            // 다른 intent는 일반 포맷 메시지
+                            addFormattedMessage(queryPlan.directAnswer, []);
+                        }
+
+                        // ChatMemory에 저장 (맥락 유지용)
+                        await chatMemory.addTurn(userMessage, queryPlan.directAnswer);
+
+                        // Supabase 저장 (user는 sendUserMessage에서 이미 저장됨)
+                        if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+                            window.chatHistory.saveMessage('assistant', queryPlan.directAnswer).catch(() => { });
+                        }
+
+                        return; // ★ 검색 로직 완전 스킵 ★
+                    }
+
+                    // 기존 off_topic 호환성 유지 (혹시 모를 레거시 응답 대응)
                     if (queryPlan.intent === 'off_topic') {
                         hideTypingIndicator();
                         addOffTopicMessage('죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다.');
@@ -582,11 +619,12 @@ async function getBotResponse(userMessage) {
         }
 
         // ========== Stage 2: Smart Search ==========
+        // (SPECIFIC intent만 여기까지 도달)
         updateTypingStatus('데이터베이스에서 최적의 정보를 검색하고 있습니다...');
         console.log('🔍 Stage 2: Smart Search 시작...');
 
         // 성능 최적화: 검색 결과 한도 조정 (파트너사 15개로 확대)
-        const isPartnerListQuery = queryPlan?.intent === '파트너사목록' || queryPlan?.targetCategory === 'partners';
+        const isPartnerListQuery = queryPlan?.subIntent === '파트너사목록' || queryPlan?.targetCategory === 'partners';
         const maxResults = isPartnerListQuery ? 15 : 30;
 
         if (queryPlan) {
@@ -664,9 +702,15 @@ async function getBotResponse(userMessage) {
         }
 
         // 대화 히스토리에 저장 (맥락 유지 + 요약 자동 트리거)
-        // 대화 히스토리에 저장 (맥락 유지 + 요약 자동 트리거)
         // 텍스트를 자르지 않고 저장하여 나중에 키워드 추출 시 누락이 없도록 함
         chatMemory.addTurn(userMessage, responseText);
+
+        // Supabase에 AI 응답 저장 (user는 sendUserMessage에서 이미 저장됨)
+        if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+            window.chatHistory.saveMessage('assistant', responseText).catch(err => {
+                console.warn('AI 응답 DB 저장 실패:', err);
+            });
+        }
 
     } catch (error) {
         console.error('Bot Response Error:', error);
@@ -903,7 +947,7 @@ function addFormattedMessage(text, contexts, modelName = null) {
         .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/^\* (.+)$/gm, '<li>$1</li>')
-        .replace(/^---[\s\S]*$/gm, '')
+        .replace(/^---$/gm, '<hr>')
         .replace(/\n/g, '<br>');
 
     html = html.replace(/(<li>.*?<\/li>)(<br>)?/g, '$1');
@@ -955,12 +999,7 @@ function addFormattedMessage(text, contexts, modelName = null) {
     chatContainer.appendChild(div);
     scrollToBottom();
 
-    // Supabase에 AI 응답 저장 (chat-history.js)
-    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-        window.chatHistory.saveMessage('assistant', text).catch(err => {
-            console.warn('AI 응답 DB 저장 실패:', err);
-        });
-    }
+    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
 }
 
 function escapeHtml(text) {
@@ -1030,10 +1069,74 @@ function addOffTopicMessage(text) {
     chatContainer.appendChild(div);
     scrollToBottom();
 
-    // Supabase 저장
-    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-        window.chatHistory.saveMessage('assistant', text).catch(() => { });
-    }
+    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
+}
+
+// OUT_OF_SCOPE 응답 렌더링 (플래너 연결 버튼 포함)
+function addOutOfScopeMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'message bot';
+
+    // 피드백 버튼용 ID 생성 및 데이터 저장
+    const messageId = Date.now();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+        </div>
+    `;
+
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: window.currentQuestion || '',
+        answer: text.substring(0, 500)
+    };
+
+    // 고정 메시지 (친절한 톤 + 답변 가능 영역 안내)
+    const fixedMessage = `
+        <p style="margin-bottom: 12px; line-height: 1.7;">
+            해당 내용은 전문적인 지식이 필요한 영역이라, 저보다 담당 플래너에게 문의하시는 것이 가장 정확합니다. 😊
+        </p>
+        <p style="margin-bottom: 8px; line-height: 1.7;">
+            대신 저는 아래 내용에 대해 답변드릴 수 있어요!
+        </p>
+        <ul style="margin: 0 0 16px 24px; padding: 0; color: #475569; line-height: 1.8;">
+            <li>🏥 개원 입지 분석 및 상권 정보</li>
+            <li>🎨 인테리어, 간판, 의료기기 파트너사 추천</li>
+            <li>📋 개원 절차 및 체크리스트 안내</li>
+        </ul>
+        <p style="margin-bottom: 16px; line-height: 1.7; color: #64748b;">
+            플래너 연결을 원하시면 아래 버튼을 눌러주세요. 빠른 시일 내에 회신드리겠습니다.
+        </p>
+    `;
+
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">
+            ${fixedMessage}
+            <button class="contact-planner-btn" onclick="openContactModal()" style="
+                background-color: #536db1;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.2s;
+                margin-bottom: 16px;
+            ">
+                <span style="font-size: 16px;">📞</span> 플래너에게 연결하기
+            </button>
+            ${feedbackButtons}
+        </div>
+    `;
+    chatContainer.appendChild(div);
+    scrollToBottom();
+
+    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
 }
 
 // NO_DATA 응답 렌더링 (볼드체, 불렛 포인트 지원 + 플래너 연락 버튼)
@@ -1154,10 +1257,7 @@ function addNoDataMessage(text) {
     chatContainer.appendChild(div);
     scrollToBottom();
 
-    // Supabase 저장
-    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-        window.chatHistory.saveMessage('assistant', text).catch(() => { });
-    }
+    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
 }
 
 // ========== 답변 복사 기능 ==========
@@ -1462,30 +1562,21 @@ function setUserSpecialty(specialty) {
 // ==========================
 // 다크/라이트 모드 토글
 // ==========================
+// 다크/라이트 모드 토글 (라이트 모드 고정을 위해 기능 비활성화 또는 라이트 고정)
 function toggleTheme() {
+    // 라이트 모드 고정 정책에 따라 기능을 실행하지 않거나 항상 light를 유지합니다.
     const html = document.documentElement;
-    const currentTheme = html.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
 
-    html.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-
-    console.log(`🎨 테마 변경: ${newTheme}`);
+    console.log(`🎨 테마 정책: 라이트 모드 고정`);
 }
 
-// 저장된 테마 또는 시스템 테마 적용
+// 초기 테마 설정 (라이트 모드 고정)
 function initTheme() {
-    const savedTheme = localStorage.getItem('theme');
-
-    if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    } else {
-        // 시스템 다크 모드 감지
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (prefersDark) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-    }
+    // 항상 라이트 모드로 설정
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
 }
 
 // 페이지 로드 전에 테마 적용 (깜빡임 방지)
