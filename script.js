@@ -1142,7 +1142,7 @@ function addFormattedMessage(text, contexts, modelName = null) {
     `;
 
     chatContainer.appendChild(div);
-    scrollToBottom();
+    scrollToMessageTop(div);
 
     // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
 }
@@ -1198,6 +1198,21 @@ function scrollToBottom() {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
+// AI 응답 완료 시 직전 사용자 질문부터 보이도록 스크롤
+function scrollToMessageTop(messageElement) {
+    if (messageElement) {
+        // AI 응답 바로 이전의 사용자 메시지 찾기
+        const prevSibling = messageElement.previousElementSibling;
+        if (prevSibling && prevSibling.classList.contains('user')) {
+            // 사용자 질문부터 보이도록 스크롤
+            prevSibling.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            // 이전 메시지가 없으면 현재 메시지로 스크롤
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+}
+
 // OFF_TOPIC 응답 렌더링
 function addOffTopicMessage(text) {
     const div = document.createElement('div');
@@ -1226,7 +1241,7 @@ function addOffTopicMessage(text) {
         </div>
     `;
     chatContainer.appendChild(div);
-    scrollToBottom();
+    scrollToMessageTop(div);
 
     // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
 }
@@ -1293,7 +1308,7 @@ function addOutOfScopeMessage(text) {
         </div>
     `;
     chatContainer.appendChild(div);
-    scrollToBottom();
+    scrollToMessageTop(div);
 
     // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
 }
@@ -1447,7 +1462,7 @@ function addNoDataMessage(text) {
         </div>
     `;
     chatContainer.appendChild(div);
-    scrollToBottom();
+    scrollToMessageTop(div);
 
     // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
 }
