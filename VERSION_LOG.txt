@@ -1,0 +1,24 @@
+# 챗봇 버전 로그
+===============================
+
+## v2.1.0 (2026-02-02)
+### 변경사항: 관련 주제 UI 개선 (제미나이 스타일)
+- 불렛포인트 리스트 → 자연스러운 대화체로 변경
+- 💡 관련 주제 섹션 제거
+- 본문 내 **굵은 글씨** 주제를 클릭 가능한 링크로 변환
+- 정렬 문제 완전 해결
+
+### 수정 파일
+- script.js: AI 프롬프트 변경, addFormattedMessage/addNoDataMessage 파싱 로직 수정
+- chat-history.js: addBotMessageToUI 동일하게 수정
+- styles.css: .clickable-topic 스타일 추가
+
+---
+
+## v2.0.0 (이전 버전)
+- Intent Classifier 도입 (MECE 6분류)
+- OUT_OF_SCOPE 검색 활성화
+- topics.json 앵커 주제 시스템
+
+===============================
+백업 폴더: backup_v2_before_intent_classifier/

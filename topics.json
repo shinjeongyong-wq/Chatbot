@@ -1,0 +1,2131 @@
+{
+  "generatedAt": "2026-02-02T09:46:49.846Z",
+  "totalTopics": 197,
+  "categories": [
+    "advanced",
+    "checklist",
+    "hospital-basics",
+    "partners",
+    "portfolio"
+  ],
+  "topics": [
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🏗️ 인테리어 심화편 (1)",
+      "category": "advanced",
+      "subCategory": "interior",
+      "keywords": [
+        "인테리어",
+        "심화편"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🫅 의료기기 미용 편 (1)",
+      "category": "advanced",
+      "subCategory": "medical-device-beauty",
+      "keywords": [
+        "의료기기",
+        "미용"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🦷 의료기기 치과 편 (1)",
+      "category": "advanced",
+      "subCategory": "medical-device-dental",
+      "keywords": [
+        "의료기기",
+        "치과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🩻 의료기기 내과 편 (1)",
+      "category": "advanced",
+      "subCategory": "medical-device-internal",
+      "keywords": [
+        "의료기기",
+        "내과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "💉 의료기기 통증 편 (1)",
+      "category": "advanced",
+      "subCategory": "medical-device-pain",
+      "keywords": [
+        "의료기기",
+        "통증"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⚠️ 간판 심화편 (1)",
+      "category": "advanced",
+      "subCategory": "signage",
+      "keywords": [
+        "간판",
+        "심화편"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "자동화재속보설비 작동 여부",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "자동화재속보설비",
+        "작동",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "자동화재탐지설비",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "자동화재탐지설비"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "소화기 비치 여부",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "소화기",
+        "비치",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "유도등 및 유도표지",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "유도등",
+        "유도표지"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "내부 마감재 방염 처리 여부",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "내부",
+        "마감재",
+        "방염",
+        "처리",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "도면과의 일치 여부",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "도면과의",
+        "일치",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "피난구(비상계단) 도어 개폐 정상 작동 여부",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "피난구",
+        "비상계단",
+        "도어",
+        "개폐",
+        "정상"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "피난경로 확보 여부",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "피난경로",
+        "확보",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "비상방송설비 또는 시각경보기",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "비상방송설비",
+        "또는",
+        "시각경보기"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "비상 콘센트, 누전차단기 작동 여부",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "비상",
+        "콘센트",
+        "누전차단기",
+        "작동",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "입원실 여부",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "입원실",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "전기실 및 EPS실 접근 불가하거나 잠금 상태 아님",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "전기실",
+        "EPS실",
+        "접근",
+        "불가하거나",
+        "잠금"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "계단실/복도 연기감지기 및 비상조명등 작동 상태",
+      "category": "checklist",
+      "subCategory": "facilities",
+      "keywords": [
+        "계단실",
+        "복도",
+        "연기감지기",
+        "비상조명등",
+        "작동"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "주차 요금 체계 ",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "주차",
+        "요금",
+        "체계"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "철거 주체 확인 (양도양수, 미철거 공실)",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "철거",
+        "주체",
+        "확인",
+        "양도양수",
+        "미철거"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "소방 시설",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "소방",
+        "시설"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "기존 내부 급/배수 현황",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "기존",
+        "내부",
+        "배수",
+        "현황"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "인테리어 공사(소음, 일반) 지정 시간대 ",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "인테리어",
+        "공사",
+        "소음",
+        "일반",
+        "지정"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "장애인 주차장",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "장애인",
+        "주차장"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "간판, 각종 광고사인물",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "간판",
+        "각종",
+        "광고사인물"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "바닥 코아 작업 가능 여부 ",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "바닥",
+        "코아",
+        "작업",
+        "가능",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "바닥 종류, 상태, 마감재, 방통",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "바닥",
+        "종류",
+        "상태",
+        "마감재",
+        "방통"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "퇴실 시 원상복구 기준 ",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "퇴실",
+        "원상복구",
+        "기준"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "바닥, 천정 누수 (흔적)",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "바닥",
+        "천정",
+        "누수",
+        "흔적"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "폐기물 / 자재 / 장비 반출입 경로 ",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "폐기물",
+        "자재",
+        "장비",
+        "반출입",
+        "경로"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "냉난방 방식, 증설 ",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "냉난방",
+        "방식",
+        "증설"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "주차 입고 기준",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "주차",
+        "입고",
+        "기준"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "옆/위/아래 기존 임차인 현황",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "아래",
+        "기존",
+        "임차인",
+        "현황"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "기타 시설 파손 여부",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "기타",
+        "시설",
+        "파손",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "장애인 화장실 위치",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "장애인",
+        "화장실",
+        "위치"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "창호 깨짐 여부",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "창호",
+        "깨짐",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "출입구 폐쇄 시간 여부 ",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "출입구",
+        "폐쇄",
+        "시간",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "현재 전기 용량 (차단기)",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "현재",
+        "전기",
+        "용량",
+        "차단기"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "휠체어 경사로",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "휠체어",
+        "경사로"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "의료기관 개설 신고 가능 여부",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "의료기관",
+        "개설",
+        "신고",
+        "가능",
+        "여부"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🧯 소방점검 체크리스트 (1)",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "소방점검",
+        "체크리스트"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🗃️ 행정업무 체크리스트 (원장님용) (1)",
+      "category": "checklist",
+      "subCategory": "general",
+      "keywords": [
+        "행정업무",
+        "체크리스트",
+        "원장님용"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🏠 \n중개팀→플래너팀 부동산 정보 점검표 (1)",
+      "category": "checklist",
+      "subCategory": "regulations",
+      "keywords": [
+        "중개팀",
+        "플래너팀",
+        "부동산",
+        "정보",
+        "점검표"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🪑 가구",
+      "category": "hospital-basics",
+      "subCategory": "during-construction/furniture",
+      "keywords": [
+        "가구"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "클린앤제이",
+      "category": "hospital-basics",
+      "subCategory": "during-construction/infrastructure",
+      "keywords": [
+        "클린앤제이"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "코웨이",
+      "category": "hospital-basics",
+      "subCategory": "during-construction/infrastructure",
+      "keywords": [
+        "코웨이"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🧹 정기청소",
+      "category": "hospital-basics",
+      "subCategory": "during-construction/infrastructure",
+      "keywords": [
+        "정기청소"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🥢 소모품",
+      "category": "hospital-basics",
+      "subCategory": "during-construction/infrastructure",
+      "keywords": [
+        "소모품"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "규수방",
+      "category": "hospital-basics",
+      "subCategory": "during-construction/textiles",
+      "keywords": [
+        "규수방"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "가림",
+      "category": "hospital-basics",
+      "subCategory": "during-construction/textiles",
+      "keywords": [
+        "가림"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🧑‍💼 유니폼",
+      "category": "hospital-basics",
+      "subCategory": "during-construction/textiles",
+      "keywords": [
+        "유니폼"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "닥터사이클린",
+      "category": "hospital-basics",
+      "subCategory": "during-construction/waste",
+      "keywords": [
+        "닥터사이클린"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "📋 행정 업무",
+      "category": "hospital-basics",
+      "subCategory": "post-opening/admin",
+      "keywords": [
+        "행정",
+        "업무"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "💻 EMR & CRM",
+      "category": "hospital-basics",
+      "subCategory": "post-opening/emr-crm",
+      "keywords": [
+        "EMR",
+        "CRM"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🏢 관리 관련 업체 ",
+      "category": "hospital-basics",
+      "subCategory": "post-opening/management",
+      "keywords": [
+        "관리",
+        "관련",
+        "업체"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "💊 네이처파마",
+      "category": "hospital-basics",
+      "subCategory": "post-opening/pharmacy",
+      "keywords": [
+        "네이처파마"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "💊 유원팜",
+      "category": "hospital-basics",
+      "subCategory": "post-opening/pharmacy",
+      "keywords": [
+        "유원팜"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🔧 철거 및 운영 필수 설비",
+      "category": "hospital-basics",
+      "subCategory": "pre-construction/demolition",
+      "keywords": [
+        "철거",
+        "운영",
+        "필수",
+        "설비"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🏠 인테리어 (기본편)",
+      "category": "hospital-basics",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "인테리어",
+        "기본편"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🗣️ 마케팅 업체 (1)",
+      "category": "hospital-basics",
+      "subCategory": "pre-construction/marketing",
+      "keywords": [
+        "마케팅",
+        "업체"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🏥 의료기기 (기본편)",
+      "category": "hospital-basics",
+      "subCategory": "pre-construction/medical-device",
+      "keywords": [
+        "의료기기",
+        "기본편"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🪧 간판 (기본편) ",
+      "category": "hospital-basics",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "간판",
+        "기본편"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "💰 세무",
+      "category": "hospital-basics",
+      "subCategory": "pre-construction/tax-loan",
+      "keywords": [
+        "세무"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "베가스 CRM",
+      "category": "partners",
+      "subCategory": "post-construction/emr-crm",
+      "keywords": [
+        "베가스",
+        "CRM"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "스마트/우노 CRM",
+      "category": "partners",
+      "subCategory": "post-construction/emr-crm",
+      "keywords": [
+        "스마트",
+        "우노",
+        "CRM"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "KOS CRM",
+      "category": "partners",
+      "subCategory": "post-construction/emr-crm",
+      "keywords": [
+        "KOS",
+        "CRM"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "스마트닥터CRM",
+      "category": "partners",
+      "subCategory": "post-construction/emr-crm",
+      "keywords": [
+        "스마트닥터CRM"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "바우스가구",
+      "category": "partners",
+      "subCategory": "post-construction/furniture",
+      "keywords": [
+        "바우스가구"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "오름앤컴퍼니",
+      "category": "partners",
+      "subCategory": "post-construction/furniture",
+      "keywords": [
+        "오름앤컴퍼니"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "UNWIND",
+      "category": "partners",
+      "subCategory": "post-construction/furniture",
+      "keywords": [
+        "UNWIND"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "DS소파",
+      "category": "partners",
+      "subCategory": "post-construction/furniture",
+      "keywords": [
+        "DS소파"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "루벨루테",
+      "category": "partners",
+      "subCategory": "post-construction/furniture",
+      "keywords": [
+        "루벨루테"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "메종비퍼니처",
+      "category": "partners",
+      "subCategory": "post-construction/furniture",
+      "keywords": [
+        "메종비퍼니처"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "플랜티",
+      "category": "partners",
+      "subCategory": "post-construction/marketing",
+      "keywords": [
+        "플랜티"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "부산은행",
+      "category": "partners",
+      "subCategory": "pre-construction/bank",
+      "keywords": [
+        "부산은행"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "[하나은행] 닥터플래티늄",
+      "category": "partners",
+      "subCategory": "pre-construction/bank",
+      "keywords": [
+        "하나은행",
+        "닥터플래티늄"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "[경남은행] 메디칼론",
+      "category": "partners",
+      "subCategory": "pre-construction/bank",
+      "keywords": [
+        "경남은행",
+        "메디칼론"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "BUD",
+      "category": "partners",
+      "subCategory": "pre-construction/homepage",
+      "keywords": [
+        "BUD"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "원프레임",
+      "category": "partners",
+      "subCategory": "pre-construction/homepage",
+      "keywords": [
+        "원프레임"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "파인애플피티엘",
+      "category": "partners",
+      "subCategory": "pre-construction/homepage",
+      "keywords": [
+        "파인애플피티엘"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "YourDev:유어데브",
+      "category": "partners",
+      "subCategory": "pre-construction/homepage",
+      "keywords": [
+        "YourDev",
+        "유어데브"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "무아디자인",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "무아디자인"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "JWC그룹",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "JWC그룹"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "플럭스",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "플럭스"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "플랜디자인",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "플랜디자인"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "네스트디자인 ",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "네스트디자인"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "톤앤무드",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "톤앤무드"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "인투익스",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "인투익스"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "씨투와이",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "씨투와이"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "써드스페이스",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "써드스페이스"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "메이드바이",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "메이드바이"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "더 코나 메디스페이스",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "코나",
+        "메디스페이스"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🛠️ 오픈닥터 인테리어 파트너사 (1)",
+      "category": "partners",
+      "subCategory": "pre-construction/interior",
+      "keywords": [
+        "오픈닥터",
+        "인테리어",
+        "파트너사"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "LG U+",
+      "category": "partners",
+      "subCategory": "pre-construction/pc-network",
+      "keywords": [
+        "LG"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "KT (내부용)",
+      "category": "partners",
+      "subCategory": "pre-construction/pc-network",
+      "keywords": [
+        "KT",
+        "내부용"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "SK쉴더스(ADT캡스)",
+      "category": "partners",
+      "subCategory": "pre-construction/pc-network",
+      "keywords": [
+        "SK쉴더스",
+        "ADT캡스"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "덴탈컴넷",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "덴탈컴넷"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "중앙정보기술",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "중앙정보기술"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "LS디자인",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "LS디자인"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "더프라임",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "더프라임"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "디온에이(D.on.A)",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "디온에이",
+        "on"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "동부기업",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "동부기업"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "디자인캐프",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "디자인캐프"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "📊 CRM/EMR 파트너사 (원장님용) (1)",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "CRM",
+        "EMR",
+        "파트너사",
+        "원장님용"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "💪 중후반  프로세스 파트너사 (원장님용) (1)",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "중후반",
+        "프로세스",
+        "파트너사",
+        "원장님용"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "💺 오픈닥터 가구 파트너사 (1)",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "오픈닥터",
+        "가구",
+        "파트너사"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🖥️ 오픈닥터 PC&네트워크, 통신&보안 파트너사 (1)",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "오픈닥터",
+        "PC",
+        "네트워크",
+        "통신",
+        "보안"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🏠 오픈닥터 홈페이지 파트너사 (1)",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "오픈닥터",
+        "홈페이지",
+        "파트너사"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🚧 오픈닥터 간판 파트너사 (1)",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "오픈닥터",
+        "간판",
+        "파트너사"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "🏦 은행 파트너사 (원장님용) (1)",
+      "category": "partners",
+      "subCategory": "pre-construction/signage",
+      "keywords": [
+        "은행",
+        "파트너사",
+        "원장님용"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 레지움피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "레지움피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 디오레의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "디오레의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 핀트성형외과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "핀트성형외과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 레지움피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "레지움피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 룬피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "룬피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 셀리에의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "셀리에의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 프라임영상의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "프라임영상의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 레지움피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "레지움피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 셀리에의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "셀리에의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 프라임영상의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "프라임영상의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 신촌연세재활의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "신촌연세재활의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 프라임영상의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "프라임영상의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 서울린치과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "서울린치과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 핀트성형외과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "핀트성형외과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 신촌연세재활의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "신촌연세재활의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 라인드치과교정과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "라인드치과교정과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 셀리에의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "셀리에의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 경희유연한의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "경희유연한의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 레지움피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "레지움피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 룬피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "룬피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 바다치과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "바다치과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 프라임영상의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "프라임영상의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 레지움피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "레지움피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 셀리에의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "셀리에의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 핀트성형외과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "핀트성형외과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 룬피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "룬피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 라인드치과교정과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "라인드치과교정과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 강한서울정형외과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "강한서울정형외과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 셀리에의원-쇼파",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "셀리에의원",
+        "쇼파"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 레지움피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "레지움피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 셀리에의원-작품스타일링제작",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "셀리에의원",
+        "작품스타일링제작"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 아차산마루마취통증의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "아차산마루마취통증의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 라인드치과교정과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "라인드치과교정과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 핀트성형외과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "핀트성형외과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 레지움피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "레지움피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 분당새로이치과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "분당새로이치과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 턱투미구강내과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "턱투미구강내과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 셀리에의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "셀리에의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 분당새로이치과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "분당새로이치과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 서울사려깊은치과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "서울사려깊은치과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 라인드치과교정과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "라인드치과교정과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 연세그대로치과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "연세그대로치과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 아차산마루마취통증의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "아차산마루마취통증의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 룬피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "룬피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 핀트성형외과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "핀트성형외과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 경희유연한의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "경희유연한의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 디오레의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "디오레의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 라인드치과교정과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "라인드치과교정과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 아차산마루마취통증의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "아차산마루마취통증의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 신촌연세재활의학과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "신촌연세재활의학과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 턱투미구강내과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "턱투미구강내과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 서울사려깊은치과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "서울사려깊은치과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 메인비뇨의학과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "메인비뇨의학과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 연세튼튼재활의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "연세튼튼재활의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 리스토리성형외과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "리스토리성형외과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 레지움피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "레지움피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 서울린교정치과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "서울린교정치과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 분당새로이치과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "분당새로이치과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 연세그대로치과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "연세그대로치과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 룬피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "룬피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 상동척척연합의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "상동척척연합의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 강한서울정형외과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "강한서울정형외과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 셀리에의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "셀리에의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 연세튼튼재활의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "연세튼튼재활의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 프라임영상의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "프라임영상의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 경희유연한의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "경희유연한의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 구리사암한의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "구리사암한의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 레지움피부과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "레지움피부과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 신촌연세재활의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "신촌연세재활의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 이젠스마일치과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "이젠스마일치과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 신촌연세재활의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "신촌연세재활의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 서울든든한치과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "서울든든한치과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 수유바로본의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "수유바로본의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 프라임영상의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "프라임영상의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 삼성스마트신경과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "삼성스마트신경과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 아차산마루마취통증의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "아차산마루마취통증의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 연세튼튼재활의학과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "연세튼튼재활의학과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 상동척척연합의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "상동척척연합의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 라인드치과교정과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "라인드치과교정과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 강한서울정형외과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "강한서울정형외과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 이젠스마일치과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "이젠스마일치과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 룬피부과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "룬피부과의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 벨리스성수의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "벨리스성수의원"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 턱투미구강내과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "턱투미구강내과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 연세그대로치과",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "연세그대로치과"
+      ],
+      "source": "notion"
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "title": "⭐ 분당새로이치과의원",
+      "category": "portfolio",
+      "subCategory": "customers",
+      "keywords": [
+        "분당새로이치과의원"
+      ],
+      "source": "notion"
+    }
+  ]
+}

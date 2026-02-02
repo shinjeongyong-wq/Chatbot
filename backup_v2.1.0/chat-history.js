@@ -598,27 +598,18 @@ function addBotMessageToUI(content) {
     const chatContainer = document.getElementById('chatContainer');
     if (!chatContainer) return;
 
-
-    // 0. [RELATED_TOPICS] 블록 추출 및 제거 (파이프 + 불렛 둘 다 지원)
+    // 0. [RELATED_TOPICS] 블록 추출 및 제거 (파이프 구분 형식)
     let relatedTopics = [];
-    const topicsMatch = content.match(/\[RELATED_TOPICS\]([\s\S]*?)\[\/RELATED_TOPICS\]/);
+    const topicsMatch = content.match(/\[RELATED_TOPICS\](.*?)\[\/RELATED_TOPICS\]/);
     if (topicsMatch) {
         const topicsBlock = topicsMatch[1].trim();
-        // 파이프(|)가 있으면 파이프로 분리, 없으면 줄바꿈+불렛으로 분리
-        if (topicsBlock.includes('|')) {
-            relatedTopics = topicsBlock
-                .split('|')
-                .map(topic => topic.trim())
-                .filter(topic => topic.length > 0);
-        } else {
-            // 기존 형식: 줄바꿈 + 불렛(-, •, *)
-            relatedTopics = topicsBlock
-                .split('\n')
-                .map(line => line.replace(/^[-•*]\s*/, '').trim())
-                .filter(line => line.length > 0);
-        }
+        // 파이프(|)로 구분된 주제들 추출
+        relatedTopics = topicsBlock
+            .split('|')
+            .map(topic => topic.trim())
+            .filter(topic => topic.length > 0);
         // 본문에서 [RELATED_TOPICS] 블록 제거
-        content = content.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
+        content = content.replace(/\[RELATED_TOPICS\].*?\[\/RELATED_TOPICS\]/, '').trim();
     }
 
     // 마크다운 → HTML 변환 (script.js의 addFormattedMessage와 동일한 로직)

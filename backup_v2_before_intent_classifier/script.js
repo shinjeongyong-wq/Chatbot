@@ -5,26 +5,6 @@ const CONFIG = {
     CHAT_ENDPOINT: '/api/chat'
 };
 
-// ★ 앵커 주제 (topics.json에서 로드) ★
-let anchorTopics = [];
-
-// topics.json 로드
-async function loadAnchorTopics() {
-    try {
-        const response = await fetch('/data/topics.json');
-        if (response.ok) {
-            const data = await response.json();
-            anchorTopics = data.topics || [];
-            console.log(`✅ 앵커 주제 ${anchorTopics.length}개 로드 완료`);
-        }
-    } catch (error) {
-        console.error('앵커 주제 로드 실패:', error);
-    }
-}
-
-// 페이지 로드 시 앵커 주제 로드
-loadAnchorTopics();
-
 // ★ Phase 4: 진료과별 키워드 확장 ★
 const SPECIALTIES = {
     '통증': {
@@ -326,48 +306,6 @@ function extractMentionedKeywords() {
     return result;
 }
 
-// ★ 사용자 질문과 관련된 앵커 주제 찾기 ★
-function findRelatedAnchorTopics(userMessage, count = 3) {
-    if (!anchorTopics || anchorTopics.length === 0) {
-        return [];
-    }
-
-    const message = userMessage.toLowerCase();
-
-    // 각 주제별 관련도 점수 계산
-    const scored = anchorTopics.map(topic => {
-        let score = 0;
-        const question = topic.question.toLowerCase();
-        const category = topic.category.toLowerCase();
-        const subCategory = (topic.subCategory || '').toLowerCase();
-
-        // 카테고리 매칭
-        if (message.includes(category)) score += 3;
-        if (message.includes(subCategory)) score += 2;
-
-        // 질문 키워드 매칭
-        const questionWords = question.split(/[\s/]+/).filter(w => w.length > 1);
-        questionWords.forEach(word => {
-            if (message.includes(word)) score += 1;
-        });
-
-        // 메시지 키워드가 질문에 있는지
-        const messageWords = message.split(/[\s/]+/).filter(w => w.length > 1);
-        messageWords.forEach(word => {
-            if (question.includes(word)) score += 1;
-        });
-
-        return { question: topic.question, score };
-    });
-
-    // 점수순 정렬 후 상위 N개 선택
-    return scored
-        .filter(t => t.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, count)
-        .map(t => t.question);
-}
-
 // ★★★ 고유명사(업체명/엔티티) 강제 포함 함수 ★★★
 // 질문에 특정 고유명사가 언급되면 해당 문서를 강제로 포함시킴
 function findForcedDocsByCompanyName(userMessage, allDocs) {
@@ -457,18 +395,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderFAQFields();
     } catch (error) {
         console.error('Initial Load Error:', error);
-    }
-
-    // topics.json 로드 (앵커 주제)
-    try {
-        const topicsResponse = await fetch('/data/topics.json');
-        if (topicsResponse.ok) {
-            const topicsData = await topicsResponse.json();
-            anchorTopics = topicsData.topics || [];
-            console.log(`✅ 앵커 주제 로드 완료: ${anchorTopics.length}개`);
-        }
-    } catch (error) {
-        console.warn('topics.json 로드 실패:', error);
     }
     setupEventListeners();
 });
@@ -641,54 +567,9 @@ async function getBotResponse(userMessage) {
                     queryPlan = planResult.plan;
                     console.log('✅ Query Plan 수신:', queryPlan);
                     console.log('   Intent:', queryPlan.intent);
-                    console.log('   RequiresSearch:', queryPlan.requiresSearch);
                     console.log('   Planner:', planResult.modelName);
 
-                    // ★ MECE 6분류 기반 분기 처리 ★
-                    if (queryPlan.requiresSearch === false && queryPlan.directAnswer) {
-                        // 검색 불필요: 즉시 답변 출력 후 종료
-                        hideTypingIndicator();
-
-                        // Intent별 스타일 적용
-                        const intentStyles = {
-                            'GREETING': { icon: '👋', style: 'greeting' },
-                            'ABUSE': { icon: '🚫', style: 'warning' },
-                            'OFF_TOPIC': { icon: '💬', style: 'info' },
-                            'OUT_OF_SCOPE': { icon: '📞', style: 'referral' },
-                            'AMBIGUOUS': { icon: '❓', style: 'clarification' }
-                        };
-
-                        const intentInfo = intentStyles[queryPlan.intent] || { icon: '💡', style: 'default' };
-                        console.log(`🎯 [${queryPlan.intent}] 검색 스킵, 즉시 답변 출력`);
-
-                        // ★ OUT_OF_SCOPE 전용 처리: 플래너 연결 버튼 포함 UI ★
-                        if (queryPlan.intent === 'OUT_OF_SCOPE') {
-                            addOutOfScopeMessage(queryPlan.directAnswer);
-                        } else if (queryPlan.intent === 'AMBIGUOUS') {
-                            // ★ AMBIGUOUS 전용 처리: 관련 주제 추천 ★
-                            const relatedTopics = findRelatedAnchorTopics(userMessage, 5);
-                            let responseWithTopics = queryPlan.directAnswer;
-                            if (relatedTopics.length > 0) {
-                                responseWithTopics += '\n\n[RELATED_TOPICS]\n' + relatedTopics.map(t => `- ${t}`).join('\n') + '\n[/RELATED_TOPICS]';
-                            }
-                            addFormattedMessage(responseWithTopics, []);
-                        } else {
-                            // 다른 intent는 일반 포맷 메시지
-                            addFormattedMessage(queryPlan.directAnswer, []);
-                        }
-
-                        // ChatMemory에 저장 (맥락 유지용)
-                        await chatMemory.addTurn(userMessage, queryPlan.directAnswer);
-
-                        // Supabase 저장 (user는 sendUserMessage에서 이미 저장됨)
-                        if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-                            window.chatHistory.saveMessage('assistant', queryPlan.directAnswer).catch(() => { });
-                        }
-
-                        return; // ★ 검색 로직 완전 스킵 ★
-                    }
-
-                    // 기존 off_topic 호환성 유지 (혹시 모를 레거시 응답 대응)
+                    // Off-topic 체크
                     if (queryPlan.intent === 'off_topic') {
                         hideTypingIndicator();
                         addOffTopicMessage('죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다.');
@@ -701,12 +582,11 @@ async function getBotResponse(userMessage) {
         }
 
         // ========== Stage 2: Smart Search ==========
-        // (SPECIFIC intent만 여기까지 도달)
         updateTypingStatus('데이터베이스에서 최적의 정보를 검색하고 있습니다...');
         console.log('🔍 Stage 2: Smart Search 시작...');
 
         // 성능 최적화: 검색 결과 한도 조정 (파트너사 15개로 확대)
-        const isPartnerListQuery = queryPlan?.subIntent === '파트너사목록' || queryPlan?.targetCategory === 'partners';
+        const isPartnerListQuery = queryPlan?.intent === '파트너사목록' || queryPlan?.targetCategory === 'partners';
         const maxResults = isPartnerListQuery ? 15 : 30;
 
         if (queryPlan) {
@@ -784,15 +664,9 @@ async function getBotResponse(userMessage) {
         }
 
         // 대화 히스토리에 저장 (맥락 유지 + 요약 자동 트리거)
+        // 대화 히스토리에 저장 (맥락 유지 + 요약 자동 트리거)
         // 텍스트를 자르지 않고 저장하여 나중에 키워드 추출 시 누락이 없도록 함
         chatMemory.addTurn(userMessage, responseText);
-
-        // Supabase에 AI 응답 저장 (user는 sendUserMessage에서 이미 저장됨)
-        if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-            window.chatHistory.saveMessage('assistant', responseText).catch(err => {
-                console.warn('AI 응답 DB 저장 실패:', err);
-            });
-        }
 
     } catch (error) {
         console.error('Bot Response Error:', error);
@@ -907,13 +781,15 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **중요**: [OFF_TOPIC] 사용 시 다른 긴 설명이나 인용을 절대 포함하지 마세요.
 
 6. 사용자가 요청한 **구체적인 정보(예: 금액, 수치, 리스트 등)**가 참고문서에 없거나 부족한 경우 → '[NO_DATA]' 태그와 함께 **아래 형식을 정확히** 따르세요:
-   - **형식**: (1) 감사/사과 문단 → (빈 줄) → (2) 고정 안내 문구 → (빈 줄) → (3) [RELATED_TOPICS] 블록
+   - **형식**: (1) 감사/사과 문단 → (빈 줄) → (2) "원하시면, 아래 내용들을 더 자세히 알려드릴 수 있습니다" → (빈 줄) → (3) 불렛 리스트 → (빈 줄) → (4) 아래의 고정 안내 문구
    - **고정 안내 문구**: "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
-   - **⚠️ 중요 규칙**:
-     - **본문에 불렛포인트(*, -, •)로 추천 주제를 나열하지 마세요!** 
-     - 관련 주제는 반드시 답변 맨 끝의 [RELATED_TOPICS] 블록에만 작성하세요.
-     - **[NO_DATA] 응답에서는 [ID: n] 인용을 절대 사용하지 마세요.**
+   - **규칙**:
+     - **[NO_DATA] 응답에서는 [ID: n] 인용을 절대 사용하지 마세요.** 불렛 리스트에도 인용 금지입니다.
+     - **고정 안내 문구는 답변에서 딱 1번만 사용하세요.** 시스템이 버튼을 별도로 추가하므로 중복되지 않게 주의하세요.
      - 인용 번호 수동 생성 금지 및 상투적인 맺음말("성공적인 개원~")을 절대 사용하지 마세요.
+     - 리스트 항목(* 키워드)과 고정 안내 문구 사이에는 반드시 빈 줄을 하나 넣으세요.
+     - 불렛 기호(*) 뒤에는 반드시 공백 한 칸을 두세요. 
+     - 답변 본문에 "플래너에게 직접 문의하세요" 같은 다른 변형 문구는 쓰지 말고 위의 고정 안내 문구만 쓰세요.
 
 # 출처 인용 규칙 (매우 중요!)
 1. **인용 방식 (ID 필수)**: 답변의 각 사실 정보 뒤에는 해당 정보의 출처인 참고문서의 ID를 **[ID: n]** 형식으로 반드시 표시하세요. (예: 닥터사이클린은 환경부 공식 지정 업체입니다 [ID: 0]). 
@@ -921,43 +797,12 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 3. **ID 중복 금지**: 한 단락 내에서 같은 ID가 반복되어 가독성을 해치지 않도록 하세요. 
 4. **하단 요약 금지 (CRITICAL)**: 답변 가장 아랫부분에 별도로 '참고문서' 리스트를 만들거나 ID를 모아서 나열하지 마세요. 주석은 본문 안에만 존재해야 합니다.
 
+# 답변 형식
 - **가독성 최우선**: 각 리스트 항목(1. 2. 3...) 사이와 주요 섹션 사이에는 반드시 **빈 줄(Double Line Break)**을 추가하여 답변이 빽빽해 보이지 않게 하세요.
 - **볼드체 활용**: 업체명, 평당가, 주요 특징 등 핵심 정보는 **볼드체**를 사용하여 시인성을 높이세요.
 - 줄바꿈을 적절히 사용하여 하나의 텍스트 덩어리가 너무 크지 않게 조절하세요.
 - 정중하고 전문적인 말투 (~요, ~습니다)
-- 자연스러운 맺음말로 답변을 마무리하고, 그 뒤에 어떠한 참고문서 목록도 덧붙이지 마세요.
-
-# 관련 주제 추천 (필수)
-**답변 작성 후, 반드시 아래 규칙대로 관련 주제를 추천하세요.**
-
-[사용 가능한 주제 목록 - 아래 목록에서 **글자 그대로 복사**해서 사용하세요]
-${anchorTopics.map(t => `- ${t.question}`).join('\n')}
-
-**⚠️ 중요 규칙:**
-1. **반드시 위 목록에 있는 질문을 글자 그대로 복사**하세요. 단어 하나도 바꾸지 마세요.
-2. 목록에 없는 질문은 **절대 추천하지 마세요**. 임의로 만들면 안 됩니다.
-3. 현재 답변과 관련있는 주제 2~3개를 선택하세요.
-4. 방금 답변한 내용과 동일한 질문은 제외하세요.
-5. **자연스러운 대화체로 추천**하세요. 아래 형식을 **정확히** 따르세요:
-
-**형식:**
-\`\`\`
-[RELATED_TOPICS]주제1|주제2|주제3[/RELATED_TOPICS]
-
-원장님, 혹시 **주제1**이나 **주제2**에 대해서도 궁금하신가요? 언제든 물어보세요!
-\`\`\`
-
-**예시:**
-\`\`\`
-[RELATED_TOPICS]인테리어 평당가 얼마나 하나요?|인테리어 절차가 어떻게 되나요?|인테리어 업체 추천해주세요[/RELATED_TOPICS]
-
-원장님, 혹시 **인테리어 평당가**나 **인테리어 절차**에 대해서도 궁금하신가요? 언제든 물어보세요!
-\`\`\`
-
-**주의:**
-- [RELATED_TOPICS] 블록은 한 줄로 작성하고, 주제는 파이프(|)로 구분하세요.
-- 본문에서는 주제를 **굵은 글씨**로 감싸서 자연스럽게 문장에 녹여내세요.
-- 주제를 축약하지 말고 정확한 질문 텍스트를 사용하세요.`;
+- 자연스러운 맺음말로 답변을 마무리하고, 그 뒤에 어떠한 참고문서 목록도 덧붙이지 마세요.`;
 
 
     try {
@@ -1018,28 +863,6 @@ function addFormattedMessage(text, contexts, modelName = null) {
     const div = document.createElement('div');
     div.className = 'message bot';
 
-    // 0. [RELATED_TOPICS] 블록 추출 및 제거 (파이프 + 불렛 둘 다 지원)
-    let relatedTopics = [];
-    const topicsMatch = text.match(/\[RELATED_TOPICS\]([\s\S]*?)\[\/RELATED_TOPICS\]/);
-    if (topicsMatch) {
-        const topicsBlock = topicsMatch[1].trim();
-        // 파이프(|)가 있으면 파이프로 분리, 없으면 줄바꿈+불렛으로 분리
-        if (topicsBlock.includes('|')) {
-            relatedTopics = topicsBlock
-                .split('|')
-                .map(topic => topic.trim())
-                .filter(topic => topic.length > 0);
-        } else {
-            // 기존 형식: 줄바꿈 + 불렛(-, •, *)
-            relatedTopics = topicsBlock
-                .split('\n')
-                .map(line => line.replace(/^[-•*]\s*/, '').trim())
-                .filter(line => line.length > 0);
-        }
-        // 본문에서 [RELATED_TOPICS] 블록 제거
-        text = text.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
-    }
-
     // 1. [ID: n] 형식의 주석 파싱 및 재정렬
     let processedText = text;
     // [ID: 0], [ID: 1] 혹은 [ID:0] 형식을 모두 잡는 정규식
@@ -1087,19 +910,7 @@ function addFormattedMessage(text, contexts, modelName = null) {
     html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul class="response-list">$1</ul>');
     html = html.replace(/<\/ul><br>?<ul class="response-list">/g, '');
 
-    // 3. 관련 주제를 클릭 가능한 링크로 변환
-    // 본문의 **주제**를 찾아서 클릭 가능하게 만듦
-    if (relatedTopics.length > 0) {
-        relatedTopics.forEach(topic => {
-            // **주제** 형태의 굵은 글씨를 클릭 가능한 링크로 변환
-            const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
-            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
-            html = html.replace(regex, clickableLink);
-        });
-    }
-
-    // 4. [1], [2] 주석을 툴팁 HTML로 최종 변환
+    // 3. [1], [2] 주석을 툴팁 HTML로 최종 변환
     // 번호가 큰 것부터 치환하여 중복 매칭 방지
     const sortedNewNums = Object.values(idToNewNumMap).sort((a, b) => b - a);
 
@@ -1116,10 +927,10 @@ function addFormattedMessage(text, contexts, modelName = null) {
         html = html.replace(regex, citationHtml);
     });
 
-    // 5. 사용한 모델명 표시
+    // 4. 사용한 모델명 표시
     const modelInfo = modelName ? `<div class="model-info">🤖 ${modelName}</div>` : '';
 
-    // 6. 피드백 버튼 + 복사 버튼 추가
+    // 5. 피드백 버튼 + 복사 버튼 추가
     const messageId = Date.now();
     const feedbackButtons = `
         <div class="feedback-buttons" data-message-id="${messageId}">
@@ -1144,21 +955,12 @@ function addFormattedMessage(text, contexts, modelName = null) {
     chatContainer.appendChild(div);
     scrollToBottom();
 
-    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
-}
-
-// 관련 주제 버튼 클릭 시 해당 질문 자동 전송
-function sendRelatedTopic(topic) {
-    // topics.json에 있는 질문인지 확인
-    const isValidTopic = anchorTopics.some(t => t.question === topic);
-    if (!isValidTopic) {
-        console.warn('유효하지 않은 앵커 주제:', topic);
-        return;
+    // Supabase에 AI 응답 저장 (chat-history.js)
+    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+        window.chatHistory.saveMessage('assistant', text).catch(err => {
+            console.warn('AI 응답 DB 저장 실패:', err);
+        });
     }
-
-    // 입력창에 질문 넣고 전송
-    userInput.value = topic;
-    sendUserMessage(topic);
 }
 
 function escapeHtml(text) {
@@ -1228,102 +1030,16 @@ function addOffTopicMessage(text) {
     chatContainer.appendChild(div);
     scrollToBottom();
 
-    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
-}
-
-// OUT_OF_SCOPE 응답 렌더링 (플래너 연결 버튼 포함)
-function addOutOfScopeMessage(text) {
-    const div = document.createElement('div');
-    div.className = 'message bot';
-
-    // 피드백 버튼용 ID 생성 및 데이터 저장
-    const messageId = Date.now();
-    const feedbackButtons = `
-        <div class="feedback-buttons" data-message-id="${messageId}">
-            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
-            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
-        </div>
-    `;
-
-    window.lastMessages = window.lastMessages || {};
-    window.lastMessages[messageId] = {
-        question: window.currentQuestion || '',
-        answer: text.substring(0, 500)
-    };
-
-    // 고정 메시지 (친절한 톤 + 답변 가능 영역 안내)
-    const fixedMessage = `
-        <p style="margin-bottom: 12px; line-height: 1.7;">
-            해당 내용은 전문적인 지식이 필요한 영역이라, 저보다 담당 플래너에게 문의하시는 것이 가장 정확합니다. 😊
-        </p>
-        <p style="margin-bottom: 8px; line-height: 1.7;">
-            대신 저는 아래 내용에 대해 답변드릴 수 있어요!
-        </p>
-        <ul style="margin: 0 0 16px 24px; padding: 0; color: #475569; line-height: 1.8;">
-            <li>🎨 인테리어, 간판, 의료기기 파트너사 추천</li>
-            <li>📋 개원 절차 및 체크리스트 안내</li>
-            <li>💡 진료과별 개원 팁 및 가이드</li>
-        </ul>
-        <p style="margin-bottom: 16px; line-height: 1.7; color: #64748b;">
-            플래너 연결을 원하시면 아래 버튼을 눌러주세요. 빠른 시일 내에 회신드리겠습니다.
-        </p>
-    `;
-
-    div.innerHTML = `
-        <div class="message-avatar">AI</div>
-        <div class="message-content formatted-response">
-            ${fixedMessage}
-            <button class="contact-planner-btn" onclick="openContactModal()" style="
-                background-color: #536db1;
-                color: white;
-                border: none;
-                padding: 12px 24px;
-                border-radius: 8px;
-                font-weight: 600;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                transition: background 0.2s;
-                margin-bottom: 16px;
-            ">
-                <span style="font-size: 16px;">📞</span> 플래너에게 연결하기
-            </button>
-            ${feedbackButtons}
-        </div>
-    `;
-    chatContainer.appendChild(div);
-    scrollToBottom();
-
-    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
+    // Supabase 저장
+    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+        window.chatHistory.saveMessage('assistant', text).catch(() => { });
+    }
 }
 
 // NO_DATA 응답 렌더링 (볼드체, 불렛 포인트 지원 + 플래너 연락 버튼)
 function addNoDataMessage(text) {
     const div = document.createElement('div');
     div.className = 'message bot';
-
-    // 0. [RELATED_TOPICS] 블록 추출 및 제거 (파이프 + 불렛 둘 다 지원)
-    let relatedTopics = [];
-    const topicsMatch = text.match(/\[RELATED_TOPICS\]([\s\S]*?)\[\/RELATED_TOPICS\]/);
-    if (topicsMatch) {
-        const topicsBlock = topicsMatch[1].trim();
-        // 파이프(|)가 있으면 파이프로 분리, 없으면 줄바꿈+불렛으로 분리
-        if (topicsBlock.includes('|')) {
-            relatedTopics = topicsBlock
-                .split('|')
-                .map(topic => topic.trim())
-                .filter(topic => topic.length > 0);
-        } else {
-            // 기존 형식: 줄바꿈 + 불렛(-, •, *)
-            relatedTopics = topicsBlock
-                .split('\n')
-                .map(line => line.replace(/^[-•*]\s*/, '').trim())
-                .filter(line => line.length > 0);
-        }
-        // 본문에서 [RELATED_TOPICS] 블록 제거
-        text = text.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
-    }
 
     // 1. 인용 번호 제거 ([숫자], [ID: 숫자] 형식 모두)
     let cleanedText = text.replace(/\[\d+\]/g, '').replace(/\[ID:\s*\d+\]/gi, '').trim();
@@ -1392,20 +1108,9 @@ function addNoDataMessage(text) {
         htmlParts.push(`<ul style="margin: 16px 0; padding-left: 48px; list-style-type: disc;">${listItems.join('')}</ul>`);
     }
 
-    let html = htmlParts.join('');
+    const html = htmlParts.join('');
 
-    // 6. 관련 주제를 클릭 가능한 링크로 변환
-    if (relatedTopics.length > 0) {
-        relatedTopics.forEach(topic => {
-            // **주제** 형태의 굵은 글씨를 클릭 가능한 링크로 변환
-            const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
-            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
-            html = html.replace(regex, clickableLink);
-        });
-    }
-
-    // 7. 피드백 버튼용 ID 생성 및 데이터 저장
+    // 피드백 버튼용 ID 생성 및 데이터 저장
     const messageId = Date.now();
     const feedbackButtons = `
         <div class="feedback-buttons" data-message-id="${messageId}">
@@ -1449,7 +1154,10 @@ function addNoDataMessage(text) {
     chatContainer.appendChild(div);
     scrollToBottom();
 
-    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
+    // Supabase 저장
+    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+        window.chatHistory.saveMessage('assistant', text).catch(() => { });
+    }
 }
 
 // ========== 답변 복사 기능 ==========

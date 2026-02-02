@@ -1,0 +1,639 @@
+{
+    "category": "anchor-topics",
+    "itemCount": 70,
+    "lastUpdated": "2026-02-02T18:57:00.000Z",
+    "topics": [
+        {
+            "id": 1,
+            "category": "인테리어",
+            "subCategory": "기본",
+            "question": "인테리어 업체 추천해주세요",
+            "dataSource": [
+                "partners/pre-construction/interior.json"
+            ]
+        },
+        {
+            "id": 2,
+            "category": "인테리어",
+            "subCategory": "기본",
+            "question": "인테리어 평당가 얼마나 하나요?",
+            "dataSource": [
+                "partners/pre-construction/interior.json"
+            ]
+        },
+        {
+            "id": 3,
+            "category": "인테리어",
+            "subCategory": "기본",
+            "question": "인테리어 절차가 어떻게 되나요?",
+            "dataSource": [
+                "hospital-basics/pre-construction/interior.json"
+            ]
+        },
+        {
+            "id": 4,
+            "category": "인테리어",
+            "subCategory": "기본",
+            "question": "치과 인테리어 잘하는 업체 있나요?",
+            "dataSource": [
+                "partners/pre-construction/interior.json"
+            ]
+        },
+        {
+            "id": 5,
+            "category": "인테리어",
+            "subCategory": "기본",
+            "question": "피부과/미용 인테리어 추천",
+            "dataSource": [
+                "partners/pre-construction/interior.json"
+            ]
+        },
+        {
+            "id": 6,
+            "category": "인테리어",
+            "subCategory": "기본",
+            "question": "먹미팅이 뭔가요?",
+            "dataSource": [
+                "hospital-basics/pre-construction/interior.json"
+            ]
+        },
+        {
+            "id": 7,
+            "category": "인테리어",
+            "subCategory": "기본",
+            "question": "마감재 미팅에서 뭘 결정하나요?",
+            "dataSource": [
+                "hospital-basics/pre-construction/interior.json"
+            ]
+        },
+        {
+            "id": 8,
+            "category": "인테리어",
+            "subCategory": "기본",
+            "question": "인테리어 공사 기간 얼마나 걸리나요?",
+            "dataSource": [
+                "hospital-basics/pre-construction/interior.json"
+            ]
+        },
+        {
+            "id": 9,
+            "category": "인테리어",
+            "subCategory": "기본",
+            "question": "하자 점검 어떻게 하나요?",
+            "dataSource": [
+                "hospital-basics/pre-construction/interior.json"
+            ]
+        },
+        {
+            "id": 10,
+            "category": "인테리어",
+            "subCategory": "심화",
+            "question": "실내건축공사업면허가 뭔가요?",
+            "dataSource": [
+                "advanced/interior.json"
+            ]
+        },
+        {
+            "id": 11,
+            "category": "인테리어",
+            "subCategory": "심화",
+            "question": "견적서 구성은 어떻게 되나요?",
+            "dataSource": [
+                "advanced/interior.json"
+            ]
+        },
+        {
+            "id": 12,
+            "category": "인테리어",
+            "subCategory": "심화",
+            "question": "계약서에서 확인해야 할 것들",
+            "dataSource": [
+                "advanced/interior.json"
+            ]
+        },
+        {
+            "id": 13,
+            "category": "인테리어",
+            "subCategory": "심화",
+            "question": "우수내시경실 인증이 뭔가요?",
+            "dataSource": [
+                "advanced/interior.json"
+            ]
+        },
+        {
+            "id": 14,
+            "category": "인테리어",
+            "subCategory": "심화",
+            "question": "전력량 검토 방법",
+            "dataSource": [
+                "advanced/interior.json"
+            ]
+        },
+        {
+            "id": 15,
+            "category": "철거/기반설비",
+            "subCategory": "기본",
+            "question": "철거 비용 얼마나 드나요?",
+            "dataSource": [
+                "hospital-basics/pre-construction/demolition.json"
+            ]
+        },
+        {
+            "id": 16,
+            "category": "철거/기반설비",
+            "subCategory": "기본",
+            "question": "전유부/공용부 차이가 뭔가요?",
+            "dataSource": [
+                "checklist/general.json"
+            ]
+        },
+        {
+            "id": 17,
+            "category": "철거/기반설비",
+            "subCategory": "기본",
+            "question": "냉난방 설비 확인할 것들",
+            "dataSource": [
+                "hospital-basics/pre-construction/demolition.json"
+            ]
+        },
+        {
+            "id": 18,
+            "category": "철거/기반설비",
+            "subCategory": "기본",
+            "question": "공조덕트가 뭔가요?",
+            "dataSource": [
+                "hospital-basics/pre-construction/demolition.json"
+            ]
+        },
+        {
+            "id": 19,
+            "category": "행정업무",
+            "subCategory": "기본",
+            "question": "개설신고 절차가 어떻게 되나요?",
+            "dataSource": [
+                "hospital-basics/post-opening/admin.json"
+            ]
+        },
+        {
+            "id": 20,
+            "category": "행정업무",
+            "subCategory": "기본",
+            "question": "보건소 실사 준비 사항",
+            "dataSource": [
+                "hospital-basics/post-opening/admin.json"
+            ]
+        },
+        {
+            "id": 21,
+            "category": "행정업무",
+            "subCategory": "기본",
+            "question": "요양기관번호 어떻게 받나요?",
+            "dataSource": [
+                "hospital-basics/post-opening/admin.json"
+            ]
+        },
+        {
+            "id": 22,
+            "category": "행정업무",
+            "subCategory": "기본",
+            "question": "사업용 계좌 신고 방법",
+            "dataSource": [
+                "hospital-basics/post-opening/admin.json"
+            ]
+        },
+        {
+            "id": 23,
+            "category": "간판",
+            "subCategory": "기본",
+            "question": "간판 업체 추천해주세요",
+            "dataSource": [
+                "partners/pre-construction/signage.json"
+            ]
+        },
+        {
+            "id": 24,
+            "category": "간판",
+            "subCategory": "기본",
+            "question": "간판 비용 얼마나 하나요?",
+            "dataSource": [
+                "partners/pre-construction/signage.json"
+            ]
+        },
+        {
+            "id": 25,
+            "category": "간판",
+            "subCategory": "기본",
+            "question": "간판 관련 법규가 뭐가 있나요?",
+            "dataSource": [
+                "hospital-basics/pre-construction/signage.json"
+            ]
+        },
+        {
+            "id": 26,
+            "category": "간판",
+            "subCategory": "기본",
+            "question": "외부간판/내부간판 차이",
+            "dataSource": [
+                "hospital-basics/pre-construction/signage.json"
+            ]
+        },
+        {
+            "id": 27,
+            "category": "홈페이지",
+            "subCategory": "기본",
+            "question": "홈페이지 제작 업체 추천",
+            "dataSource": [
+                "partners/pre-construction/homepage.json"
+            ]
+        },
+        {
+            "id": 28,
+            "category": "홈페이지",
+            "subCategory": "기본",
+            "question": "홈페이지 비용 얼마나 드나요?",
+            "dataSource": [
+                "partners/pre-construction/homepage.json"
+            ]
+        },
+        {
+            "id": 29,
+            "category": "홈페이지",
+            "subCategory": "기본",
+            "question": "원페이지 홈페이지가 뭔가요?",
+            "dataSource": [
+                "partners/pre-construction/homepage.json"
+            ]
+        },
+        {
+            "id": 30,
+            "category": "EMR/CRM",
+            "subCategory": "기본",
+            "question": "EMR이 뭔가요?",
+            "dataSource": [
+                "hospital-basics/post-opening/emr-crm.json"
+            ]
+        },
+        {
+            "id": 31,
+            "category": "EMR/CRM",
+            "subCategory": "기본",
+            "question": "CRM이 뭔가요?",
+            "dataSource": [
+                "hospital-basics/post-opening/emr-crm.json"
+            ]
+        },
+        {
+            "id": 32,
+            "category": "EMR/CRM",
+            "subCategory": "기본",
+            "question": "피부과/미용 EMR 추천",
+            "dataSource": [
+                "partners/post-construction/emr-crm.json"
+            ]
+        },
+        {
+            "id": 33,
+            "category": "EMR/CRM",
+            "subCategory": "기본",
+            "question": "차트/오더/코드가 뭔가요?",
+            "dataSource": [
+                "hospital-basics/post-opening/emr-crm.json"
+            ]
+        },
+        {
+            "id": 34,
+            "category": "통신/보안",
+            "subCategory": "기본",
+            "question": "병원 인터넷/전화 추천",
+            "dataSource": [
+                "partners/pre-construction/pc-network.json"
+            ]
+        },
+        {
+            "id": 35,
+            "category": "통신/보안",
+            "subCategory": "기본",
+            "question": "CCTV/보안 업체 추천",
+            "dataSource": [
+                "partners/pre-construction/pc-network.json"
+            ]
+        },
+        {
+            "id": 36,
+            "category": "통신/보안",
+            "subCategory": "기본",
+            "question": "KT/LG/SK 비교",
+            "dataSource": [
+                "partners/pre-construction/pc-network.json"
+            ]
+        },
+        {
+            "id": 37,
+            "category": "가구",
+            "subCategory": "기본",
+            "question": "병원 가구 업체 추천",
+            "dataSource": [
+                "partners/post-construction/furniture.json"
+            ]
+        },
+        {
+            "id": 38,
+            "category": "가구",
+            "subCategory": "기본",
+            "question": "붙박이 가구 vs 이동 가구 차이",
+            "dataSource": [
+                "hospital-basics/during-construction/furniture.json"
+            ]
+        },
+        {
+            "id": 39,
+            "category": "가구",
+            "subCategory": "기본",
+            "question": "대기실 소파 추천",
+            "dataSource": [
+                "partners/post-construction/furniture.json"
+            ]
+        },
+        {
+            "id": 40,
+            "category": "섬유/유니폼",
+            "subCategory": "기본",
+            "question": "침구/린넨 업체 추천",
+            "dataSource": [
+                "hospital-basics/during-construction/textiles.json"
+            ]
+        },
+        {
+            "id": 41,
+            "category": "섬유/유니폼",
+            "subCategory": "기본",
+            "question": "커튼/블라인드 업체 추천",
+            "dataSource": [
+                "hospital-basics/during-construction/textiles.json"
+            ]
+        },
+        {
+            "id": 42,
+            "category": "관리/소모품",
+            "subCategory": "기본",
+            "question": "정기청소 업체 추천",
+            "dataSource": [
+                "hospital-basics/during-construction/infrastructure.json"
+            ]
+        },
+        {
+            "id": 43,
+            "category": "관리/소모품",
+            "subCategory": "기본",
+            "question": "의료폐기물 처리 업체",
+            "dataSource": [
+                "hospital-basics/during-construction/waste.json"
+            ]
+        },
+        {
+            "id": 44,
+            "category": "관리/소모품",
+            "subCategory": "기본",
+            "question": "정수기 추천",
+            "dataSource": [
+                "hospital-basics/during-construction/infrastructure.json"
+            ]
+        },
+        {
+            "id": 45,
+            "category": "체크리스트",
+            "subCategory": "소방",
+            "question": "소방 설비 체크리스트",
+            "dataSource": [
+                "checklist/facilities.json",
+                "checklist/general.json"
+            ]
+        },
+        {
+            "id": 46,
+            "category": "체크리스트",
+            "subCategory": "시설",
+            "question": "장애인 편의시설 확인사항",
+            "dataSource": [
+                "checklist/general.json"
+            ]
+        },
+        {
+            "id": 47,
+            "category": "체크리스트",
+            "subCategory": "시설",
+            "question": "전기용량 확인 방법",
+            "dataSource": [
+                "checklist/general.json",
+                "advanced/interior.json"
+            ]
+        },
+        {
+            "id": 48,
+            "category": "의료기기",
+            "subCategory": "통증",
+            "question": "C-Arm이 뭔가요?",
+            "dataSource": [
+                "advanced/medical-device-pain.json"
+            ]
+        },
+        {
+            "id": 49,
+            "category": "의료기기",
+            "subCategory": "통증",
+            "question": "통증 클리닉 필수 장비",
+            "dataSource": [
+                "advanced/medical-device-pain.json"
+            ]
+        },
+        {
+            "id": 50,
+            "category": "의료기기",
+            "subCategory": "통증",
+            "question": "통증 클리닉 장비 예산",
+            "dataSource": [
+                "advanced/medical-device-pain.json"
+            ]
+        },
+        {
+            "id": 51,
+            "category": "의료기기",
+            "subCategory": "통증",
+            "question": "초음파 장비 종류",
+            "dataSource": [
+                "advanced/medical-device-pain.json"
+            ]
+        },
+        {
+            "id": 52,
+            "category": "의료기기",
+            "subCategory": "통증",
+            "question": "고주파 치료기 설명",
+            "dataSource": [
+                "advanced/medical-device-pain.json"
+            ]
+        },
+        {
+            "id": 53,
+            "category": "의료기기",
+            "subCategory": "통증",
+            "question": "체외충격파(ESWT) 설명",
+            "dataSource": [
+                "advanced/medical-device-pain.json"
+            ]
+        },
+        {
+            "id": 54,
+            "category": "의료기기",
+            "subCategory": "통증",
+            "question": "도수치료 테이블 추천",
+            "dataSource": [
+                "advanced/medical-device-pain.json"
+            ]
+        },
+        {
+            "id": 55,
+            "category": "의료기기",
+            "subCategory": "통증",
+            "question": "통증 클리닉 개원 절차",
+            "dataSource": [
+                "advanced/medical-device-pain.json"
+            ]
+        },
+        {
+            "id": 56,
+            "category": "의료기기",
+            "subCategory": "치과",
+            "question": "치과 필수 장비",
+            "dataSource": [
+                "advanced/medical-device-dental.json"
+            ]
+        },
+        {
+            "id": 57,
+            "category": "의료기기",
+            "subCategory": "치과",
+            "question": "치과 장비 예산",
+            "dataSource": [
+                "advanced/medical-device-dental.json"
+            ]
+        },
+        {
+            "id": 58,
+            "category": "의료기기",
+            "subCategory": "치과",
+            "question": "방사선 차폐 설계",
+            "dataSource": [
+                "advanced/medical-device-dental.json"
+            ]
+        },
+        {
+            "id": 59,
+            "category": "의료기기",
+            "subCategory": "내과",
+            "question": "검진 내과 필수 장비",
+            "dataSource": [
+                "advanced/medical-device-internal.json"
+            ]
+        },
+        {
+            "id": 60,
+            "category": "의료기기",
+            "subCategory": "내과",
+            "question": "내시경 세트 구성",
+            "dataSource": [
+                "advanced/medical-device-internal.json"
+            ]
+        },
+        {
+            "id": 61,
+            "category": "의료기기",
+            "subCategory": "내과",
+            "question": "X-ray/DR/PACS 설명",
+            "dataSource": [
+                "advanced/medical-device-internal.json"
+            ]
+        },
+        {
+            "id": 62,
+            "category": "의료기기",
+            "subCategory": "내과",
+            "question": "유방촬영기(맘모그래피) 설명",
+            "dataSource": [
+                "advanced/medical-device-internal.json"
+            ]
+        },
+        {
+            "id": 63,
+            "category": "의료기기",
+            "subCategory": "내과",
+            "question": "골밀도 측정기 설명",
+            "dataSource": [
+                "advanced/medical-device-internal.json"
+            ]
+        },
+        {
+            "id": 64,
+            "category": "의료기기",
+            "subCategory": "내과",
+            "question": "투석 내과 장비",
+            "dataSource": [
+                "advanced/medical-device-internal.json"
+            ]
+        },
+        {
+            "id": 65,
+            "category": "의료기기",
+            "subCategory": "미용",
+            "question": "피코레이저 설명",
+            "dataSource": [
+                "advanced/medical-device-beauty.json"
+            ]
+        },
+        {
+            "id": 66,
+            "category": "의료기기",
+            "subCategory": "미용",
+            "question": "IPL 설명",
+            "dataSource": [
+                "advanced/medical-device-beauty.json"
+            ]
+        },
+        {
+            "id": 67,
+            "category": "의료기기",
+            "subCategory": "미용",
+            "question": "써마지 설명",
+            "dataSource": [
+                "advanced/medical-device-beauty.json"
+            ]
+        },
+        {
+            "id": 68,
+            "category": "의료기기",
+            "subCategory": "미용",
+            "question": "울쎄라/슈링크 설명",
+            "dataSource": [
+                "advanced/medical-device-beauty.json"
+            ]
+        },
+        {
+            "id": 69,
+            "category": "의료기기",
+            "subCategory": "미용",
+            "question": "인모드 설명",
+            "dataSource": [
+                "advanced/medical-device-beauty.json"
+            ]
+        },
+        {
+            "id": 70,
+            "category": "의료기기",
+            "subCategory": "미용",
+            "question": "미용 클리닉 장비 예산",
+            "dataSource": [
+                "advanced/medical-device-beauty.json"
+            ]
+        }
+    ]
+}

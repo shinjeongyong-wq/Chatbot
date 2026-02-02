@@ -598,29 +598,6 @@ function addBotMessageToUI(content) {
     const chatContainer = document.getElementById('chatContainer');
     if (!chatContainer) return;
 
-
-    // 0. [RELATED_TOPICS] 블록 추출 및 제거 (파이프 + 불렛 둘 다 지원)
-    let relatedTopics = [];
-    const topicsMatch = content.match(/\[RELATED_TOPICS\]([\s\S]*?)\[\/RELATED_TOPICS\]/);
-    if (topicsMatch) {
-        const topicsBlock = topicsMatch[1].trim();
-        // 파이프(|)가 있으면 파이프로 분리, 없으면 줄바꿈+불렛으로 분리
-        if (topicsBlock.includes('|')) {
-            relatedTopics = topicsBlock
-                .split('|')
-                .map(topic => topic.trim())
-                .filter(topic => topic.length > 0);
-        } else {
-            // 기존 형식: 줄바꿈 + 불렛(-, •, *)
-            relatedTopics = topicsBlock
-                .split('\n')
-                .map(line => line.replace(/^[-•*]\s*/, '').trim())
-                .filter(line => line.length > 0);
-        }
-        // 본문에서 [RELATED_TOPICS] 블록 제거
-        content = content.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
-    }
-
     // 마크다운 → HTML 변환 (script.js의 addFormattedMessage와 동일한 로직)
     let html = content
         .replace(/```[\s\S]*?```/g, '')  // 코드 블록 제거
@@ -637,17 +614,6 @@ function addBotMessageToUI(content) {
     html = html.replace(/(<li>.*?<\/li>)(<br>)?/g, '$1');
     html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul class="response-list">$1</ul>');
     html = html.replace(/<\/ul><br>?<ul class="response-list">/g, '');
-
-    // 관련 주제를 클릭 가능한 링크로 변환
-    if (relatedTopics.length > 0) {
-        relatedTopics.forEach(topic => {
-            // **주제** 형태의 굵은 글씨를 클릭 가능한 링크로 변환
-            const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
-            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
-            html = html.replace(regex, clickableLink);
-        });
-    }
 
     // 피드백 버튼 + 복사 버튼 추가
     const messageId = Date.now() + Math.random();
