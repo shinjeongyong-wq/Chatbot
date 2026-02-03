@@ -119,7 +119,8 @@ class ChatMemory {
             this.sessionMemories[sessionId] = {
                 recentBuffer: [],
                 contextSummary: '',
-                isSummarizing: false
+                isSummarizing: false,
+                usedTopics: []  // ★ 사용자가 질문한 RT 기록 ★
             };
             console.log(`🧠 [ChatMemory] 새 세션 메모리 생성: ${sessionId.substring(0, 8)}...`);
         } else {
@@ -130,9 +131,25 @@ class ChatMemory {
     // 현재 세션의 메모리 getter
     get currentMemory() {
         if (!this.currentSessionId || !this.sessionMemories[this.currentSessionId]) {
-            return { recentBuffer: [], contextSummary: '', isSummarizing: false };
+            return { recentBuffer: [], contextSummary: '', isSummarizing: false, usedTopics: [] };
         }
         return this.sessionMemories[this.currentSessionId];
+    }
+
+    // ★ 사용자가 질문한 RT 추적 ★
+    get usedTopics() { return this.currentMemory.usedTopics || []; }
+
+    addUsedTopic(topicQuestion) {
+        if (this.currentSessionId && this.sessionMemories[this.currentSessionId]) {
+            if (!this.sessionMemories[this.currentSessionId].usedTopics) {
+                this.sessionMemories[this.currentSessionId].usedTopics = [];
+            }
+            // 중복 방지
+            if (!this.sessionMemories[this.currentSessionId].usedTopics.includes(topicQuestion)) {
+                this.sessionMemories[this.currentSessionId].usedTopics.push(topicQuestion);
+                console.log(`🧠 [ChatMemory] RT 사용 기록: "${topicQuestion.substring(0, 30)}..."`);
+            }
+        }
     }
 
     // 기존 API 호환 (recentBuffer, contextSummary, isSummarizing)
@@ -168,7 +185,8 @@ class ChatMemory {
             this.sessionMemories[this.currentSessionId] = {
                 recentBuffer: [],
                 contextSummary: '',
-                isSummarizing: false
+                isSummarizing: false,
+                usedTopics: []  // ★ RT 추적도 초기화 ★
             };
             console.log(`🧠 [ChatMemory] 세션 초기화: ${this.currentSessionId.substring(0, 8)}...`);
         }
@@ -327,45 +345,56 @@ function extractMentionedKeywords() {
 }
 
 // ★ 사용자 질문과 관련된 앵커 주제 찾기 ★
-function findRelatedAnchorTopics(userMessage, count = 3) {
+// includeUsed: true면 이미 질문한 주제도 포함 (기록용), false면 제외 (추천용)
+function findRelatedAnchorTopics(userMessage, count = 3, includeUsed = false) {
     if (!anchorTopics || anchorTopics.length === 0) {
         return [];
     }
 
     const message = userMessage.toLowerCase();
 
+    // 이미 사용자가 질문한 주제 가져오기
+    const usedTopics = chatMemory.usedTopics || [];
+
     // 각 주제별 관련도 점수 계산
-    const scored = anchorTopics.map(topic => {
-        let score = 0;
-        const question = topic.question.toLowerCase();
-        const category = topic.category.toLowerCase();
-        const subCategory = (topic.subCategory || '').toLowerCase();
+    const scored = anchorTopics
+        .filter(topic => includeUsed || !usedTopics.includes(topic.question))  // ★ 옵션에 따라 필터링 ★
+        .map(topic => {
+            let score = 0;
+            const question = topic.question.toLowerCase();
+            const category = topic.category.toLowerCase();
+            const subCategory = (topic.subCategory || '').toLowerCase();
 
-        // 카테고리 매칭
-        if (message.includes(category)) score += 3;
-        if (message.includes(subCategory)) score += 2;
+            // 카테고리 매칭
+            if (message.includes(category)) score += 3;
+            if (message.includes(subCategory)) score += 2;
 
-        // 질문 키워드 매칭
-        const questionWords = question.split(/[\s/]+/).filter(w => w.length > 1);
-        questionWords.forEach(word => {
-            if (message.includes(word)) score += 1;
+            // 질문 키워드 매칭
+            const questionWords = question.split(/[\s/]+/).filter(w => w.length > 1);
+            questionWords.forEach(word => {
+                if (message.includes(word)) score += 1;
+            });
+
+            // 메시지 키워드가 질문에 있는지
+            const messageWords = message.split(/[\s/]+/).filter(w => w.length > 1);
+            messageWords.forEach(word => {
+                if (question.includes(word)) score += 1;
+            });
+
+            return { question: topic.question, score };
         });
-
-        // 메시지 키워드가 질문에 있는지
-        const messageWords = message.split(/[\s/]+/).filter(w => w.length > 1);
-        messageWords.forEach(word => {
-            if (question.includes(word)) score += 1;
-        });
-
-        return { question: topic.question, score };
-    });
 
     // 점수순 정렬 후 상위 N개 선택
-    return scored
+    const result = scored
         .filter(t => t.score > 0)
         .sort((a, b) => b.score - a.score)
         .slice(0, count)
         .map(t => t.question);
+
+    if (!includeUsed) {
+        console.log(`🎯 [RT] 추천 후보: ${result.length}개 (제외된 주제: ${usedTopics.length}개)`);
+    }
+    return result;
 }
 
 // ★★★ 고유명사(업체명/엔티티) 강제 포함 함수 ★★★
@@ -591,6 +620,13 @@ async function sendUserMessage(message) {
 async function getBotResponse(userMessage) {
     // 피드백용으로 현재 질문 저장
     window.currentQuestion = userMessage;
+
+    // ★ 사용자 질문과 매칭되는 RT 주제 기록 (중복 추천 방지) ★
+    // 기록할 때는 이미 사용된 주제라도 다시 매칭하여 정확히 기록함 (includeUsed = true)
+    const matchedTopics = findRelatedAnchorTopics(userMessage, 1, true);
+    if (matchedTopics.length > 0) {
+        chatMemory.addUsedTopic(matchedTopics[0]);
+    }
 
     // 사용자 질문을 Google Sheets에 수집 (비동기, 에러 무시)
     try {
@@ -949,7 +985,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 **답변 작성 후, 반드시 아래 규칙대로 관련 주제를 추천하세요.**
 
 [사용 가능한 주제 목록 - 아래 목록에서 **글자 그대로 복사**해서 사용하세요]
-${anchorTopics.map(t => `- ${t.question}`).join('\n')}
+${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t => `- ${t.question}`).join('\n')}
 
 **⚠️ 중요 규칙:**
 1. **반드시 위 목록에 있는 질문을 글자 그대로 복사**하세요. 단어 하나도 바꾸지 마세요.
@@ -976,7 +1012,6 @@ ${anchorTopics.map(t => `- ${t.question}`).join('\n')}
 - [RELATED_TOPICS] 블록은 한 줄로 작성하고, 주제는 파이프(|)로 구분하세요.
 - 본문에서는 주제를 **굵은 글씨**로 감싸서 자연스럽게 문장에 녹여내세요.
 - 주제를 축약하지 말고 정확한 질문 텍스트를 사용하세요.`;
-
 
     try {
         console.log('🤖 AI 서버 호출 중...');

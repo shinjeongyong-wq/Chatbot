@@ -1,6 +1,21 @@
 # 챗봇 버전 로그
 ===============================
 
+## v2.3.2 (2026-02-03)
+### 변경사항: Related Topics(RT) 개선
+- **RT 주제 대폭 확장**: 70개 → 835개 (노션 198개 + Q&A 653개 + 기존 70개 - 포트폴리오 86개)
+- **RT 중복 추천 방지**: 사용자가 질문한 주제는 다시 추천되지 않음
+- **ChatMemory에 usedTopics 추가**: 세션별로 사용된 RT 추적
+- **findRelatedAnchorTopics 필터링 추가**: 이미 질문한 주제 제외
+
+### 수정/추가 파일
+- data/topics.json: 835개 주제로 확장
+- script.js: ChatMemory.usedTopics, addUsedTopic() 추가
+- script.js: findRelatedAnchorTopics() 에 usedTopics 필터링 추가
+- script.js: getBotResponse() 에서 사용자 질문 매칭 주제 기록
+
+---
+
 ## v2.4.0 (2026-02-03) - ❌ 롤백됨 (벡터 검색 실험 실패)
 ### 변경사항: 벡터 유사도 기반 검색 엔진 도입
 - **Gemini Embeddings API 연동**: 문서/쿼리를 768차원 벡터로 변환
