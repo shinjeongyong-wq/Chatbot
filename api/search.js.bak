@@ -129,19 +129,26 @@ function expandQueryWithSynonyms(query) {
     return [...new Set(expandedWords)].filter(w => w.length >= 2);
 }
 
-// ========== Smart Score 계산 (단순화 v2.3.1) ==========
+// ========== Smart Score 계산 ==========
 function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strategy) {
     const question = (item.question || '').toLowerCase();
     const answer = (item.answer || '').toLowerCase();
     const field = (item.metadata?.field || '').toLowerCase();
     const specialties = (item.metadata?.specialties || []).join(' ').toLowerCase();
+    const features = (item.metadata?.features || []).join(' ').toLowerCase();
 
-    const text = question + ' ' + answer + ' ' + field + ' ' + specialties;
+    const text = question + ' ' + answer + ' ' + field + ' ' + specialties + ' ' + features;
     const textNoSpace = text.replace(/\s/g, '');
 
     let score = 0;
 
-    // 1. 핵심 키워드 매칭 (최대 +0.6)
+    const isSpecialtyQuestion = coreKeywords?.some(kw =>
+        kw && (kw.includes('진료과') || kw.includes('특화') || kw.includes('전문'))
+    ) || expandedKeywords?.some(kw =>
+        kw && (kw.includes('진료과') || kw.includes('특화') || kw.includes('전문'))
+    );
+
+    // 1. 핵심 키워드 매칭
     if (coreKeywords && coreKeywords.length > 0) {
         let coreHits = 0;
         for (const keyword of coreKeywords) {
@@ -159,7 +166,7 @@ function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strate
         score += Math.min((coreHits / coreKeywords.length) * 0.6, 0.6);
     }
 
-    // 2. 확장 키워드 매칭 (최대 +0.25)
+    // 2. 확장 키워드 매칭
     if (expandedKeywords && expandedKeywords.length > 0) {
         let expandHits = 0;
         for (const keyword of expandedKeywords) {
@@ -174,7 +181,7 @@ function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strate
         score += Math.min((expandHits / expandedKeywords.length) * 0.25, 0.25);
     }
 
-    // 3. 토픽 매칭 (+0.1)
+    // 3. 토픽 매칭
     if (topic && topic !== '기타') {
         const searchTopic = topic.toLowerCase();
         if (field.includes(searchTopic) || question.includes(searchTopic)) {
@@ -182,9 +189,50 @@ function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strate
         }
     }
 
+    // 4. 진료과 관련 보너스
+    if (isSpecialtyQuestion && specialties) {
+        score += 0.2;
+        for (const keyword of (coreKeywords || [])) {
+            if (keyword && specialties.includes(keyword.toLowerCase())) {
+                score += 0.15;
+                break;
+            }
+        }
+    }
+
+    // 5. 검색 전략별 조정
+    if (strategy === 'exact') {
+        if (coreKeywords && coreKeywords.length > 0) {
+            let hasCoreMatch = coreKeywords.some(kw => {
+                if (!kw) return false;
+                const kwLower = kw.toLowerCase();
+                const kwNoSpace = kwLower.replace(/\s/g, '');
+                return text.includes(kwLower) || textNoSpace.includes(kwNoSpace);
+            });
+            if (!hasCoreMatch) {
+                score *= 0.3;
+            }
+        }
+    }
+
+    // 6. 파트너사 검색 보너스
+    const isPartnerSearch = coreKeywords?.some(kw => kw && (kw.includes('파트너') || kw.includes('업체')));
+    if (isPartnerSearch) {
+        if (answer.includes('회사 소개') || answer.includes('예상 가격') || answer.includes('포트폴리오')) {
+            score += 0.3;
+        }
+        if (answer.includes('년차') || answer.includes('설립') || answer.includes('진행 가능')) {
+            score += 0.2;
+        }
+    }
+
+    // 7. features 보너스
+    if (features && features.length > 0) {
+        score += 0.05;
+    }
+
     return score;
 }
-
 
 // ========== 진료과 보너스 계산 ==========
 function calculateSpecialtyBonus(item, userSpecialty) {
@@ -210,11 +258,10 @@ function calculateSpecialtyBonus(item, userSpecialty) {
         }
     }
 
-    // 진료과 보너스 단순화 (최대 +0.2)
     if (specialties && specialties.includes(userSpecialty.code.toLowerCase())) {
-        bonus += 0.2;
+        bonus += 2.0;
     } else if (matchCount > 0) {
-        bonus += Math.min(matchCount * 0.05, 0.15);
+        bonus += Math.min(matchCount * 0.2, 0.8);
     }
 
     return bonus;
@@ -262,7 +309,12 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
                 score = score + 0.5;
             }
 
-            // 인테리어/간판 혼동 방지 패널티 제거됨 (v2.3.1)
+            // 인테리어/간판 혼동 방지 (토픽 기반)
+            if (topic === '인테리어' && (itemTopic.includes('간판') || itemField.includes('간판'))) {
+                score = score * 0.6;
+            } else if (topic === '간판' && (itemTopic.includes('인테리어') || itemField.includes('인테리어'))) {
+                score = score * 0.6;
+            }
         }
 
         // ★ 파트너사 가중치: subIntent가 '파트너사목록'일 때만 적용 ★

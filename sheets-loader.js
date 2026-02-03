@@ -129,15 +129,54 @@ class GoogleSheetsLoader {
 
                 const data = await res.json();
 
-                // 각 항목 추가 (기존 구조 유지 + 카테고리 메타데이터 보강)
-                for (const item of data.items || []) {
+                // 기존 items 배열 형식 처리
+                if (data.items && Array.isArray(data.items)) {
+                    for (const item of data.items) {
+                        notionItems.push({
+                            ...item,
+                            metadata: {
+                                ...item.metadata,
+                                field: this.getCategoryField(categoryPath),
+                                topic: this.getCategoryTopic(categoryPath),
+                                categoryPath: categoryPath
+                            }
+                        });
+                    }
+                }
+                // 새로운 단일 객체 형식 처리 (로드맵 데이터)
+                else if (data.id || data.title) {
+                    // details 배열을 answer 문자열로 변환
+                    let answerText = '';
+                    if (data.details && Array.isArray(data.details)) {
+                        answerText = data.details.map(d => `• ${d}`).join('\n');
+                    } else if (data.content) {
+                        answerText = data.content;
+                    } else if (data.sections) {
+                        // details 폴더의 상세 가이드 형식
+                        answerText = data.sections.map(s => {
+                            let text = `### ${s.heading}\n`;
+                            if (s.content) {
+                                text += Array.isArray(s.content) ? s.content.join('\n') : s.content;
+                            }
+                            return text;
+                        }).join('\n\n');
+                    } else if (data.summary) {
+                        answerText = data.summary;
+                    }
+
                     notionItems.push({
-                        ...item,
+                        id: data.id,
+                        source: 'notion',
+                        question: data.title,
+                        answer: answerText,
                         metadata: {
-                            ...item.metadata,
                             field: this.getCategoryField(categoryPath),
                             topic: this.getCategoryTopic(categoryPath),
-                            categoryPath: categoryPath
+                            categoryPath: categoryPath,
+                            wave: data.wave || null,
+                            order: data.order || null,
+                            relatedDetail: data.relatedDetail || null,
+                            type: data.type || 'guide'
                         }
                     });
                 }
@@ -157,7 +196,9 @@ class GoogleSheetsLoader {
             'hospital-basics': '개원 시 필요 영역 [기본편]',
             'advanced': '심화 콘텐츠',
             'checklist': '체크리스트',
-            'uncategorized': '기타'
+            'uncategorized': '기타',
+            '병의원_개업_로드맵': '개업 로드맵',
+            'hospital-opening-roadmap': '개업 로드맵'
         };
         return fieldMap[parts[0]] || parts[0];
     }

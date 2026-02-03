@@ -1,7 +1,7 @@
 {
-  "version": "5.0",
-  "generatedAt": "2026-01-21T08:44:00.000Z",
-  "totalItems": 197,
+  "version": "5.2",
+  "generatedAt": "2026-02-03T13:21:00.000Z",
+  "totalItems": 198,
   "categories": {
     "advanced/interior": {
       "itemCount": 1,
@@ -130,6 +130,10 @@
     "portfolio/customers": {
       "itemCount": 86,
       "file": "customers.json"
+    },
+    "hospital-opening-roadmap": {
+      "itemCount": 1,
+      "file": "hospital-opening-roadmap.json"
     }
   }
 }

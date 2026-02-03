@@ -718,8 +718,6 @@ async function getBotResponse(userMessage) {
             relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, maxResults);
         }
 
-        console.log(`📚 검색 결과: ${relatedContexts.length}개 문서`);
-
         // ========== Stage 2.5: 고유명사(업체명) 강제 포함 ==========
         // 질문에 특정 업체명이 언급되면 해당 문서를 강제로 포함
         const forcedResult = findForcedDocsByCompanyName(userMessage, sheetsLoader.cache || []);
@@ -739,8 +737,17 @@ async function getBotResponse(userMessage) {
             });
 
             relatedContexts = [...uniqueForcedDocs, ...relatedContexts];
-            console.log(`📚 병합 후 총 문서: ${relatedContexts.length}개 (강제 ${uniqueForcedDocs.length}개 + 일반 ${relatedContexts.length - uniqueForcedDocs.length}개)`);
         }
+
+        // ★ 출처 분석 (Log용) ★
+        const sourceCounts = relatedContexts.reduce((acc, doc) => {
+            const src = doc.source || 'etc';
+            acc[src] = (acc[src] || 0) + 1;
+            return acc;
+        }, {});
+
+        console.log(`📚 최종 문서: ${relatedContexts.length}개 (Notion: ${sourceCounts.notion || 0}, Q&A: ${sourceCounts.qa || 0}, FAQ: ${sourceCounts.faq || 0})`);
+
 
         // ========== Stage 3: Answer Generation ==========
         updateTypingStatus('찾은 정보를 바탕으로 답변을 작성하고 있습니다...');
@@ -779,7 +786,10 @@ async function getBotResponse(userMessage) {
             addNoDataMessage(cleanText);
             responseText = cleanText;
         } else {
-            // 필터링된 컨텍스트를 사용하여 포매팅 (중요: 답변의 [번호]와 일치시키기 위함)
+            // ★ 모든 인용 주석 제거 (v2.3.1) ★
+            // [1], [2, 3], [ID: 1], [ID: 2, 3] 등 모든 형태
+            responseText = responseText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').trim();
+            // 필터링된 컨텍스트를 사용하여 포매팅
             addFormattedMessage(responseText, result.filteredContexts || relatedContexts, result.modelName);
         }
 
@@ -815,6 +825,14 @@ async function callOpenRouterAPI(userQuery, contexts) {
 
         console.log(`   📚 최종 문서: ${filteredContexts.length}개 (범위: ${minDocs}~${maxDocs})`);
 
+        // ★ 최종 문서 30개 상세 로그 ★
+        console.log('   📋 문서 목록:');
+        filteredContexts.forEach((doc, idx) => {
+            const src = doc.source || 'etc';
+            const q = (doc.question || '').substring(0, 50);
+            console.log(`      [${idx + 1}] (${src}) ${q}${doc.question.length > 50 ? '...' : ''}`);
+        });
+
         // 문서 포맷팅 함수
         const formatDoc = (item, idx) => {
             let prefix = `[${idx + 1}]`;
@@ -831,9 +849,9 @@ async function callOpenRouterAPI(userQuery, contexts) {
                 prefix += ` (공통) |`;
             }
 
-            // 토큰 최적화: answer를 400자로 제한
-            const truncatedAnswer = item.answer.length > 400
-                ? item.answer.substring(0, 400) + '...(이하 생략)'
+            // 토큰 최적화: answer를 15000자로 제한 (v2.3.1)
+            const truncatedAnswer = item.answer.length > 15000
+                ? item.answer.substring(0, 15000) + '...(이하 생략)'
                 : item.answer;
             return `${prefix} Q: ${item.question}\nA: ${truncatedAnswer}`;
         };
@@ -892,12 +910,12 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 # 핵심 규칙
 1. **[중복 답변 금지]**: 이미 **# ⛔ 중복 금지** 섹션에 있는 업체나 정보가 **# 참고문서**에 또 나오더라도, 이를 제외하고 **새로운 데이터 위주로** 답변하세요.
 
-2. **[진료과 기반 정보 제공 및 주의사항 안내]**:
-   - 제공된 참고문서에 포함된 업체/정보는 검색 엔진이 사용자의 질문 의도에 맞춰 선별한 것이므로 **숨기지 말고 적극적으로 소개**하세요.
-   - **[CASE A: 진료과 일치]**: 파트너사의 특화 진료과가 사용자의 진료과와 일치하는 경우, 적극 추천하고 상세히 설명하세요.
-   - **[CASE B: 진료과 불일치 (주의사항 필수)]**: 참고문서에는 있지만 특화 진료과가 사용자와 다른 경우(예: 사용자 '미용', 파트너 '통증'), **정보를 누락하지 말고 상세히 답변하되, 반드시 아래 주의사항을 덧붙이세요.**
-     - **안내 멘트 예시**: "해당 파트너사는 주로 **[참고문서의 진료과]**에 특화되어 있습니다. 원장님의 진료과인 **[사용자 진료과]** 관련 시공/납품 사례는 별도 확인이 필요할 수 있음을 안내해 드립니다."
-   - 참고문서에 있는 [통증✓], [내과✓] 등의 태그 정보를 기준으로 판단하세요.
+2. **[정보 선별 및 주의사항 안내]**:
+   - **[핵심 원칙]**: 사용자 질문의 의도가 '업체 추천'이 아닌 '방법/정보 요청'인 경우, 파트너사 목록보다는 **절차와 가이드 내용 위주로 답변**하세요.
+   - **[CASE A: 진료과 일치 및 업체 추천 의도]**: 사용자가 직접적으로 업체를 찾거나 진료과가 완벽히 일치하는 최적의 파트너사가 있을 때만 정보를 상세히 소개하세요.
+   - **[CASE B: 일반 정보 중심 질문]**: 참고문서에 업체 정보가 있더라도 질문의 본질(예: 비용, 절차)과 직접 관련이 없다면 **과감히 생략하거나 가볍게 언급**만 하세요. 
+   - 만약 정보를 제공할 경우, 특화 진료과가 사용자와 다르다면 반드시 아래 주의사항을 덧붙이세요.
+     - **안내 멘트 예시**: "참고로 해당 정보(또는 업체)는 주로 **[참고문서의 진료과]**에 특화되어 있어, 원장님의 **[사용자 진료과]**에는 상세 확인이 필요할 수 있습니다."
 
 3. **[주제 일관성 유지]**: 현재 대화의 주제(예: 인테리어)를 중심으로 답변하세요. 참고문서에 다른 주제가 섞여 있다면 사용자의 질문 의도에 부합하는 내용만 골라내어 자연스럽게 답변하세요. 만약 요청하신 주제에 대한 새로운 정보가 정말 없다면, 억지로 다른 주제를 꺼내기보다는 현재까지 안내해 드린 내용을 정리하거나 추가 확인이 필요함을 정직하게 전달하세요.
 
