@@ -1,0 +1,2170 @@
+const CONFIG = {
+    USE_MOCK_DATA: false,
+
+    // API 엔드포인트 (Vercel Serverless Function)
+    CHAT_ENDPOINT: '/api/chat'
+};
+
+// ★ 앵커 주제 (topics.json에서 로드) ★
+let anchorTopics = [];
+
+// topics.json 로드
+async function loadAnchorTopics() {
+    try {
+        const response = await fetch('/data/topics.json');
+        if (response.ok) {
+            const data = await response.json();
+            anchorTopics = data.topics || [];
+            console.log(`✅ 앵커 주제 ${anchorTopics.length}개 로드 완료`);
+        }
+    } catch (error) {
+        console.error('앵커 주제 로드 실패:', error);
+    }
+}
+
+// 페이지 로드 시 앵커 주제 로드
+loadAnchorTopics();
+
+// ★ Phase 4: 진료과별 키워드 확장 ★
+const SPECIALTIES = {
+    '통증': {
+        label: '통증',
+        emoji: '💪',
+        keywords: [
+            // 기본
+            '통증', '정형외과', '재활', '물리치료', '도수치료', 'X-ray', '척추', '관절',
+            // 시술
+            '신경차단', '주사', '프롤로', '증식치료', '초음파', 'C-arm', '씨암',
+            // 장비
+            '충격파', 'ESWT', '고주파', '레이저치료', 'HILT', '적외선',
+            // 부위
+            '허리', '목', '어깨', '무릎', '발목', '손목', '디스크', '협착증',
+            // 기타
+            '근골격', 'MSK', '스포츠손상'
+        ]
+    },
+    '내과': {
+        label: '내과',
+        emoji: '🩺',
+        keywords: [
+            // 기본
+            '내과', '검진', '내시경', '초음파', '만성질환', '건강검진', '소화기',
+            // 검사
+            '위내시경', '대장내시경', '복부초음파', '간초음파', '혈액검사',
+            // 질환
+            '고혈압', '당뇨', '고지혈증', '간질환', '위염', '당뇨병', '신부전',
+            // 장비
+            '투석', '투석기', '심전도', 'EKG', 'X-ray', 'CT', 'MRI',
+            // 검진
+            '암검진', '5대암', '국가검진', '종합검진', '건강검진센터'
+        ]
+    },
+    '미용': {
+        label: '미용',
+        emoji: '✨',
+        keywords: [
+            // 기본
+            '피부', '미용', '성형', '레이저', '보톡스', '필러', '리프팅', '피부과', '성형외과',
+            // 시술명
+            '주름', '탄력', '모공', '여드름', '색소', '미백', '홍조',
+            '슈링크', '울쎄라', '써마지', '인모드', '튠페이스',
+            // 의료기기
+            'IPL', 'M22', '피코레이저', '피코', '프락셔널', 'CO2', 'CO2레이저',
+            '고주파', 'RF', 'HIFU', '초음파리프팅',
+            // 부위
+            '얼굴', '눈가', '이마', '팔자', '턱선', '목주름',
+            // 기타
+            '안티에이징', '쁘띠', '비침습', '동안'
+        ]
+    },
+    '치과': {
+        label: '치과',
+        emoji: '🦷',
+        keywords: [
+            // 기본
+            '치과', '임플란트', '교정', '보철', '스케일링', '덴탈',
+            // 시술
+            '발치', '신경치료', '근관치료', '잇몸치료', '치주',
+            '라미네이트', '베니어', '크라운', '브릿지',
+            // 교정
+            '투명교정', '인비절라인', '설측교정', '부분교정',
+            // 장비
+            'X-ray', '파노라마', 'CT', 'CAD/CAM', '구강스캐너',
+            // 기타
+            '충치', '사랑니', '치아미백', '치석제거'
+        ]
+    }
+};
+
+let currentUserSpecialty = null; // 사용자가 선택한 진료과
+
+let sheetsLoader = null;
+let faqNavigationStack = [];
+
+// ==========================
+// 0. ChatMemory (클라이언트 메모리 관리자) - 세션별 분리
+// ==========================
+class ChatMemory {
+    constructor() {
+        this.sessionMemories = {};  // { sessionId: { recentBuffer, contextSummary, isSummarizing } }
+        this.currentSessionId = null;
+    }
+
+    // 세션 설정 (전환 시 호출)
+    setSession(sessionId) {
+        this.currentSessionId = sessionId;
+
+        // 해당 세션의 메모리가 없으면 새로 생성
+        if (!this.sessionMemories[sessionId]) {
+            this.sessionMemories[sessionId] = {
+                recentBuffer: [],
+                contextSummary: '',
+                isSummarizing: false
+            };
+            console.log(`🧠 [ChatMemory] 새 세션 메모리 생성: ${sessionId.substring(0, 8)}...`);
+        } else {
+            console.log(`🧠 [ChatMemory] 세션 전환: ${sessionId.substring(0, 8)}... (기존 대화 ${this.sessionMemories[sessionId].recentBuffer.length}턴 복원)`);
+        }
+    }
+
+    // 현재 세션의 메모리 getter
+    get currentMemory() {
+        if (!this.currentSessionId || !this.sessionMemories[this.currentSessionId]) {
+            return { recentBuffer: [], contextSummary: '', isSummarizing: false };
+        }
+        return this.sessionMemories[this.currentSessionId];
+    }
+
+    // 기존 API 호환 (recentBuffer, contextSummary, isSummarizing)
+    get recentBuffer() { return this.currentMemory.recentBuffer; }
+    set recentBuffer(val) {
+        if (this.currentSessionId && this.sessionMemories[this.currentSessionId]) {
+            this.sessionMemories[this.currentSessionId].recentBuffer = val;
+        }
+    }
+
+    get contextSummary() { return this.currentMemory.contextSummary; }
+    set contextSummary(val) {
+        if (this.currentSessionId && this.sessionMemories[this.currentSessionId]) {
+            this.sessionMemories[this.currentSessionId].contextSummary = val;
+        }
+    }
+
+    get isSummarizing() { return this.currentMemory.isSummarizing; }
+    set isSummarizing(val) {
+        if (this.currentSessionId && this.sessionMemories[this.currentSessionId]) {
+            this.sessionMemories[this.currentSessionId].isSummarizing = val;
+        }
+    }
+
+    // 하위 호환성 (기존 conversationHistory 대체)
+    get history() {
+        return this.recentBuffer;
+    }
+
+    // 현재 세션만 초기화
+    reset() {
+        if (this.currentSessionId && this.sessionMemories[this.currentSessionId]) {
+            this.sessionMemories[this.currentSessionId] = {
+                recentBuffer: [],
+                contextSummary: '',
+                isSummarizing: false
+            };
+            console.log(`🧠 [ChatMemory] 세션 초기화: ${this.currentSessionId.substring(0, 8)}...`);
+        }
+    }
+
+    // 특정 세션 삭제 (채팅 삭제 시)
+    deleteSession(sessionId) {
+        if (this.sessionMemories[sessionId]) {
+            delete this.sessionMemories[sessionId];
+            console.log(`🧠 [ChatMemory] 세션 삭제: ${sessionId.substring(0, 8)}...`);
+        }
+    }
+
+    // Context for AI Input (Summary + Recent)
+    getContextPrompt() {
+        let prompt = "";
+        if (this.contextSummary) {
+            prompt += `[이전 대화 요약]:\n${this.contextSummary}\n\n`;
+        }
+        // 최근 메시지는 최신순이 아니라 시간순(과거->최신)으로 출력
+        if (this.recentBuffer.length > 0) {
+            prompt += `[최근 대화]:\n${this.recentBuffer.map(h => `Q: ${h.user}\nA: ${h.assistant}`).join('\n')}\n`;
+        }
+        return prompt || '(첫 대화)';
+    }
+
+    async addTurn(userMsg, botMsg) {
+        if (!this.currentSessionId) {
+            console.warn('⚠️ [ChatMemory] 세션이 설정되지 않음. 대화 저장 스킵.');
+            return;
+        }
+
+        this.recentBuffer.push({ user: userMsg, assistant: botMsg });
+
+        console.log(`🧠 [ChatMemory] 대화 저장 완료 (${this.recentBuffer.length}/3 턴 쌓임, 세션: ${this.currentSessionId.substring(0, 8)}...)`);
+
+        // 3턴을 초과하면 가장 오래된 턴을 요약본으로 압축 (백그라운드)
+        if (this.recentBuffer.length > 3 && !this.isSummarizing) {
+            console.log('🚨 [맥락봇] 대화가 3턴을 초과하여 요약을 시작합니다.');
+            this.triggerSummaryLoop();
+        } else if (this.recentBuffer.length <= 3) {
+            console.log(`💡 [맥락봇] 요약까지 ${3 - this.recentBuffer.length + 1}턴 더 필요합니다.`);
+        }
+    }
+
+    async triggerSummaryLoop() {
+        this.isSummarizing = true;
+        const sessionId = this.currentSessionId; // 루프 중 세션 변경 방지
+
+        try {
+            while (this.sessionMemories[sessionId]?.recentBuffer.length > 3) {
+                const oldest = this.sessionMemories[sessionId].recentBuffer[0];
+
+                // 요약 대상: 기존 요약 + 가장 오래된 대화
+                const contextToSummarize = [];
+                if (this.sessionMemories[sessionId].contextSummary) {
+                    contextToSummarize.push({ question: "이전 요약", answer: this.sessionMemories[sessionId].contextSummary });
+                }
+                contextToSummarize.push({ question: oldest.user, answer: oldest.assistant });
+
+                console.log('🧹 [맥락봇] 백그라운드 요약 요청 전송 중...');
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'summary',
+                        userQuery: "대화 요약 요청", // API 핸들러의 userQuery 필수 체크 통과용
+                        contextHistory: contextToSummarize
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.summary) {
+                        this.sessionMemories[sessionId].contextSummary = data.summary;
+                        this.sessionMemories[sessionId].recentBuffer.shift(); // 성공 시 버퍼에서 제거
+                        console.log('✅ [ChatMemory] 요약 완료:', data.summary.substring(0, 30) + '...');
+                    } else {
+                        break;
+                    }
+                } else {
+                    console.error('Summary API failed');
+                    break;
+                }
+            }
+        } catch (e) {
+            console.error('Summary Error:', e);
+        } finally {
+            if (this.sessionMemories[sessionId]) {
+                this.sessionMemories[sessionId].isSummarizing = false;
+            }
+        }
+    }
+}
+
+let chatMemory = new ChatMemory(); // 인스턴스 생성
+window.chatMemory = chatMemory; // 전역 접근 가능하도록 export
+const MAX_HISTORY = 10; // (더 이상 사용되지 않지만 호환성 위해 남김)
+
+// ★ 지능형 중복 배제: 이전 답변에서 언급된 주요 키워드(업체명, 장비명) 추출 ★
+function extractMentionedKeywords() {
+    const mentioned = new Set();
+    const sources = [...chatMemory.recentBuffer];
+
+    // 요약본도 소스에 추가
+    if (chatMemory.contextSummary) {
+        sources.push({ assistant: chatMemory.contextSummary });
+    }
+
+    if (sources.length === 0) return [];
+
+    sources.forEach(h => {
+        if (!h.assistant) return;
+        const text = h.assistant;
+
+        // 1. 번호/불렛 항목 추출 (예: "1. 삼성의료기", "* 루비레이저", "3. 씨투와이")
+        // 숫자로 시작하는 리스트 항목에서 굵은 글씨나 일반 텍스트 추출
+        const listItems = text.match(/(?:\d+\.|\*|-)\s+(\*\*|)([가-힣A-Z][가-힣A-Za-z0-9\s\-\/\(\)]{2,35})(?:\*\*|)/g) || [];
+        listItems.forEach(item => {
+            // 숫자/기호 및 볼드마크 제거
+            const cleaned = item.replace(/^(?:\d+\.|\*|-)\s*/g, '').replace(/\*\*/g, '').trim();
+            if (cleaned.length >= 2) mentioned.add(cleaned);
+        });
+
+        // 2. 괄호 안의 영문 약자 (예: "(ESWT)", "(RF)")
+        const acronyms = text.match(/\(([A-Z][A-Za-z0-9\-\/]{1,15})\)/g) || [];
+        acronyms.forEach(item => {
+            const cleaned = item.replace(/[()]/g, '').trim();
+            if (cleaned.length >= 2) mentioned.add(cleaned);
+        });
+
+        // 3. 굵은 글씨로 강조된 핵심 단어 (예: "**전자기펄스기**", "**JWC 그룹**")
+        const boldItems = text.match(/\*\*([가-힣A-Za-z0-9\s\-\/]{2,30})\*\*/g) || [];
+        boldItems.forEach(item => {
+            const cleaned = item.replace(/\*\*/g, '').trim();
+            // 특정 불용어 포함된 경우 제외
+            if (cleaned.length >= 2 && !/규칙|중요|주의|참고|특징|강점/.test(cleaned)) {
+                mentioned.add(cleaned);
+            }
+        });
+
+        // 4. 콜론 앞의 핵심 단어 (예: "체외충격파(ESWT):")
+        const colonItems = text.match(/([가-힣A-Za-z][가-힣A-Za-z0-9\s\-\/\(\)]{2,25}):/g) || [];
+        colonItems.forEach(item => {
+            const cleaned = item.replace(/:/g, '').trim();
+            if (cleaned.length >= 2) mentioned.add(cleaned);
+        });
+    });
+
+    // 일반적인 단어 제외 (노이즈 필터)
+    const noiseWords = ['예시', '참고', '안내', '설명', '정보', '내용', '경우', '관련', '추천', '소개', '질문', '답변'];
+    const result = Array.from(mentioned).filter(word => !noiseWords.some(noise => word.includes(noise)));
+
+    console.log('🔍 추출된 키워드 (강화된 맥락):', result);
+    return result;
+}
+
+// ★ 사용자 질문과 관련된 앵커 주제 찾기 ★
+function findRelatedAnchorTopics(userMessage, count = 3) {
+    if (!anchorTopics || anchorTopics.length === 0) {
+        return [];
+    }
+
+    const message = userMessage.toLowerCase();
+
+    // 각 주제별 관련도 점수 계산
+    const scored = anchorTopics.map(topic => {
+        let score = 0;
+        const question = topic.question.toLowerCase();
+        const category = topic.category.toLowerCase();
+        const subCategory = (topic.subCategory || '').toLowerCase();
+
+        // 카테고리 매칭
+        if (message.includes(category)) score += 3;
+        if (message.includes(subCategory)) score += 2;
+
+        // 질문 키워드 매칭
+        const questionWords = question.split(/[\s/]+/).filter(w => w.length > 1);
+        questionWords.forEach(word => {
+            if (message.includes(word)) score += 1;
+        });
+
+        // 메시지 키워드가 질문에 있는지
+        const messageWords = message.split(/[\s/]+/).filter(w => w.length > 1);
+        messageWords.forEach(word => {
+            if (question.includes(word)) score += 1;
+        });
+
+        return { question: topic.question, score };
+    });
+
+    // 점수순 정렬 후 상위 N개 선택
+    return scored
+        .filter(t => t.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, count)
+        .map(t => t.question);
+}
+
+// ★★★ 고유명사(업체명/엔티티) 강제 포함 함수 ★★★
+// 질문에 특정 고유명사가 언급되면 해당 문서를 강제로 포함시킴
+function findForcedDocsByCompanyName(userMessage, allDocs) {
+    if (!allDocs || allDocs.length === 0) {
+        return { forcedDocs: [], matchedCompanies: [] };
+    }
+
+    // 1. 데이터베이스에서 고유명사(엔티티) 목록 추출
+    // - DB 레코드: question 필드가 엔티티명 (예: "무아디자인", "JWC그룹")
+    // - 일반 문서: metadata.topic 필드 활용
+    const entityNames = new Set();
+
+    allDocs.forEach(doc => {
+        // DB 레코드인 경우 question이 엔티티명
+        if (doc.metadata?.category === 'DB 레코드' && doc.question) {
+            const name = doc.question.trim();
+            // 2글자 이상, 50글자 이하의 이름만 수집 (너무 긴 건 문장임)
+            if (name.length >= 2 && name.length <= 50) {
+                entityNames.add(name);
+            }
+        }
+        // metadata.topic도 엔티티명일 수 있음
+        if (doc.metadata?.topic) {
+            const topic = doc.metadata.topic.trim();
+            if (topic.length >= 2 && topic.length <= 50) {
+                entityNames.add(topic);
+            }
+        }
+    });
+
+    // 2. 질문에서 엔티티명 매칭
+    const matchedEntities = [];
+    const userMsgLower = userMessage.toLowerCase().replace(/\s/g, ''); // 띄어쓰기 무시
+
+    for (const entity of entityNames) {
+        const entityLower = entity.toLowerCase().replace(/\s/g, '');
+        // 엔티티명이 질문에 포함되어 있는지 확인
+        if (userMsgLower.includes(entityLower)) {
+            matchedEntities.push(entity);
+        }
+    }
+
+    // 3. 매칭된 엔티티의 문서 검색
+    const forcedDocs = [];
+    if (matchedEntities.length > 0) {
+        allDocs.forEach(doc => {
+            const docQuestion = doc.question?.trim();
+            const docTopic = doc.metadata?.topic?.trim();
+
+            // question 또는 topic이 매칭된 엔티티와 일치하면 포함
+            if ((docQuestion && matchedEntities.includes(docQuestion)) ||
+                (docTopic && matchedEntities.includes(docTopic))) {
+                forcedDocs.push({ ...doc }); // 복사본 추가
+            }
+        });
+    }
+
+    return { forcedDocs, matchedCompanies: matchedEntities };
+}
+
+const chatContainer = document.getElementById('chatContainer');
+const userInput = document.getElementById('userInput');
+const sendButton = document.getElementById('sendButton');
+const faqContent = document.getElementById('faqContent');
+const faqNav = document.getElementById('faqNav');
+const faqBackBtn = document.getElementById('faqBackBtn');
+
+// ==========================
+// 1. 초기화 및 이벤트
+// ==========================
+document.addEventListener('DOMContentLoaded', async () => {
+    // 진료과 확인 - 새 로그인 시스템(chat-history.js)이 없을 경우에만 기존 모달 표시
+    const loginModal = document.getElementById('loginModal');
+    const savedSpecialty = localStorage.getItem('userSpecialty');
+
+    if (savedSpecialty && SPECIALTIES[savedSpecialty]) {
+        currentUserSpecialty = savedSpecialty;
+        updateSpecialtyBadge();
+    } else if (!loginModal) {
+        // loginModal이 없을 때만 기존 진료과 모달 사용
+        openSpecialtyModal();
+    }
+
+    sheetsLoader = new GoogleSheetsLoader();
+    try {
+        await sheetsLoader.loadData();
+        renderFAQFields();
+    } catch (error) {
+        console.error('Initial Load Error:', error);
+    }
+
+    // topics.json 로드 (앵커 주제)
+    try {
+        const topicsResponse = await fetch('/data/topics.json');
+        if (topicsResponse.ok) {
+            const topicsData = await topicsResponse.json();
+            anchorTopics = topicsData.topics || [];
+            console.log(`✅ 앵커 주제 로드 완료: ${anchorTopics.length}개`);
+        }
+    } catch (error) {
+        console.warn('topics.json 로드 실패:', error);
+    }
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    sendButton.addEventListener('click', handleSendMessage);
+    userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    });
+    userInput.addEventListener('input', () => {
+        userInput.style.height = 'auto';
+        userInput.style.height = userInput.scrollHeight + 'px';
+    });
+    faqBackBtn.addEventListener('click', navigateBack);
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('suggestion-chip')) {
+            const question = e.target.getAttribute('data-question');
+            if (question) sendUserMessage(question);
+        }
+    });
+}
+
+// ==========================
+// 2. FAQ 네비게이션
+// ==========================
+function renderFAQFields() {
+    faqNavigationStack = [];
+    updateFAQView('fields');
+    const fields = sheetsLoader.getFields().filter(f => !f.includes('주제')).sort((a, b) => a.localeCompare(b, 'ko'));
+    if (fields.length === 0) {
+        faqContent.innerHTML = '<div style="padding:20px;">표시할 내용이 없습니다.</div>';
+        return;
+    }
+    faqContent.innerHTML = fields.map(field => `
+        <button class="faq-item-btn" onclick="renderFAQTopics('${field}')">
+            <span>💡 ${field}</span><span class="faq-arrow">›</span>
+        </button>`).join('');
+}
+
+function renderFAQTopics(field) {
+    faqNavigationStack.push({ view: 'fields', data: null });
+    updateFAQView('topics');
+    const topics = sheetsLoader.getTopics(field);
+    faqContent.innerHTML = `<div style="margin-bottom:12px; font-size:13px; color:#64748b;">${field} > 주제 선택</div>` +
+        topics.map(topic => `<button class="faq-item-btn" onclick="renderFAQList('${field}', '${topic}')">
+            <span>📑 ${topic}</span><span class="faq-arrow">›</span>
+        </button>`).join('');
+}
+
+function renderFAQList(field, topic) {
+    faqNavigationStack.push({ view: 'topics', data: field });
+    updateFAQView('list');
+    const list = sheetsLoader.getFAQList(field, topic);
+    faqContent.innerHTML = `<div style="margin-bottom:12px; font-size:13px; color:#64748b;">${field} > ${topic}</div>` +
+        list.map(item => `<div class="faq-question-item" onclick="toggleFAQAnswer(this)">
+            <div class="faq-q">Q. ${item.question}</div>
+            <div class="faq-a">${item.answer.replace(/\n/g, '<br>')}</div>
+        </div>`).join('');
+}
+
+function navigateBack() {
+    if (faqNavigationStack.length === 0) return;
+    const prevState = faqNavigationStack.pop();
+    if (prevState.view === 'fields') renderFAQFields();
+    else if (prevState.view === 'topics') renderFAQTopics(prevState.data);
+}
+
+function updateFAQView(view) {
+    faqNav.classList.toggle('active', view !== 'fields');
+    faqContent.scrollTop = 0;
+}
+
+function toggleFAQAnswer(el) {
+    const wasActive = el.classList.contains('active');
+    document.querySelectorAll('.faq-question-item').forEach(e => e.classList.remove('active'));
+    if (!wasActive) el.classList.add('active');
+}
+
+// ==========================
+// 3. 채팅 및 RAG 로직
+// ==========================
+async function handleSendMessage() {
+    const message = userInput.value.trim();
+    if (!message) return;
+    sendUserMessage(message);
+}
+
+async function sendUserMessage(message) {
+    userInput.value = '';
+    userInput.style.height = 'auto';
+    const welcome = document.querySelector('.welcome-message');
+    if (welcome) welcome.style.display = 'none';
+
+    // ★ 세션이 없으면 먼저 생성 후 대기 ★
+    if (window.chatHistory) {
+        const sessionId = window.chatHistory.getCurrentSessionId();
+        if (!sessionId) {
+            console.log('📝 세션 없음 - 새 세션 생성 중...');
+            await window.chatHistory.createNewChat();
+            console.log('✅ 새 세션 생성 완료:', window.chatHistory.getCurrentSessionId());
+        }
+    }
+
+    addMessage(message, 'user');
+    showTypingIndicator();
+
+    // Supabase에 사용자 메시지 저장 (chat-history.js)
+    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+        window.chatHistory.saveMessage('user', message).catch(err => {
+            console.warn('사용자 메시지 DB 저장 실패:', err);
+        });
+    }
+
+    getBotResponse(message);
+}
+
+async function getBotResponse(userMessage) {
+    // 피드백용으로 현재 질문 저장
+    window.currentQuestion = userMessage;
+
+    // 사용자 질문을 Google Sheets에 수집 (비동기, 에러 무시)
+    try {
+        const response = await fetch('/api/collect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sheetName: 'UserQuestions',
+                question: userMessage,
+                timestamp: new Date().toLocaleString('ko-KR')
+            })
+        });
+        const result = await response.json();
+        if (!result.success) {
+            console.warn('⚠️ 질문 수집 실패:', result.error);
+        }
+    } catch (e) {
+        console.warn('질문 수집 중 시스템 오류:', e);
+    }
+
+    try {
+        // ========== Stage 1: Query Planning ==========
+        updateTypingStatus('질문의 의도와 맥락을 분석하고 있습니다...');
+        console.log('🧠 Stage 1: Query Planning 시작...');
+        let queryPlan = null;
+        let relatedContexts = [];
+
+        try {
+            const userSpec = getUserSpecialty();
+            // ★ 현재까지 언급된 항목들 추출 ★
+            const alreadyMentioned = extractMentionedKeywords();
+
+            const planResponse = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userQuery: userMessage,
+                    mode: 'plan',
+                    userSpecialty: userSpec,
+                    recentContext: chatMemory.getContextPrompt(),  // 요약 + 최근 대화 전달
+                    alreadyMentioned: alreadyMentioned             // 중복 제거용 데이터 추가
+                })
+            });
+
+            if (planResponse.ok) {
+                const planResult = await planResponse.json();
+                if (planResult.success && planResult.plan) {
+                    queryPlan = planResult.plan;
+                    console.log('✅ Query Plan 수신:', queryPlan);
+                    console.log('   Intent:', queryPlan.intent);
+                    console.log('   RequiresSearch:', queryPlan.requiresSearch);
+                    console.log('   Planner:', planResult.modelName);
+
+                    // ★ MECE 6분류 기반 분기 처리 ★
+                    if (queryPlan.requiresSearch === false && queryPlan.directAnswer) {
+                        // 검색 불필요: 즉시 답변 출력 후 종료
+                        hideTypingIndicator();
+
+                        // Intent별 스타일 적용
+                        const intentStyles = {
+                            'GREETING': { icon: '👋', style: 'greeting' },
+                            'ABUSE': { icon: '🚫', style: 'warning' },
+                            'OFF_TOPIC': { icon: '💬', style: 'info' },
+                            'OUT_OF_SCOPE': { icon: '📞', style: 'referral' },
+                            'AMBIGUOUS': { icon: '❓', style: 'clarification' }
+                        };
+
+                        const intentInfo = intentStyles[queryPlan.intent] || { icon: '💡', style: 'default' };
+                        console.log(`🎯 [${queryPlan.intent}] 검색 스킵, 즉시 답변 출력`);
+
+                        // ★ OUT_OF_SCOPE 전용 처리: 플래너 연결 버튼 포함 UI ★
+                        if (queryPlan.intent === 'OUT_OF_SCOPE') {
+                            addOutOfScopeMessage(queryPlan.directAnswer);
+                        } else if (queryPlan.intent === 'AMBIGUOUS') {
+                            // ★ AMBIGUOUS 전용 처리: 관련 주제 추천 ★
+                            const relatedTopics = findRelatedAnchorTopics(userMessage, 5);
+                            let responseWithTopics = queryPlan.directAnswer;
+                            if (relatedTopics.length > 0) {
+                                responseWithTopics += '\n\n[RELATED_TOPICS]\n' + relatedTopics.map(t => `- ${t}`).join('\n') + '\n[/RELATED_TOPICS]';
+                            }
+                            addFormattedMessage(responseWithTopics, []);
+                        } else {
+                            // 다른 intent는 일반 포맷 메시지
+                            addFormattedMessage(queryPlan.directAnswer, []);
+                        }
+
+                        // ChatMemory에 저장 (맥락 유지용)
+                        await chatMemory.addTurn(userMessage, queryPlan.directAnswer);
+
+                        // Supabase 저장 (user는 sendUserMessage에서 이미 저장됨)
+                        if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+                            window.chatHistory.saveMessage('assistant', queryPlan.directAnswer).catch(() => { });
+                        }
+
+                        return; // ★ 검색 로직 완전 스킵 ★
+                    }
+
+                    // 기존 off_topic 호환성 유지 (혹시 모를 레거시 응답 대응)
+                    if (queryPlan.intent === 'off_topic') {
+                        hideTypingIndicator();
+                        addOffTopicMessage('죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다.');
+                        return;
+                    }
+                }
+            }
+        } catch (planError) {
+            console.warn('Query Planning 실패, 기본 검색으로 fallback:', planError);
+        }
+
+        // ========== Stage 2: Smart Search ==========
+        // (SPECIFIC intent만 여기까지 도달)
+        updateTypingStatus('데이터베이스에서 최적의 정보를 검색하고 있습니다...');
+        console.log('🔍 Stage 2: Smart Search 시작...');
+
+        // 성능 최적화: 검색 결과 한도 조정 (파트너사 15개로 확대)
+        const isPartnerListQuery = queryPlan?.subIntent === '파트너사목록' || queryPlan?.targetCategory === 'partners';
+        const maxResults = isPartnerListQuery ? 15 : 30;
+
+        if (queryPlan) {
+            // Query Plan 기반 스마트 검색 (사용자 진료과 정보 전달)
+            const userSpec = getUserSpecialty();
+            relatedContexts = await sheetsLoader.smartSearch(queryPlan, maxResults, userSpec);
+        } else {
+            // Fallback: 기존 키워드 검색
+            relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, maxResults);
+        }
+
+        console.log(`📚 검색 결과: ${relatedContexts.length}개 문서`);
+
+        // ========== Stage 2.5: 고유명사(업체명) 강제 포함 ==========
+        // 질문에 특정 업체명이 언급되면 해당 문서를 강제로 포함
+        const forcedResult = findForcedDocsByCompanyName(userMessage, sheetsLoader.cache || []);
+
+        if (forcedResult.forcedDocs.length > 0) {
+            console.log(`🎯 고유명사 매칭: ${forcedResult.matchedCompanies.join(', ')}`);
+            console.log(`📌 강제 포함 문서: ${forcedResult.forcedDocs.length}개`);
+
+            // 중복 제거 후 병합 (강제 문서를 앞에 배치)
+            const regularQuestions = new Set(relatedContexts.map(d => d.question));
+            const uniqueForcedDocs = forcedResult.forcedDocs.filter(d => !regularQuestions.has(d.question));
+
+            // 강제 문서에 높은 점수 부여 (정렬 유지용)
+            uniqueForcedDocs.forEach(doc => {
+                doc.score = 100; // 강제 포함 문서는 최상위 점수
+                doc._forcedInclude = true; // 강제 포함 마커
+            });
+
+            relatedContexts = [...uniqueForcedDocs, ...relatedContexts];
+            console.log(`📚 병합 후 총 문서: ${relatedContexts.length}개 (강제 ${uniqueForcedDocs.length}개 + 일반 ${relatedContexts.length - uniqueForcedDocs.length}개)`);
+        }
+
+        // ========== Stage 3: Answer Generation ==========
+        updateTypingStatus('찾은 정보를 바탕으로 답변을 작성하고 있습니다...');
+        console.log('💬 Stage 3: 답변 생성 시작...');
+        const result = await callOpenRouterAPI(userMessage, relatedContexts);
+
+        hideTypingIndicator();
+
+        // AI 응답 태그 감지
+        let responseText = result.text;
+
+        // ★ 토픽 태그 파싱 및 세션 제목 업데이트 ★
+        const topicMatch = responseText.match(/\[TOPIC:\s*([^\]]+)\]/);
+        if (topicMatch && topicMatch[1]) {
+            const topic = topicMatch[1].trim();
+            console.log(`📌 토픽 감지: ${topic}`);
+            // chat-history.js의 updateCurrentSessionTitle 함수 호출
+            if (typeof updateCurrentSessionTitle === 'function') {
+                updateCurrentSessionTitle(topic);
+            }
+            // 토픽 태그 제거 (UI에 보이지 않도록)
+            responseText = responseText.replace(/\[TOPIC:\s*[^\]]+\]\n?/, '').trim();
+        }
+
+        if (responseText.includes('[OFF_TOPIC]')) {
+            let cleanText = responseText.replace('[OFF_TOPIC]', '').trim();
+            // Rambling 방지: [번호] 인용이 포함되어 있다면 제거 (Off-topic엔 불필요)
+            cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
+            addOffTopicMessage(cleanText);
+            responseText = cleanText;
+        } else if (responseText.includes('[NO_DATA]')) {
+            let cleanText = responseText.replace('[NO_DATA]', '').trim();
+            // 인용 번호 제거
+            cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
+
+            addNoDataMessage(cleanText);
+            responseText = cleanText;
+        } else {
+            // 필터링된 컨텍스트를 사용하여 포매팅 (중요: 답변의 [번호]와 일치시키기 위함)
+            addFormattedMessage(responseText, result.filteredContexts || relatedContexts, result.modelName);
+        }
+
+        // 대화 히스토리에 저장 (맥락 유지 + 요약 자동 트리거)
+        // 텍스트를 자르지 않고 저장하여 나중에 키워드 추출 시 누락이 없도록 함
+        chatMemory.addTurn(userMessage, responseText);
+
+        // Supabase에 AI 응답 저장 (user는 sendUserMessage에서 이미 저장됨)
+        if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+            window.chatHistory.saveMessage('assistant', responseText).catch(err => {
+                console.warn('AI 응답 DB 저장 실패:', err);
+            });
+        }
+
+    } catch (error) {
+        console.error('Bot Response Error:', error);
+        hideTypingIndicator();
+        addMessage('죄송합니다. 오류가 발생했습니다.', 'bot');
+    }
+}
+
+async function callOpenRouterAPI(userQuery, contexts) {
+    // ★ Phase 3-2: 참고문서에 진료과 메타데이터 시각화 ★
+    const userSpec = getUserSpecialty();
+    let contextText = '';
+
+    let filteredContexts = []; // 선언 이동 및 스코프 확장
+    if (contexts && contexts.length > 0) {
+        // ★ Step 6: Top N 선택 (10~30개) - sheets-loader.js에서 이미 동적 컷오프 수행됨 ★
+        const maxDocs = Math.min(contexts.length, 30);
+        const minDocs = Math.min(contexts.length, 10);
+        filteredContexts = contexts.slice(0, maxDocs);
+
+        console.log(`   📚 최종 문서: ${filteredContexts.length}개 (범위: ${minDocs}~${maxDocs})`);
+
+        // 문서 포맷팅 함수
+        const formatDoc = (item, idx) => {
+            let prefix = `[${idx + 1}]`;
+
+            // 진료과 태그 시각화
+            if (item.metadata?.specialties && item.metadata.specialties.length > 0) {
+                const tags = item.metadata.specialties.map(s => {
+                    const emoji = SPECIALTIES[s]?.emoji || '';
+                    const match = userSpec && s === userSpec.code ? '✓' : '';
+                    return `${emoji}${s}${match}`;
+                }).join(' ');
+                prefix += ` ${tags} |`;
+            } else {
+                prefix += ` (공통) |`;
+            }
+
+            // 토큰 최적화: answer를 400자로 제한
+            const truncatedAnswer = item.answer.length > 400
+                ? item.answer.substring(0, 400) + '...(이하 생략)'
+                : item.answer;
+            return `${prefix} Q: ${item.question}\nA: ${truncatedAnswer}`;
+        };
+
+        // 단순 문서 목록 구성 (계층화 없음)
+        contextText = filteredContexts.map((item, idx) => formatDoc(item, idx)).join('\n\n');
+    }
+
+    // 대화 히스토리 구성 (ChatMemory 활용)
+    let historyText = chatMemory.getContextPrompt();
+
+    // ★ Phase 3-1: 시스템 프롬프트에 진료과 우선순위 강화 ★
+    let specialtyInfo = '';
+    if (userSpec && userSpec.label) {
+        specialtyInfo = `사용자는 **${userSpec.label}** 개원을 준비 중입니다.
+
+**[중요] 답변 생성 규칙:**
+1. 검색 결과 중 **[${userSpec.label}✓]** 태그가 있는 문서를 **최우선**으로 참고하세요.
+2. 태그가 없어도 본문에 ${userSpec.keywords.slice(0, 5).join(', ')} 등 ${userSpec.label} 관련 내용이 있으면 우선 포함하세요.
+3. 다른 진료과 내용보다 **${userSpec.label} 관련 정보를 먼저** 설명하세요.
+4. 파트너사/의료기기/비용 등의 질문에서도 **${userSpec.label}에 적합한 항목을 우선 추천**하세요.`;
+    }
+
+    // ★ 지능형 중복 배제: 이미 언급된 항목 목록 생성 ★
+    const alreadyMentioned = extractMentionedKeywords();
+    let deduplicationRule = '';
+    if (alreadyMentioned.length > 0) {
+        deduplicationRule = `
+# ⛔ 중복 금지 (이미 설명한 항목)
+${alreadyMentioned.slice(0, 15).join(', ')}
+
+→ 위 항목은 다시 설명하지 마세요. 새로운 정보만 답변하거나, 없으면 "추가 정보가 없습니다"라고 하세요.
+`;
+    }
+
+    // 첫 대화인지 확인 (토픽 생성용)
+    const isFirstMessage = !historyText || historyText === '(첫 대화)' || chatMemory.recentBuffer.length === 0;
+    const topicGenerationRule = isFirstMessage ? `
+# ⭐ 토픽 생성 (첫 대화일 때만)
+- 이 대화의 주제를 한글 10자 이내로 요약하여 답변의 **맨 첫 줄**에 다음 형식으로 작성하세요: \`[TOPIC: 주제]\`
+- 예시: \`[TOPIC: 임플란트 장비]\`, \`[TOPIC: 인테리어 비용]\`, \`[TOPIC: 세무 상담]\`
+- 토픽 태그 다음 줄부터 실제 답변을 시작하세요.
+` : '';
+
+    const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변해주세요.
+
+${specialtyInfo ? '# 사용자 진료과\n' + specialtyInfo + '\n' : ''}
+${deduplicationRule}
+${topicGenerationRule}
+# 이전 대화
+${historyText ? historyText : '(첫 대화)'}
+
+# 참고문서
+${contextText ? contextText : '(관련 데이터 없음)'}
+
+# 핵심 규칙
+1. **[중복 답변 금지]**: 이미 **# ⛔ 중복 금지** 섹션에 있는 업체나 정보가 **# 참고문서**에 또 나오더라도, 이를 제외하고 **새로운 데이터 위주로** 답변하세요.
+
+2. **[진료과 기반 정보 제공 및 주의사항 안내]**:
+   - 제공된 참고문서에 포함된 업체/정보는 검색 엔진이 사용자의 질문 의도에 맞춰 선별한 것이므로 **숨기지 말고 적극적으로 소개**하세요.
+   - **[CASE A: 진료과 일치]**: 파트너사의 특화 진료과가 사용자의 진료과와 일치하는 경우, 적극 추천하고 상세히 설명하세요.
+   - **[CASE B: 진료과 불일치 (주의사항 필수)]**: 참고문서에는 있지만 특화 진료과가 사용자와 다른 경우(예: 사용자 '미용', 파트너 '통증'), **정보를 누락하지 말고 상세히 답변하되, 반드시 아래 주의사항을 덧붙이세요.**
+     - **안내 멘트 예시**: "해당 파트너사는 주로 **[참고문서의 진료과]**에 특화되어 있습니다. 원장님의 진료과인 **[사용자 진료과]** 관련 시공/납품 사례는 별도 확인이 필요할 수 있음을 안내해 드립니다."
+   - 참고문서에 있는 [통증✓], [내과✓] 등의 태그 정보를 기준으로 판단하세요.
+
+3. **[주제 일관성 유지]**: 현재 대화의 주제(예: 인테리어)를 중심으로 답변하세요. 참고문서에 다른 주제가 섞여 있다면 사용자의 질문 의도에 부합하는 내용만 골라내어 자연스럽게 답변하세요. 만약 요청하신 주제에 대한 새로운 정보가 정말 없다면, 억지로 다른 주제를 꺼내기보다는 현재까지 안내해 드린 내용을 정리하거나 추가 확인이 필요함을 정직하게 전달하세요.
+
+4. 참고문서 내용 기반으로만 답변 (할루시네이션 금지)
+
+5. 병원 개원과 무관한 질문 → "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
+   - **중요**: [OFF_TOPIC] 사용 시 다른 긴 설명이나 인용을 절대 포함하지 마세요.
+
+6. 사용자가 요청한 **구체적인 정보(예: 금액, 수치, 리스트 등)**가 참고문서에 없거나 부족한 경우 → '[NO_DATA]' 태그와 함께 **아래 형식을 정확히** 따르세요:
+   - **형식**: (1) 감사/사과 문단 → (빈 줄) → (2) 고정 안내 문구 → (빈 줄) → (3) [RELATED_TOPICS] 블록
+   - **고정 안내 문구**: "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
+   - **⚠️ 중요 규칙**:
+     - **본문에 불렛포인트(*, -, •)로 추천 주제를 나열하지 마세요!** 
+     - 관련 주제는 반드시 답변 맨 끝의 [RELATED_TOPICS] 블록에만 작성하세요.
+     - **[NO_DATA] 응답에서는 [ID: n] 인용을 절대 사용하지 마세요.**
+     - 인용 번호 수동 생성 금지 및 상투적인 맺음말("성공적인 개원~")을 절대 사용하지 마세요.
+
+# 출처 인용 규칙 (매우 중요!)
+1. **인용 방식 (ID 필수)**: 답변의 각 사실 정보 뒤에는 해당 정보의 출처인 참고문서의 ID를 **[ID: n]** 형식으로 반드시 표시하세요. (예: 닥터사이클린은 환경부 공식 지정 업체입니다 [ID: 0]). 
+2. **인용 최소화 (Clean UI)**: 동일한 출처에서 가져온 내용이 연속될 경우, 문장마다 붙이지 말고 해당 단락(Paragraph)이나 리스트 항목의 끝에 한 번만 표시하세요.
+3. **ID 중복 금지**: 한 단락 내에서 같은 ID가 반복되어 가독성을 해치지 않도록 하세요. 
+4. **하단 요약 금지 (CRITICAL)**: 답변 가장 아랫부분에 별도로 '참고문서' 리스트를 만들거나 ID를 모아서 나열하지 마세요. 주석은 본문 안에만 존재해야 합니다.
+
+- **가독성 최우선**: 각 리스트 항목(1. 2. 3...) 사이와 주요 섹션 사이에는 반드시 **빈 줄(Double Line Break)**을 추가하여 답변이 빽빽해 보이지 않게 하세요.
+- **볼드체 활용**: 업체명, 평당가, 주요 특징 등 핵심 정보는 **볼드체**를 사용하여 시인성을 높이세요.
+- 줄바꿈을 적절히 사용하여 하나의 텍스트 덩어리가 너무 크지 않게 조절하세요.
+- 정중하고 전문적인 말투 (~요, ~습니다)
+- 자연스러운 맺음말로 답변을 마무리하고, 그 뒤에 어떠한 참고문서 목록도 덧붙이지 마세요.
+
+# 관련 주제 추천 (필수)
+**답변 작성 후, 반드시 아래 규칙대로 관련 주제를 추천하세요.**
+
+[사용 가능한 주제 목록 - 아래 목록에서 **글자 그대로 복사**해서 사용하세요]
+${anchorTopics.map(t => `- ${t.question}`).join('\n')}
+
+**⚠️ 중요 규칙:**
+1. **반드시 위 목록에 있는 질문을 글자 그대로 복사**하세요. 단어 하나도 바꾸지 마세요.
+2. 목록에 없는 질문은 **절대 추천하지 마세요**. 임의로 만들면 안 됩니다.
+3. 현재 답변과 관련있는 주제 2~3개를 선택하세요.
+4. 방금 답변한 내용과 동일한 질문은 제외하세요.
+5. **자연스러운 대화체로 추천**하세요. 아래 형식을 **정확히** 따르세요:
+
+**형식:**
+\`\`\`
+[RELATED_TOPICS]주제1|주제2|주제3[/RELATED_TOPICS]
+
+원장님, 혹시 **주제1**이나 **주제2**에 대해서도 궁금하신가요? 언제든 물어보세요!
+\`\`\`
+
+**예시:**
+\`\`\`
+[RELATED_TOPICS]인테리어 평당가 얼마나 하나요?|인테리어 절차가 어떻게 되나요?|인테리어 업체 추천해주세요[/RELATED_TOPICS]
+
+원장님, 혹시 **인테리어 평당가**나 **인테리어 절차**에 대해서도 궁금하신가요? 언제든 물어보세요!
+\`\`\`
+
+**주의:**
+- [RELATED_TOPICS] 블록은 한 줄로 작성하고, 주제는 파이프(|)로 구분하세요.
+- 본문에서는 주제를 **굵은 글씨**로 감싸서 자연스럽게 문장에 녹여내세요.
+- 주제를 축약하지 말고 정확한 질문 텍스트를 사용하세요.`;
+
+
+    try {
+        console.log('🤖 AI 서버 호출 중...');
+
+        const response = await fetch(CONFIG.CHAT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userQuery: `질문: ${userQuery}`,
+                systemPrompt: systemPrompt
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error(`API 에러: ${response.status}`, errorData);
+
+            let errorMsg = '죄송합니다. AI 서버 연결에 문제가 발생했습니다.';
+
+            // API Key 미설정 시 사용자에게 힌트 제공 (디버깅용)
+            if (errorData.debug && !errorData.debug.apiKeyExists) {
+                errorMsg += '\n(원인: Vercel 환경변수 GEMINI_API_KEY가 설정되지 않았습니다)';
+            } else if (errorData.error) {
+                errorMsg += `\n(원인: ${errorData.error})`;
+            }
+
+            return { text: errorMsg, modelName: null };
+        }
+
+        const data = await response.json();
+
+        return {
+            text: data.text,
+            modelName: data.modelName,
+            filteredContexts: filteredContexts
+        };
+
+    } catch (error) {
+        console.error('AI 호출 에러:', error);
+        return { text: '서버 연결에 실패했습니다.', modelName: null };
+    }
+}
+
+// ==========================
+// 4. UI 렌더링
+// ==========================
+function addMessage(text, sender) {
+    const div = document.createElement('div');
+    div.className = `message ${sender}`;
+    div.innerHTML = `<div class="message-avatar">${sender === 'user' ? '나' : 'AI'}</div><div class="message-content">${text.replace(/\n/g, '<br>')}</div>`;
+    chatContainer.appendChild(div);
+    scrollToBottom();
+}
+
+// 마크다운을 HTML로 변환하여 렌더링
+function addFormattedMessage(text, contexts, modelName = null) {
+    const div = document.createElement('div');
+    div.className = 'message bot';
+
+    // 0. [RELATED_TOPICS] 블록 추출 및 제거 (파이프 + 불렛 둘 다 지원)
+    let relatedTopics = [];
+    const topicsMatch = text.match(/\[RELATED_TOPICS\]([\s\S]*?)\[\/RELATED_TOPICS\]/);
+    if (topicsMatch) {
+        const topicsBlock = topicsMatch[1].trim();
+        // 파이프(|)가 있으면 파이프로 분리, 없으면 줄바꿈+불렛으로 분리
+        if (topicsBlock.includes('|')) {
+            relatedTopics = topicsBlock
+                .split('|')
+                .map(topic => topic.trim())
+                .filter(topic => topic.length > 0);
+        } else {
+            // 기존 형식: 줄바꿈 + 불렛(-, •, *)
+            relatedTopics = topicsBlock
+                .split('\n')
+                .map(line => line.replace(/^[-•*]\s*/, '').trim())
+                .filter(line => line.length > 0);
+        }
+        // 본문에서 [RELATED_TOPICS] 블록 제거
+        text = text.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
+    }
+
+    // 1. [ID: n] 형식의 주석 파싱 및 재정렬
+    let processedText = text;
+    // [ID: 0], [ID: 1] 혹은 [ID:0] 형식을 모두 잡는 정규식
+    const idCitationRegex = /\[ID:\s*(\d+)\]/g;
+    const foundIds = []; // 실제 사용된 원본 ID들 (등장 순서대로)
+    let match;
+
+    // 텍스트 전체를 스캔하여 언급된 모든 소스 ID를 등장 순서대로 수집
+    while ((match = idCitationRegex.exec(text)) !== null) {
+        const id = parseInt(match[1]);
+        if (!isNaN(id) && !foundIds.includes(id)) {
+            foundIds.push(id);
+        }
+    }
+
+    // 소스 ID -> 사용자용 새 번호 매핑 (ID: 4 -> [1], ID: 0 -> [2] 등)
+    const idToNewNumMap = {};
+    foundIds.forEach((sourceId, idx) => {
+        idToNewNumMap[sourceId] = idx + 1;
+    });
+
+    // 실제 표시될 컨텍스트 데이터를 ID 기반으로 정확히 추출 (인덱스 에러 방지)
+    const activeContexts = foundIds.map(sourceId => {
+        return contexts[sourceId];
+    }).filter(ctx => ctx);
+
+    // 텍스트 본문의 [ID: n] -> [1] 형태로 변환
+    processedText = text.replace(idCitationRegex, (match, idStr) => {
+        const id = parseInt(idStr);
+        const newNum = idToNewNumMap[id];
+        return newNum ? `[${newNum}]` : ''; // 매핑 실패 시 공백 처리 (할루시네이션 방지)
+    });
+
+    // 2. 마크다운 → HTML 변환 (processedText 기반)
+    let html = processedText
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/^### (.+)$/gm, '<h4 class="response-heading">$1</h4>')
+        .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^\* (.+)$/gm, '<li>$1</li>')
+        .replace(/^---$/gm, '<hr>')
+        .replace(/\n/g, '<br>');
+
+    html = html.replace(/(<li>.*?<\/li>)(<br>)?/g, '$1');
+    html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul class="response-list">$1</ul>');
+    html = html.replace(/<\/ul><br>?<ul class="response-list">/g, '');
+
+    // 3. 관련 주제를 클릭 가능한 링크로 변환
+    // 본문의 **주제**를 찾아서 클릭 가능하게 만듦
+    if (relatedTopics.length > 0) {
+        relatedTopics.forEach(topic => {
+            // **주제** 형태의 굵은 글씨를 클릭 가능한 링크로 변환
+            const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
+            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
+            html = html.replace(regex, clickableLink);
+        });
+    }
+
+    // 4. [1], [2] 주석을 툴팁 HTML로 최종 변환
+    // 번호가 큰 것부터 치환하여 중복 매칭 방지
+    const sortedNewNums = Object.values(idToNewNumMap).sort((a, b) => b - a);
+
+    sortedNewNums.forEach(num => {
+        const ctx = activeContexts[num - 1]; // activeContexts는 foundIds 순서대로 담겨 있음
+        if (!ctx) return;
+
+        const answerPreview = ctx.answer.length > 200 ? ctx.answer.substring(0, 200) + '...' : ctx.answer;
+        const tooltip = `<strong>Q:</strong> ${escapeHtml(ctx.question)}<br><br><strong>A:</strong> ${escapeHtml(answerPreview)}`;
+        const citationHtml = `<span class="cite-ref">[${num}]<span class="cite-tooltip">${tooltip}</span></span>`;
+
+        // [번호] 형식을 찾아서 치환
+        const regex = new RegExp(`\\[${num}\\]`, 'g');
+        html = html.replace(regex, citationHtml);
+    });
+
+    // 5. 사용한 모델명 표시
+    const modelInfo = modelName ? `<div class="model-info">🤖 ${modelName}</div>` : '';
+
+    // 6. 피드백 버튼 + 복사 버튼 추가
+    const messageId = Date.now();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사">📋</button>
+        </div>
+    `;
+
+    // 질문/답변 저장 (피드백용)
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: window.currentQuestion || '',
+        answer: text.substring(0, 500)
+    };
+
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">${html}${modelInfo}${feedbackButtons}</div>
+    `;
+
+    chatContainer.appendChild(div);
+    scrollToMessageTop(div);
+
+    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
+}
+
+// 관련 주제 버튼 클릭 시 해당 질문 자동 전송
+function sendRelatedTopic(topic) {
+    // topics.json에 있는 질문인지 확인
+    const isValidTopic = anchorTopics.some(t => t.question === topic);
+    if (!isValidTopic) {
+        console.warn('유효하지 않은 앵커 주제:', topic);
+        return;
+    }
+
+    // 입력창에 질문 넣고 전송
+    userInput.value = topic;
+    sendUserMessage(topic);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showTypingIndicator() {
+    const div = document.createElement('div');
+    div.id = 'typingIndicator';
+    div.className = 'typing-indicator';
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="typing-dots">
+            <span></span><span></span><span></span>
+        </div>
+        <span id="typingStatus" style="color:#64748b; font-size:13px; margin-left:8px;">준비 중...</span>
+    `;
+    chatContainer.appendChild(div);
+    scrollToBottom();
+}
+
+function updateTypingStatus(message) {
+    const statusEl = document.getElementById('typingStatus');
+    if (statusEl) {
+        statusEl.textContent = message;
+    }
+}
+
+function hideTypingIndicator() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+}
+
+function scrollToBottom() {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// AI 응답 완료 시 직전 사용자 질문부터 보이도록 스크롤
+function scrollToMessageTop(messageElement) {
+    if (messageElement) {
+        // AI 응답 바로 이전의 사용자 메시지 찾기
+        const prevSibling = messageElement.previousElementSibling;
+        if (prevSibling && prevSibling.classList.contains('user')) {
+            // 사용자 질문부터 보이도록 스크롤
+            prevSibling.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            // 이전 메시지가 없으면 현재 메시지로 스크롤
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+}
+
+// OFF_TOPIC 응답 렌더링
+function addOffTopicMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'message bot';
+
+    // 피드백 버튼용 ID 생성 및 데이터 저장
+    const messageId = Date.now();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+        </div>
+    `;
+
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: window.currentQuestion || '',
+        answer: text.substring(0, 500)
+    };
+
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">
+            <p style="color: #64748b;">${text}</p>
+            ${feedbackButtons}
+        </div>
+    `;
+    chatContainer.appendChild(div);
+    scrollToMessageTop(div);
+
+    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
+}
+
+// OUT_OF_SCOPE 응답 렌더링 (플래너 연결 버튼 포함)
+function addOutOfScopeMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'message bot';
+
+    // 피드백 버튼용 ID 생성 및 데이터 저장
+    const messageId = Date.now();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+        </div>
+    `;
+
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: window.currentQuestion || '',
+        answer: text.substring(0, 500)
+    };
+
+    // 고정 메시지 (친절한 톤 + 답변 가능 영역 안내)
+    const fixedMessage = `
+        <p style="margin-bottom: 12px; line-height: 1.7;">
+            해당 내용은 전문적인 지식이 필요한 영역이라, 저보다 담당 플래너에게 문의하시는 것이 가장 정확합니다. 😊
+        </p>
+        <p style="margin-bottom: 8px; line-height: 1.7;">
+            대신 저는 아래 내용에 대해 답변드릴 수 있어요!
+        </p>
+        <ul style="margin: 0 0 16px 24px; padding: 0; color: #475569; line-height: 1.8;">
+            <li>🎨 인테리어, 간판, 의료기기 파트너사 추천</li>
+            <li>📋 개원 절차 및 체크리스트 안내</li>
+            <li>💡 진료과별 개원 팁 및 가이드</li>
+        </ul>
+        <p style="margin-bottom: 16px; line-height: 1.7; color: #64748b;">
+            플래너 연결을 원하시면 아래 버튼을 눌러주세요. 빠른 시일 내에 회신드리겠습니다.
+        </p>
+    `;
+
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">
+            ${fixedMessage}
+            <button class="contact-planner-btn" onclick="openContactModal()" style="
+                background-color: #536db1;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.2s;
+                margin-bottom: 16px;
+            ">
+                <span style="font-size: 16px;">📞</span> 플래너에게 연결하기
+            </button>
+            ${feedbackButtons}
+        </div>
+    `;
+    chatContainer.appendChild(div);
+    scrollToMessageTop(div);
+
+    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
+}
+
+// NO_DATA 응답 렌더링 (볼드체, 불렛 포인트 지원 + 플래너 연락 버튼)
+function addNoDataMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'message bot';
+
+    // 0. [RELATED_TOPICS] 블록 추출 및 제거 (파이프 + 불렛 둘 다 지원)
+    let relatedTopics = [];
+    const topicsMatch = text.match(/\[RELATED_TOPICS\]([\s\S]*?)\[\/RELATED_TOPICS\]/);
+    if (topicsMatch) {
+        const topicsBlock = topicsMatch[1].trim();
+        // 파이프(|)가 있으면 파이프로 분리, 없으면 줄바꿈+불렛으로 분리
+        if (topicsBlock.includes('|')) {
+            relatedTopics = topicsBlock
+                .split('|')
+                .map(topic => topic.trim())
+                .filter(topic => topic.length > 0);
+        } else {
+            // 기존 형식: 줄바꿈 + 불렛(-, •, *)
+            relatedTopics = topicsBlock
+                .split('\n')
+                .map(line => line.replace(/^[-•*]\s*/, '').trim())
+                .filter(line => line.length > 0);
+        }
+        // 본문에서 [RELATED_TOPICS] 블록 제거
+        text = text.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
+    }
+
+    // 1. 인용 번호 제거 ([숫자], [ID: 숫자] 형식 모두)
+    let cleanedText = text.replace(/\[\d+\]/g, '').replace(/\[ID:\s*\d+\]/gi, '').trim();
+
+    // 2. 고정 안내 문구 제거 (UI에서 별도로 표시하므로 LLM 출력에서 제거)
+    cleanedText = cleanedText.replace(/질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다\.?/g, '').trim();
+
+    // 3. 줄 단위로 분리 (다양한 줄바꿈 형식 지원)
+    const lines = cleanedText.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+
+    // 4. 맺음말 제거 로직
+    const filteredLines = [];
+    let listStarted = false;
+
+    for (const line of lines) {
+        // 불렛 포인트 감지: * 또는 - 또는 ● 로 시작 (공백 유무 무관)
+        const isBullet = /^[\*\-●]\s*.+/.test(line);
+
+        if (isBullet) {
+            listStarted = true;
+            filteredLines.push(line);
+        } else if (listStarted && !isBullet) {
+            // 리스트가 시작된 후 일반 텍스트가 나오면 맺음말로 간주하고 중단
+            if (line.includes('성공') || line.includes('언제든') || line.includes('도움')) {
+                break; // 맺음말 이후 무시
+            }
+            filteredLines.push(line);
+        } else {
+            filteredLines.push(line);
+        }
+    }
+
+    // 5. 마크다운 → HTML 변환
+    let htmlParts = [];
+    let inList = false;
+    let listItems = [];
+
+    for (const line of filteredLines) {
+        // 불렛 포인트 체크 (앞뒤 공백 무시하고 *, -, ● 로 시작하는 행)
+        const bulletMatch = line.trim().match(/^[\*\-●]\s*(.+)$/);
+
+        if (bulletMatch) {
+            if (!inList) {
+                inList = true;
+                listItems = [];
+            }
+            // 불렛 내용에서 볼드체 변환
+            let content = bulletMatch[1].replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            listItems.push(`<li style="margin-bottom: 8px; line-height: 1.6;">${content}</li>`);
+        } else {
+            // 불렛이 아닌 경우
+            if (inList && listItems.length > 0) {
+                // 이전 리스트 마감
+                htmlParts.push(`<ul style="margin: 16px 0; padding-left: 48px; list-style-type: disc;">${listItems.join('')}</ul>`);
+                listItems = [];
+                inList = false;
+            }
+            // 일반 텍스트도 볼드체 변환
+            let content = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            htmlParts.push(`<p style="margin-bottom: 12px;">${content}</p>`);
+        }
+    }
+
+    // 마지막 리스트 마감
+    if (inList && listItems.length > 0) {
+        htmlParts.push(`<ul style="margin: 16px 0; padding-left: 48px; list-style-type: disc;">${listItems.join('')}</ul>`);
+    }
+
+    let html = htmlParts.join('');
+
+    // 6. 관련 주제를 클릭 가능한 링크로 변환
+    if (relatedTopics.length > 0) {
+        relatedTopics.forEach(topic => {
+            // **주제** 형태의 굵은 글씨를 클릭 가능한 링크로 변환
+            const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
+            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
+            html = html.replace(regex, clickableLink);
+        });
+    }
+
+    // 7. 피드백 버튼용 ID 생성 및 데이터 저장
+    const messageId = Date.now();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+        </div>
+    `;
+
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: window.currentQuestion || '',
+        answer: text.substring(0, 500)
+    };
+
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">
+            <div class="no-data-text" style="line-height: 1.7;">${html}</div>
+            <p style="margin: 20px 0 16px 0; color: #64748b; font-size: 14px;">
+                질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
+            </p>
+            <button class="contact-planner-btn" onclick="openContactModal()" style="
+                background-color: #536db1;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.2s;
+                margin-bottom: 16px;
+            ">
+                <span style="font-size: 16px;">☎️</span> 플래너에게 연락하기
+            </button>
+            ${feedbackButtons}
+        </div>
+    `;
+    chatContainer.appendChild(div);
+    scrollToMessageTop(div);
+
+    // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
+}
+
+// ========== 답변 복사 기능 ==========
+async function copyMessageToClipboard(messageId, buttonElement) {
+    const messageData = window.lastMessages?.[messageId];
+    if (!messageData) {
+        console.warn('복사할 메시지를 찾을 수 없습니다:', messageId);
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(messageData.answer);
+
+        // 시각적 피드백
+        const originalText = buttonElement.textContent;
+        buttonElement.textContent = '✅';
+        buttonElement.classList.add('copied');
+
+        setTimeout(() => {
+            buttonElement.textContent = originalText;
+            buttonElement.classList.remove('copied');
+        }, 2000);
+
+    } catch (error) {
+        console.error('클립보드 복사 실패:', error);
+        alert('복사에 실패했습니다. 브라우저 권한을 확인해주세요.');
+    }
+}
+
+// ========== 피드백 시스템 ==========
+let currentFeedbackType = null;
+let currentFeedbackMessageId = null;
+
+function openFeedbackModal(type, messageId) {
+    currentFeedbackType = type;
+    currentFeedbackMessageId = messageId;
+
+    const modal = document.getElementById('feedbackModal');
+    const title = document.getElementById('feedbackModalTitle');
+    const textarea = document.getElementById('feedbackTextarea');
+
+    title.textContent = type === 'good' ? '👍 긍정적 피드백' : '👎 부정적 피드백';
+    textarea.value = '';
+    modal.classList.add('active');
+
+    // 버튼 선택 표시
+    const buttons = document.querySelector(`[data-message-id="${messageId}"]`);
+    if (buttons) {
+        buttons.querySelectorAll('.feedback-btn').forEach(btn => btn.classList.remove('selected'));
+        buttons.querySelector(`.feedback-btn.${type}`).classList.add('selected');
+    }
+}
+
+function closeFeedbackModal() {
+    document.getElementById('feedbackModal').classList.remove('active');
+    currentFeedbackType = null;
+    currentFeedbackMessageId = null;
+}
+
+async function submitFeedback() {
+    const feedbackTextarea = document.getElementById('feedbackTextarea');
+    const submitBtn = document.querySelector('#feedbackModal .feedback-submit-btn');
+
+    const content = feedbackTextarea.value.trim();
+    const messageId = currentFeedbackMessageId;
+    const messageData = window.lastMessages?.[messageId] || {};
+
+    const feedback = {
+        type: currentFeedbackType === 'good' ? 'Good' : 'Bad',
+        question: messageData.question || '',
+        answer: messageData.answer || '',
+        content: content || '(내용 없음)',
+        timestamp: new Date().toLocaleString('ko-KR')
+    };
+
+    console.log('📤 피드백 전송 시도:', feedback);
+
+    // 버튼 비활성화로 중복 방지
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '전송 중...';
+    }
+
+    try {
+        const requestBody = {
+            sheetName: 'Feedback',
+            ...feedback
+        };
+
+        const response = await fetch('/api/collect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        });
+
+        const result = await response.json();
+        console.log('📥 API 응답 데이터:', result);
+
+        if (response.ok && result.success) {
+            closeFeedbackModal();
+            showSuccessModal('피드백 전달이 완료되었습니다. 감사합니다.');
+        } else {
+            const errorMsg = result.error || '저장 중 문제가 발생했습니다.';
+            console.error('⚠️ 피드백 저장 실패:', result);
+            alert(`피드백 저장 실패\n\n상태: ${response.status}\n메시지: ${errorMsg}\n\n이 메시지를 캡처해서 전달해주세요.`);
+        }
+    } catch (error) {
+        console.error('❌ 피드백 저장 오류:', error);
+        alert('피드백 제출 중 시스템 오류가 발생했습니다: ' + error.message);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '제출';
+        }
+    }
+}
+
+function showFeedbackListModal() {
+    const modal = document.getElementById('feedbackListModal');
+    modal.classList.add('active');
+    renderFeedbackList();
+}
+
+function closeFeedbackListModal() {
+    document.getElementById('feedbackListModal').classList.remove('active');
+}
+
+function renderFeedbackList() {
+    const container = document.getElementById('feedbackListContent');
+    container.innerHTML = `
+        <div style="text-align:center; padding:40px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+            <h4 style="margin-bottom: 12px; color: #334155;">피드백은 Google Sheets에서 확인하세요</h4>
+            <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;">
+                모든 사용자의 피드백은 Google Sheets "Feedback" 시트에 저장됩니다.
+            </p>
+            <a href="https://docs.google.com/spreadsheets/d/1-YZhxai1zHQOBspas4ivKBiNf8cFnq-JC7IXgFB0to4/edit#gid=1727721047" 
+               target="_blank"
+               style="display: inline-block; padding: 12px 24px; background: #536db1; color: white; text-decoration: none; border-radius: 8px; font-weight: 500;">
+                Google Sheets 열기 →
+            </a>
+        </div>
+    `;
+}
+
+// (기존 중복 함수 삭제됨 - 상단 정의 사용)
+
+
+function openContactModal() {
+    const modal = document.getElementById('contactModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+function closeContactModal() {
+    const modal = document.getElementById('contactModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+async function selectPlanner(plannerName) {
+    closeContactModal();
+
+    try {
+        // Vercel API를 통해 Slack으로 전송 (Webhook URL은 환경변수에 저장)
+        const response = await fetch('/api/slack', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                question: window.currentQuestion || '',
+                plannerName: plannerName
+            })
+        });
+
+        if (response.ok) {
+            showSuccessModal('플래너에게 전달되었습니다. 빠른 시일 내에 연락 드리겠습니다.');
+        } else {
+            throw new Error('Slack send failed');
+        }
+
+    } catch (error) {
+        console.error('Slack 전송 오류:', error);
+        alert('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
+}
+
+// 성공 메시지 모달
+function showSuccessModal(message) {
+    const modal = document.getElementById('successModal');
+    const messageEl = document.getElementById('successModalMessage');
+    if (modal && messageEl) {
+        messageEl.textContent = message;
+        modal.classList.add('active');
+    }
+}
+
+function closeSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// ==========================
+// 진료과 선택 관련 함수
+// ==========================
+function openSpecialtyModal() {
+    const modal = document.getElementById('specialtyModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+function closeSpecialtyModal() {
+    const modal = document.getElementById('specialtyModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function selectSpecialty(specialty) {
+    if (!SPECIALTIES[specialty]) {
+        console.error('Invalid specialty:', specialty);
+        return;
+    }
+
+    // 기존 진료과와 다른 경우에만 초기화 (첫 선택이 아닌 경우)
+    const isChanging = currentUserSpecialty && currentUserSpecialty !== specialty;
+
+    currentUserSpecialty = specialty;
+    localStorage.setItem('userSpecialty', specialty);
+
+    updateSpecialtyBadge();
+    closeSpecialtyModal();
+
+    console.log(`✅ 진료과 선택됨: ${SPECIALTIES[specialty].label}`);
+
+    // 진료과 변경 시 대화 히스토리 초기화 및 채팅창 리셋
+    if (isChanging) {
+        // 대화 히스토리 초기화
+        chatMemory.reset();
+        console.log('🔄 진료과 변경으로 대화 히스토리 초기화됨');
+
+        // 채팅창 초기화 (환영 메시지만 유지)
+        if (chatContainer) {
+            chatContainer.innerHTML = '';
+        }
+
+        // 환영 메시지 표시
+        const welcomeMessage = document.querySelector('.welcome-message');
+        if (welcomeMessage) {
+            welcomeMessage.style.display = 'block';
+        }
+
+        // 알림 팝업 표시
+        showSuccessModal('진료과가 변경되어 새로운 대화가 시작됩니다.');
+    }
+
+    // 환영 메시지 텍스트 업데이트
+    const welcomeMsg = document.querySelector('.welcome-message h2');
+    if (welcomeMsg) {
+        welcomeMsg.textContent = `${SPECIALTIES[specialty].emoji} ${SPECIALTIES[specialty].label} 개원을 도와드릴게요!`;
+    }
+}
+
+function updateSpecialtyBadge() {
+    const badge = document.getElementById('specialtyBadge');
+    const badgeText = document.getElementById('specialtyBadgeText');
+
+    if (badge && badgeText && currentUserSpecialty && SPECIALTIES[currentUserSpecialty]) {
+        const spec = SPECIALTIES[currentUserSpecialty];
+        badgeText.textContent = `${spec.emoji} ${spec.label}`;
+        badge.style.display = 'inline-flex';
+    }
+}
+
+// 현재 사용자의 진료과와 관련 키워드 반환
+function getUserSpecialty() {
+    if (!currentUserSpecialty || !SPECIALTIES[currentUserSpecialty]) {
+        return null;
+    }
+    return {
+        code: currentUserSpecialty,
+        ...SPECIALTIES[currentUserSpecialty]
+    };
+}
+
+// chat-history.js에서 호출하기 위한 진료과 설정 함수
+function setUserSpecialty(specialty) {
+    if (!SPECIALTIES[specialty]) {
+        console.error('Invalid specialty:', specialty);
+        return;
+    }
+    currentUserSpecialty = specialty;
+    localStorage.setItem('userSpecialty', specialty);
+    updateSpecialtyBadge();
+    console.log(`✅ 진료과 설정됨 (login 연동): ${SPECIALTIES[specialty].label}`);
+}
+
+// ==========================
+// 다크/라이트 모드 토글
+// ==========================
+// 다크/라이트 모드 토글 (라이트 모드 고정을 위해 기능 비활성화 또는 라이트 고정)
+function toggleTheme() {
+    // 라이트 모드 고정 정책에 따라 기능을 실행하지 않거나 항상 light를 유지합니다.
+    const html = document.documentElement;
+    html.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
+
+    console.log(`🎨 테마 정책: 라이트 모드 고정`);
+}
+
+// 초기 테마 설정 (라이트 모드 고정)
+function initTheme() {
+    // 항상 라이트 모드로 설정
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
+}
+
+// 페이지 로드 전에 테마 적용 (깜빡임 방지)
+initTheme();
+
+// ============ 공유/내보내기 기능 ============
+
+/**
+ * 내보내기 드롭다운 메뉴 토글
+ */
+function toggleExportMenu() {
+    const menu = document.getElementById('exportMenu');
+    if (menu) {
+        menu.classList.toggle('active');
+    }
+}
+
+// 드롭다운 외부 클릭 시 닫기
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('exportDropdown');
+    const menu = document.getElementById('exportMenu');
+    if (dropdown && menu && !dropdown.contains(e.target)) {
+        menu.classList.remove('active');
+    }
+});
+
+/**
+ * 채팅 내용을 텍스트로 추출
+ */
+function extractChatText() {
+    const chatContainer = document.getElementById('chatContainer');
+    if (!chatContainer) return '';
+
+    const messages = chatContainer.querySelectorAll('.message');
+    let text = '=== 개원 상담 챗봇 대화 내용 ===\n';
+    text += `내보내기 시간: ${new Date().toLocaleString('ko-KR')}\n`;
+    text += '━'.repeat(40) + '\n\n';
+
+    messages.forEach((msg) => {
+        const isUser = msg.classList.contains('user');
+        const role = isUser ? '👤 사용자' : '🤖 AI 컨설턴트';
+        const content = msg.querySelector('.message-content')?.textContent || msg.textContent || '';
+
+        text += `${role}:\n${content.trim()}\n\n`;
+    });
+
+    text += '━'.repeat(40) + '\n';
+    text += '© 오픈닥터 AI 컨설턴트';
+
+    return text;
+}
+
+/**
+ * 클립보드에 복사
+ */
+async function exportToClipboard() {
+    const text = extractChatText();
+
+    if (!text || text.includes('대화 내용이 없습니다')) {
+        showSuccessModal('내보낼 대화가 없습니다.');
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(text);
+        showSuccessModal('대화 내용이 클립보드에 복사되었습니다!');
+    } catch (error) {
+        console.error('클립보드 복사 실패:', error);
+        showSuccessModal('클립보드 복사에 실패했습니다.');
+    }
+
+    // 메뉴 닫기
+    document.getElementById('exportMenu')?.classList.remove('active');
+}
+
+/**
+ * TXT 파일로 저장
+ */
+function exportToTxt() {
+    const text = extractChatText();
+
+    if (!text || text.includes('대화 내용이 없습니다')) {
+        showSuccessModal('내보낼 대화가 없습니다.');
+        return;
+    }
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `개원상담_${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showSuccessModal('TXT 파일이 다운로드되었습니다!');
+
+    // 메뉴 닫기
+    document.getElementById('exportMenu')?.classList.remove('active');
+}
+
+/**
+ * PDF 파일로 저장
+ */
+function exportToPdf() {
+    const chatContainer = document.getElementById('chatContainer');
+
+    if (!chatContainer || chatContainer.querySelectorAll('.message').length === 0) {
+        showSuccessModal('내보낼 대화가 없습니다.');
+        return;
+    }
+
+    // PDF 생성용 임시 컨테이너
+    const pdfContent = document.createElement('div');
+    pdfContent.style.cssText = 'padding: 20px; font-family: sans-serif; max-width: 800px;';
+
+    // 헤더
+    const header = document.createElement('div');
+    header.innerHTML = `
+        <h1 style="color: #536db1; margin-bottom: 10px;">📋 개원 상담 챗봇 대화록</h1>
+        <p style="color: #666; font-size: 12px; margin-bottom: 20px;">내보내기 시간: ${new Date().toLocaleString('ko-KR')}</p>
+        <hr style="border: 1px solid #e5e7eb; margin-bottom: 20px;">
+    `;
+    pdfContent.appendChild(header);
+
+    // 메시지 복사
+    const messages = chatContainer.querySelectorAll('.message');
+    messages.forEach((msg) => {
+        const isUser = msg.classList.contains('user');
+        const content = msg.querySelector('.message-content')?.innerHTML || msg.innerHTML || '';
+
+        const msgDiv = document.createElement('div');
+        msgDiv.style.cssText = `
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 12px;
+            background: ${isUser ? '#f0f4ff' : '#f8f9fa'};
+            border-left: 4px solid ${isUser ? '#536db1' : '#22c55e'};
+        `;
+        msgDiv.innerHTML = `
+            <strong style="color: ${isUser ? '#536db1' : '#22c55e'};">${isUser ? '👤 사용자' : '🤖 AI 컨설턴트'}</strong>
+            <div style="margin-top: 8px; color: #1e293b;">${content}</div>
+        `;
+        pdfContent.appendChild(msgDiv);
+    });
+
+    // 푸터
+    const footer = document.createElement('div');
+    footer.innerHTML = `
+        <hr style="border: 1px solid #e5e7eb; margin-top: 20px;">
+        <p style="color: #666; font-size: 11px; text-align: center; margin-top: 10px;">© 오픈닥터 AI 컨설턴트</p>
+    `;
+    pdfContent.appendChild(footer);
+
+    // PDF 생성
+    const opt = {
+        margin: 10,
+        filename: `개원상담_${new Date().toISOString().slice(0, 10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(pdfContent).save().then(() => {
+        showSuccessModal('PDF 파일이 다운로드되었습니다!');
+    });
+
+    // 메뉴 닫기
+    document.getElementById('exportMenu')?.classList.remove('active');
+}
+
+// ============================================
+// 사이드바 토글 (접기/펼치기)
+// ============================================
+
+/**
+ * 사이드바 접기/펼치기 토글
+ */
+function toggleSidebar() {
+    const sidebar = document.getElementById('historySidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('collapsed');
+
+        // 상태 저장
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        localStorage.setItem('sidebarCollapsed', isCollapsed);
+    }
+}
+
+/**
+ * 사이드바 초기 상태 설정
+ */
+function initSidebarState() {
+    const sidebar = document.getElementById('historySidebar');
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+    if (sidebar && isCollapsed) {
+        sidebar.classList.add('collapsed');
+    }
+}
+
+// 페이지 로드 시 사이드바 상태 초기화
+document.addEventListener('DOMContentLoaded', initSidebarState);
+
+// ============================================
+// 검색 패널
+// ============================================
+
+/**
+ * 검색 패널 토글
+ */
+function toggleSearchPanel() {
+    const searchPanel = document.getElementById('searchPanel');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput = document.getElementById('chatSearchInput');
+
+    if (searchPanel && searchOverlay) {
+        const isActive = searchPanel.classList.contains('active');
+
+        if (isActive) {
+            searchPanel.classList.remove('active');
+            searchOverlay.classList.remove('active');
+        } else {
+            searchPanel.classList.add('active');
+            searchOverlay.classList.add('active');
+            // 포커스 설정
+            setTimeout(() => searchInput?.focus(), 100);
+        }
+    }
+}
+
+/**
+ * 채팅 검색 기능 (세션 제목 + 메시지 내용 검색)
+ */
+async function searchChats(query) {
+    const resultsContainer = document.getElementById('searchResults');
+    if (!resultsContainer) return;
+
+    // 검색어가 없으면 최근 대화 표시
+    if (!query.trim()) {
+        displayRecentChats();
+        return;
+    }
+
+    // 로딩 표시
+    resultsContainer.innerHTML = `
+        <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+            검색 중...
+        </div>
+    `;
+
+    // Supabase에서 메시지 검색
+    const searchResults = await window.chatHistory?.searchMessages?.(query) || [];
+
+    // 결과 표시
+    if (searchResults.length === 0) {
+        resultsContainer.innerHTML = `
+            <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                검색 결과가 없습니다.
+            </div>
+        `;
+        return;
+    }
+
+    resultsContainer.innerHTML = searchResults.slice(0, 10).map(result => {
+        const { session, matchedMessage } = result;
+        const title = escapeHtml(session.title || '새 대화');
+        const date = formatSearchDate(session.created_at);
+
+        // 매칭된 메시지 미리보기 (최대 50자)
+        let preview = '';
+        if (matchedMessage) {
+            const cleanMessage = matchedMessage.replace(/<[^>]*>/g, '').trim();
+            const highlighted = highlightSearchTerm(cleanMessage.substring(0, 80), query);
+            preview = `<div class="search-result-preview">"${highlighted}${cleanMessage.length > 80 ? '...' : ''}"</div>`;
+        }
+
+        return `
+            <div class="search-result-item" onclick="loadSearchedChat('${session.id}')">
+                <div class="search-result-header">
+                    <span class="search-result-title">📁 ${title}</span>
+                    <span class="search-result-date">${date}</span>
+                </div>
+                ${preview}
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * 검색어 하이라이트
+ */
+function highlightSearchTerm(text, query) {
+    if (!query) return escapeHtml(text);
+    const escaped = escapeHtml(text);
+    const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+    return escaped.replace(regex, '<mark style="background: rgba(0, 112, 243, 0.2); padding: 0 2px; border-radius: 2px;">$1</mark>');
+}
+
+/**
+ * 정규식 특수문자 이스케이프
+ */
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * 최근 대화 목록 표시
+ */
+function displayRecentChats() {
+    const resultsContainer = document.getElementById('searchResults');
+    if (!resultsContainer) return;
+
+    const sessions = window.chatHistory?.getAllSessions?.() || [];
+    const recentSessions = sessions.slice(0, 5);
+
+    if (recentSessions.length === 0) {
+        resultsContainer.innerHTML = `
+            <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                대화 기록이 없습니다.
+            </div>
+        `;
+        return;
+    }
+
+    resultsContainer.innerHTML = recentSessions.map(session => `
+        <div class="search-result-item" onclick="loadSearchedChat('${session.id}')">
+            <span class="search-result-title">${escapeHtml(session.title || '새 대화')}</span>
+            <span class="search-result-date">${formatSearchDate(session.created_at)}</span>
+        </div>
+    `).join('');
+}
+
+/**
+ * 검색된 채팅 로드
+ */
+function loadSearchedChat(sessionId) {
+    toggleSearchPanel(); // 패널 닫기
+
+    // chat-history.js의 로드 함수 호출
+    if (window.chatHistory?.loadSession) {
+        window.chatHistory.loadSession(sessionId);
+    }
+}
+
+/**
+ * 검색 날짜 포맷
+ */
+function formatSearchDate(dateString) {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return '오늘';
+    if (diffDays === 1) return '어제';
+    if (diffDays < 7) return `${diffDays}일 전`;
+
+    return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+}
+
+/**
+ * HTML 이스케이프
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ============================================
+// FAQ 패널
+// ============================================
+/**
+ * FAQ 패널 토글 (화면 오른쪽에서 슬라이드)
+ */
+function toggleFaqPanel() {
+    const faqPanel = document.getElementById('faqPanel');
+    if (faqPanel) {
+        faqPanel.classList.toggle('active');
+    }
+}

@@ -628,7 +628,7 @@ function addBotMessageToUI(content) {
         .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/^\* (.+)$/gm, '<li>$1</li>')
-        .replace(/^---+$/gm, '')           // ★ 수정: 구분선 한 줄만 제거 (이후 내용 보존)
+        .replace(/^---[\s\S]*$/gm, '')   // 구분선 제거
         .replace(/\[ID:\s*\d+\]/g, '')   // 인용 ID 제거 (기록에서는 불필요)
         .replace(/\[\d+\]/g, '')         // 숫자 인용도 제거
         .replace(/\n/g, '<br>');

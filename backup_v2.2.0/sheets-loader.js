@@ -406,64 +406,241 @@ class GoogleSheetsLoader {
         return score;
     }
 
-    // [Smart Search] - 서버 API 호출 방식으로 변경 (보안 강화)
+    // [Smart Search] - Query Plan 기반 지능형 검색
     async smartSearch(queryPlan, maxResults = 10, userSpecialty = null) {
         if (!this.cache) await this.loadData();
 
+        const { coreKeywords, expandedKeywords, excludeKeywords, searchStrategy, topic, targetCategory, targetSubCategory, specialtyRelevant } = queryPlan;
+        const allKeywords = [...(coreKeywords || []), ...(expandedKeywords || [])];
+
+        // ★ AI 지능형 필터링(Context Expansion)을 위해 검색 범위 조정 ★
+        // 기존 50개 → 10~30개로 하향 조정하여 속도 향상
         const finalMaxResults = maxResults || 30;
 
-        console.log('🧠 Smart Search 시작 (Server Mode)');
-        console.log('   핵심 키워드:', queryPlan.coreKeywords);
-        console.log('   확장 키워드:', queryPlan.expandedKeywords);
+        console.log('🧠 Smart Search 시작 (Broad Mode)');
+        console.log('   핵심 키워드:', coreKeywords);
+        console.log('   확장 키워드:', expandedKeywords);
+        console.log('   제외 키워드:', excludeKeywords);
+        console.log('   검색 전략:', searchStrategy);
+        console.log('   타겟 카테고리:', targetCategory);
+        console.log('   타겟 세부 카테고리:', targetSubCategory);
         console.log('   👤 사용자 진료과:', userSpecialty ? userSpecialty.label : '미선택');
 
-        try {
-            const response = await fetch('/api/search', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    action: 'search',
-                    queryPlan: queryPlan,
-                    maxResults: finalMaxResults,
-                    userSpecialty: userSpecialty
-                    // ★ 데이터는 서버에서 직접 로드 (보안 강화)
-                })
+        // 0. 전체 검색 대상 (Q&A, FAQ, Notion 모두 포함)
+        // 방어 코드: 데이터 로드 실패 시 빈 배열로 초기화하여 filter 에러 방지
+        let candidates = this.cache || [];
+
+        if (candidates.length === 0) {
+            console.warn('⚠️ 검색 가능한 데이터가 없습니다 (구글 시트 로드 실패 등)');
+            return [];
+        }
+
+        // 소스별 현황 로그
+        const qaCount = candidates.filter(i => i.source === 'qa').length;
+        const faqCount = candidates.filter(i => i.source === 'faq').length;
+        const notionCount = candidates.filter(i => i.source === 'notion').length;
+        console.log(`   📊 데이터 소스: Q&A ${qaCount}개, FAQ ${faqCount}개, Notion ${notionCount}개 (총 ${candidates.length}개)`);
+
+        // 1. 제외 키워드 필터링 (질문 필드에만 적용, 너무 공격적이지 않게)
+        candidates = candidates.filter(item => {
+            if (!excludeKeywords || excludeKeywords.length === 0) return true;
+
+            // 질문 필드에만 적용 (답변 전체에 적용하면 너무 많이 제외됨)
+            const questionText = (item.question || '').toLowerCase();
+            for (const excludeWord of excludeKeywords) {
+                // 2글자 이상 & 질문에 포함된 경우만 제외
+                if (excludeWord && excludeWord.length >= 2 && questionText.includes(excludeWord.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        console.log(`   제외 필터링 후: ${candidates.length}개`);
+
+        // 2. 검색 전략에 따른 스코어링 (모든 소스 대상)
+        let results = candidates.map(item => {
+            let score = this.calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
+
+            // 📘 Notion 데이터: 질문 주제(topic) 및 타겟 카테고리 매칭 시 강력한 보너스
+            const itemTopic = item.metadata?.topic || item.metadata?.category || '';
+            const itemField = (item.metadata?.field || '').toLowerCase();
+            const itemPath = item.metadata?.categoryPath || '';
+            const itemSubPath = item.metadata?.structuredSubCategory || '';
+
+            if (topic && topic !== '기타') {
+                const searchTopic = topic.toLowerCase();
+
+                // 1. 노션 데이터의 상세 토픽 매칭
+                if (item.source === 'notion' && (itemTopic.includes(searchTopic) || itemPath.includes(searchTopic))) {
+                    score = score + 1.2; // 보너스 수치 하향 (2.0 -> 1.2)
+                }
+                // 2. Q&A, FAQ의 필드 매칭
+                else if ((item.source === 'qa' || item.source === 'faq') && itemField.includes(searchTopic)) {
+                    score = score + 1.0; // 보너스 수치 하향 (1.5 -> 1.0)
+                }
+                // 3. 주제가 명확한데 다른 주제인 경우 (인테리어 질문에 간판 데이터 등) -> 페널티 대폭 완화
+                else if (topic === '인테리어' && (itemTopic.includes('간판') || itemPath.includes('signage') || itemField.includes('간판'))) {
+                    score = score * 0.6; // 극단적 감점 제거 (0.1 -> 0.6)
+                }
+                else if (topic === '간판' && (itemTopic.includes('인테리어') || itemPath.includes('interior') || itemField.includes('인테리어'))) {
+                    score = score * 0.6; // 극단적 감점 제거 (0.1 -> 0.6)
+                }
+            }
+
+            // ★ 세부 카테고리(targetSubCategory) 매칭 시 완만한 보너스 ★
+            if (targetSubCategory && targetSubCategory !== 'all' && item.source === 'notion') {
+                if (itemSubPath.includes(targetSubCategory)) {
+                    score = score + 1.0; // 보너스 수치 하향 (3.0 -> 1.0)
+                } else if (targetSubCategory === 'interior' && itemSubPath.includes('signage')) {
+                    score = score * 0.5; // 감점 완화 (0.01 -> 0.5)
+                }
+            }
+
+            // 🎯 의도(Intent) 기반 완만한 가중치 부여 (정보 요청 vs 업체 추천)
+            const isHowToIntent = queryPlan.intent === '정보요청' || queryPlan.intent === '절차안내';
+            const isPartnerIntent = queryPlan.intent === '파트너사목록';
+
+            if (isHowToIntent) {
+                // 방법/노하우 질문이면 지식성 데이터(advanced, basics, qa) 선호
+                if (itemPath.startsWith('advanced') || itemPath.startsWith('hospital-basics') || item.source === 'qa' || item.source === 'faq') {
+                    score = score + 0.8; // 보너스 하향 (2.5 -> 0.8)
+                }
+                if (itemPath.startsWith('partners')) {
+                    score = score * 0.7; // 감점 완화 (0.3 -> 0.7)
+                }
+            } else if (isPartnerIntent) {
+                // 업체 추천 의도면 파트너사 데이터 선호
+                if (itemPath.startsWith('partners')) {
+                    score = score + 1.0; // 보너스 하향 (2.0 -> 1.0)
+                }
+                if (itemPath.startsWith('advanced')) {
+                    score = score * 0.8; // 감점 완화 (0.5 -> 0.8)
+                }
+            }
+
+            // 구 모델 호환성 유지: 타겟 카테고리 매칭 보너스
+            if (targetCategory && targetCategory !== 'all' && item.source === 'notion') {
+                if (itemPath.startsWith(targetCategory)) {
+                    score = score * 1.5;
+                }
+            }
+
+            // ★ 사용자 진료과 기반 보너스 점수 ★
+            if (userSpecialty && userSpecialty.keywords) {
+                const specialtyBonus = this.calculateSpecialtyBonus(item, userSpecialty);
+                if (specialtyBonus > 0) {
+                    score = score + specialtyBonus;
+                }
+            }
+
+            return { ...item, score };
+        })
+            .filter(r => r.score > 0.05)  // ★ Broad Search: 임계값 0.25 -> 0.05 대폭 완화
+            .sort((a, b) => b.score - a.score);
+
+        // ★ Step 4: 카테고리 인식 가중치 적용 (Soft Penalty) ★
+        // 진료과 민감 카테고리에서 타 진료과 문서에 페널티 적용 (재정렬 대신)
+        const specialtySensitiveCategories = ['partners', 'medical_device'];
+        const isSpecialtySensitive = specialtySensitiveCategories.includes(targetCategory);
+
+        if (userSpecialty && userSpecialty.code) {
+            const userSpecCode = userSpecialty.code.toLowerCase();
+            let penaltyCount = 0;
+
+            results = results.map(item => {
+                const itemSpecs = item.metadata?.specialties || [];
+                const hasSpecTag = itemSpecs.length > 0;
+                const matchesUserSpec = itemSpecs.some(s => s.toLowerCase() === userSpecCode);
+
+                let finalScore = item.score;
+
+                // CASE A: 일반 카테고리 OR 태그 없음 OR 내 진료과 → 점수 100% 보존
+                if (!isSpecialtySensitive || !hasSpecTag || matchesUserSpec) {
+                    finalScore = item.score * 1.0;
+                }
+                // CASE B: 진료과 민감 카테고리 + 타 진료과 문서 → 40% 페널티
+                else if (isSpecialtySensitive && hasSpecTag && !matchesUserSpec) {
+                    finalScore = item.score * 0.6;
+                    penaltyCount++;
+                    console.log(`   ⚠️ 타 진료과 페널티: "${item.question?.substring(0, 20)}..." (${item.score.toFixed(2)} → ${finalScore.toFixed(2)})`);
+                }
+
+                return { ...item, score: finalScore };
             });
 
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
-            }
+            // 페널티 적용 후 재정렬
+            results.sort((a, b) => b.score - a.score);
 
-            const result = await response.json();
-
-            if (result.success && result.results) {
-                console.log(`   최종 결과: ${result.count}개`);
-                return result.results;
-            } else {
-                console.warn('⚠️ 서버 검색 결과 없음');
-                return [];
-            }
-        } catch (error) {
-            console.error('❌ 서버 검색 API 오류:', error);
-            // 폴백: 로컬 검색 (기본적인 키워드 매칭만)
-            console.log('⚠️ 로컬 폴백 검색 실행...');
-            return this.localFallbackSearch(queryPlan, finalMaxResults);
+            console.log(`   📐 가중치 적용 완료 (카테고리: ${targetCategory}, 민감: ${isSpecialtySensitive ? '예' : '아니오'})`);
+            console.log(`   ⚠️ 페널티 적용 문서: ${penaltyCount}개`);
         }
-    }
 
-    // 폴백 검색 (서버 오류 시 기본 검색)
-    localFallbackSearch(queryPlan, maxResults) {
-        const { coreKeywords } = queryPlan;
-        if (!this.cache || !coreKeywords) return [];
+        // ★★★ [DEBUG] 전체 순위 로컬 확인용 (A+C 옵션) ★★★
+        if (typeof window !== 'undefined') {
+            // 디버그 데이터 정리 (JSON 다운로드용으로만 유지)
+            const debugData = results.map((item, idx) => ({
+                순위: idx + 1,
+                점수: item.score?.toFixed(2) || '0.00',
+                소스: item.source || '-',
+                카테고리: item.metadata?.category || item.metadata?.topic || '-',
+                질문: (item.question || '').substring(0, 40) + '...',
+                업체명: item.metadata?.company || '-',
+                세부분류: item.metadata?.structuredSubCategory || '-'
+            }));
 
-        return this.cache
-            .filter(item => {
-                const text = ((item.question || '') + ' ' + (item.answer || '')).toLowerCase();
-                return coreKeywords.some(kw => kw && text.includes(kw.toLowerCase()));
-            })
-            .slice(0, maxResults);
+            // 전체 데이터를 window 객체에 저장 (JSON 다운로드용)
+            window.lastSearchDebug = {
+                timestamp: new Date().toISOString(),
+                query: coreKeywords.join(', '),
+                totalCount: results.length,
+                data: results.map((item, idx) => ({
+                    rank: idx + 1,
+                    score: item.score?.toFixed(4) || '0',
+                    source: item.source,
+                    category: item.metadata?.category || item.metadata?.topic || '',
+                    subCategory: item.metadata?.structuredSubCategory || '',
+                    company: item.metadata?.company || '',
+                    question: item.question || '',
+                    answer: (item.answer || '').substring(0, 200) + '...'
+                }))
+            };
+
+            // JSON 다운로드 함수 등록
+            window.downloadSearchDebug = function () {
+                const dataStr = JSON.stringify(window.lastSearchDebug, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `search_debug_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                console.log('✅ JSON 파일 다운로드 완료!');
+            };
+
+            console.log('💡 전체 결과 JSON 다운로드: 콘솔에서 downloadSearchDebug() 실행');
+        }
+
+        // ★ Step 5: 동적 컷오프 (1위 점수의 25% 미만 제거) ★
+        const beforeCutoff = results.length;
+        if (results.length > 0) {
+            const topScore = results[0].score;
+            const cutoffThreshold = topScore * 0.25;
+            results = results.filter(r => r.score >= cutoffThreshold);
+            console.log(`   📉 동적 컷오프: ${beforeCutoff}개 → ${results.length}개 (임계값: ${cutoffThreshold.toFixed(2)})`);
+        }
+
+        // 결과 소스별 현황
+        const resultQa = results.filter(i => i.source === 'qa').length;
+        const resultFaq = results.filter(i => i.source === 'faq').length;
+        const resultNotion = results.filter(i => i.source === 'notion').length;
+        console.log(`   📚 결과 소스: Q&A ${resultQa}개, FAQ ${resultFaq}개, Notion ${resultNotion}개`);
+        console.log(`   최종 결과: ${Math.min(results.length, finalMaxResults)}개`);
+
+        return results.slice(0, finalMaxResults);
     }
 
     // [진료과 보너스 점수 계산]
