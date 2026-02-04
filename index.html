@@ -12,8 +12,8 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* Design System - Premium Tech Style (Vercel/Linear) */
-        /* Light Mode */
+        
+        
         :root {
             --primary-color: #ffffff;
             --primary-hover: #e5e5e5;
@@ -29,11 +29,11 @@
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
 
-            /* Premium Tech Accent */
+            
             --accent-color: #0070f3;
             --accent-hover: #0060df;
 
-            /* History Sidebar - Light Premium */
+            
             --history-bg: #fafafa;
             --history-border: #e5e5e5;
             --history-text: #171717;
@@ -43,33 +43,7 @@
             --history-user-bg: #f5f5f5;
         }
 
-        /* Design System - Dark Mode (Premium Tech) - 라이트 모드 고정 정책으로 비활성화
-        [data-theme="dark"] {
-            --primary-color: #ededed;
-            --primary-hover: #d4d4d4;
-            --primary-light: rgba(255, 255, 255, 0.08);
-            --background: #0a0a0a;
-            --surface: #0a0a0a;
-            --surface-secondary: #171717;
-            --text-primary: #ededed;
-            --text-secondary: #a3a3a3;
-            --text-tertiary: #525252;
-            --border-color: #262626;
-            --shadow-sm: none;
-            --shadow-md: none;
-
-            --accent-color: #0070f3;
-            --accent-hover: #1a8cff;
-
-            --history-bg: #0a0a0a;
-            --history-border: #262626;
-            --history-text: #ededed;
-            --history-text-secondary: #a3a3a3;
-            --history-hover: rgba(255, 255, 255, 0.04);
-            --history-active: rgba(0, 112, 243, 0.15);
-            --history-user-bg: #171717;
-        }
-        */
+        
 
         * {
             margin: 0;
@@ -85,8 +59,8 @@
             overflow: hidden;
         }
 
-        /* Layout */
-        /* Layout */
+        
+        
         .app-container {
             display: flex;
             height: 100vh;
@@ -95,14 +69,14 @@
             margin: 0;
             padding: 0;
             gap: 0;
-            /* Margin-free three-panel layout */
+            
             background: var(--surface);
             overflow: hidden;
         }
 
-        /* Sidebar common styles will be handled in their respective sections below */
+        
 
-        /* FAQ Panel (화면 오른쪽에서 슬라이드) */
+        
         .faq-panel {
             position: fixed;
             top: 0;
@@ -160,7 +134,7 @@
             color: var(--text-primary);
         }
 
-        /* Search Panel (검색 패널) */
+        
         .search-panel {
             position: fixed;
             top: 50%;
@@ -304,7 +278,7 @@
             white-space: nowrap;
         }
 
-        /* Search Panel 오버레이 */
+        
         .search-overlay {
             position: fixed;
             top: 0;
@@ -320,13 +294,13 @@
             display: block;
         }
 
-        /* 기존 FAQ 사이드바 → faq-panel으로 변경 (내부 콘텐츠 스타일 유지) */
+        
         .faq-nav {
             padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
             background: var(--surface);
             display: none;
-            /* JS로 제어 */
+            
         }
 
         .faq-nav.active {
@@ -355,7 +329,7 @@
             padding: 20px 24px;
         }
 
-        /* FAQ Buttons */
+        
         .faq-item-btn {
             width: 100%;
             padding: 14px 16px;
@@ -424,7 +398,7 @@
             border-color: var(--primary-color);
         }
 
-        /* Chat Interface */
+        
         .chat-interface {
             flex: 1;
             display: flex;
@@ -452,7 +426,7 @@
             gap: 12px;
         }
 
-        /* 헤더 FAQ 버튼 */
+        
         .header-faq-btn {
             display: flex;
             align-items: center;
@@ -482,7 +456,7 @@
             color: var(--accent-color);
         }
 
-        /* 하단 힌트 영역 */
+        
         .input-hint {
             display: flex;
             align-items: center;
@@ -494,7 +468,7 @@
             flex-wrap: wrap;
         }
 
-        /* 플래너 상담 버튼 */
+        
         .planner-consult-btn {
             padding: 6px 14px;
             background: var(--accent-color);
@@ -512,45 +486,9 @@
             transform: scale(1.02);
         }
 
-        /* 라이트 모드 고정으로 사용하지 않는 스타일
-        .theme-toggle-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid var(--border-color);
-            background: var(--surface-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            transition: all 0.3s ease;
-        }
+        
 
-        .theme-toggle-btn:hover {
-            background: var(--primary-light);
-            border-color: var(--primary-color);
-            transform: scale(1.1);
-        }
-
-        .theme-icon-light {
-            display: none;
-        }
-
-        .theme-icon-dark {
-            display: inline;
-        }
-
-        [data-theme="dark"] .theme-icon-light {
-            display: inline;
-        }
-
-        [data-theme="dark"] .theme-icon-dark {
-            display: none;
-        }
-        */
-
-        /* Export Dropdown */
+        
         .export-dropdown {
             position: relative;
         }
@@ -643,7 +581,7 @@
             scroll-behavior: smooth;
         }
 
-        /* Welcome Message */
+        
         .welcome-message {
             max-width: 680px;
             margin: 40px auto;
@@ -668,7 +606,7 @@
             margin-bottom: 40px;
         }
 
-        /* Chips - Premium Tech 스타일 */
+        
         .suggested-questions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -694,7 +632,7 @@
             color: var(--text-primary);
         }
 
-        /* Messages */
+        
         .message {
             display: flex;
             gap: 16px;
@@ -729,7 +667,7 @@
             color: white;
         }
 
-        /* AI 메시지 - Premium Tech 스타일 */
+        
         .message-content {
             padding: 16px 20px;
             background: var(--surface-secondary);
@@ -739,7 +677,7 @@
             line-height: 1.7;
         }
 
-        /* 사용자 메시지 - Premium Tech Accent */
+        
         .message.user .message-content {
             background: var(--accent-color);
             color: white;
@@ -773,7 +711,7 @@
             border-color: rgba(34, 197, 94, 0.2);
         }
 
-        /* Feedback & Copy Buttons - Premium Tech 스타일 */
+        
         .feedback-buttons {
             display: flex;
             gap: 8px;
@@ -832,7 +770,7 @@
             color: #22c55e;
         }
 
-        /* Input Area */
+        
         .input-container {
             padding: 24px 32px;
             background: var(--surface);
@@ -894,7 +832,7 @@
             background: var(--accent-hover);
         }
 
-        /* Mobile Responsive */
+        
         @media (max-width: 768px) {
             .faq-sidebar {
                 position: fixed;
@@ -918,7 +856,7 @@
             }
         }
 
-        /* Citation Modal Logic */
+        
         .modal {
             display: none;
             position: fixed;
@@ -1019,7 +957,7 @@
             white-space: pre-wrap;
         }
 
-        /* Animation Keyframes */
+        
         @keyframes slideUp {
             from {
                 transform: translateY(20px);
@@ -1032,7 +970,7 @@
             }
         }
 
-        /* Citation Button Style */
+        
         .citation-btn {
             margin-top: 12px;
             padding: 8px 16px;
@@ -1054,7 +992,7 @@
             transform: translateY(-1px);
         }
 
-        /* Inline Citation Tooltip */
+        
         .cite-ref {
             display: inline;
             position: relative;
@@ -1111,7 +1049,7 @@
             border-color: #1e293b transparent transparent transparent;
         }
 
-        /* Loading Indicator Enhancement */
+        
         .typing-indicator {
             display: flex;
             align-items: center;
@@ -1167,7 +1105,7 @@
         }
 
 
-        /* Formatted Response Styles */
+        
         .formatted-response {
             line-height: 1.6;
         }
@@ -1211,7 +1149,7 @@
             font-weight: 600;
         }
 
-        /* 사용한 모델 표시 */
+        
         .model-info {
             margin-top: 16px;
             padding-top: 12px;
@@ -1221,7 +1159,7 @@
             text-align: right;
         }
 
-        /* 피드백 버튼 */
+        
         .feedback-buttons {
             display: flex;
             gap: 8px;
@@ -1269,7 +1207,7 @@
             color: #ef4444;
         }
 
-        /* 피드백 팝업 모달 */
+        
         .feedback-modal {
             display: none;
             position: fixed;
@@ -1367,7 +1305,7 @@
             cursor: pointer;
         }
 
-        /* 피드백 목록 탭 */
+        
         .feedback-tab {
             padding: 16px 24px;
             border-top: 1px solid #e2e8f0;
@@ -1385,7 +1323,7 @@
             background: #f1f5f9;
         }
 
-        /* 피드백 목록 모달 */
+        
         .feedback-list-modal {
             display: none;
             position: fixed;
@@ -1490,7 +1428,7 @@
             margin-bottom: 8px;
         }
 
-        /* Specialty Selection Modal */
+        
         .specialty-modal {
             display: none;
             position: fixed;
@@ -1582,7 +1520,7 @@
             color: var(--text-primary);
         }
 
-        /* Current Specialty Badge */
+        
         .specialty-badge {
             display: inline-flex;
             align-items: center;
@@ -1608,7 +1546,7 @@
             opacity: 0.8;
         }
 
-        /* Inline Specialty Badge (Header) */
+        
         .specialty-badge-inline {
             display: inline-flex;
             align-items: center;
@@ -1636,7 +1574,7 @@
             opacity: 0.7;
         }
 
-        /* ==================== Login Modal ==================== */
+        
         .login-modal {
             display: none;
             position: fixed;
@@ -1796,7 +1734,7 @@
             box-shadow: none;
         }
 
-        /* ==================== Chat History Sidebar ==================== */
+        
         .history-sidebar {
             width: 280px;
             background: var(--history-bg);
@@ -1808,7 +1746,7 @@
             overflow: hidden;
         }
 
-        /* 사이드바 접힌 상태 - 햄버거 버튼만 보임 */
+        
         .history-sidebar.collapsed {
             width: 56px;
         }
@@ -1825,7 +1763,7 @@
             display: none;
         }
 
-        /* 사이드바 상단 컨트롤 */
+        
         .sidebar-top-controls {
             display: flex;
             align-items: center;
@@ -1878,7 +1816,7 @@
             gap: 8px;
         }
 
-        /* FAQ 토글 버튼 - Premium Tech 스타일 */
+        
         .faq-toggle-btn {
             width: 100%;
             height: 44px;
@@ -1902,7 +1840,7 @@
             color: var(--text-primary);
         }
 
-        /* 새 채팅 버튼 - Premium Tech 스타일 */
+        
         .new-chat-btn {
             width: 100%;
             height: 44px;
@@ -1926,7 +1864,7 @@
             border-color: var(--text-tertiary);
         }
 
-        /* Hover effect removed here as it's defined above */
+        
 
         .history-list {
             flex: 1;
@@ -1934,7 +1872,7 @@
             padding: 12px;
         }
 
-        /* 채팅방 아이템 - Premium Tech 스타일 */
+        
         .history-item {
             height: 44px;
             padding: 0 12px;
@@ -2077,12 +2015,12 @@
             color: #0c4a6e;
         }
 
-        /* Hide history sidebar when not logged in */
+        
         .history-sidebar.hidden {
             display: none;
         }
 
-        /* Responsive adjustments */
+        
         @media (max-width: 1200px) {
             .history-sidebar {
                 width: 240px;
@@ -2481,7 +2419,7 @@
     </div>
 
     <style>
-        /* Confirm Modal Styles */
+        
         .confirm-modal {
             display: none;
             position: fixed;
