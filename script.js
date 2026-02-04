@@ -1212,11 +1212,12 @@ function addFormattedMessage(text, contexts, modelName = null) {
         </div>
     `;
 
-    // 질문/답변 저장 (피드백용)
+    // 질문/답변 + 맥락 저장 (피드백용)
     window.lastMessages = window.lastMessages || {};
     window.lastMessages[messageId] = {
         question: window.currentQuestion || '',
-        answer: text.substring(0, 500)
+        answer: text,  // 전체 답변 저장 (제한 없음)
+        contextPrompt: chatMemory.getContextPrompt()  // 맥락 정보 저장
     };
 
     div.innerHTML = `
@@ -1331,7 +1332,8 @@ function addOffTopicMessage(text) {
     window.lastMessages = window.lastMessages || {};
     window.lastMessages[messageId] = {
         question: window.currentQuestion || '',
-        answer: text.substring(0, 500)
+        answer: text,  // 전체 답변 저장 (제한 없음)
+        contextPrompt: chatMemory.getContextPrompt()  // 맥락 정보 저장
     };
 
     div.innerHTML = `
@@ -1364,7 +1366,8 @@ function addOutOfScopeMessage(text) {
     window.lastMessages = window.lastMessages || {};
     window.lastMessages[messageId] = {
         question: window.currentQuestion || '',
-        answer: text.substring(0, 500)
+        answer: text,  // 전체 답변 저장 (제한 없음)
+        contextPrompt: chatMemory.getContextPrompt()  // 맥락 정보 저장
     };
 
     // 고정 메시지 (친절한 톤 + 답변 가능 영역 안내)
@@ -1533,7 +1536,8 @@ function addNoDataMessage(text) {
     window.lastMessages = window.lastMessages || {};
     window.lastMessages[messageId] = {
         question: window.currentQuestion || '',
-        answer: text.substring(0, 500)
+        answer: text,  // 전체 답변 저장 (제한 없음)
+        contextPrompt: chatMemory.getContextPrompt()  // 맥락 정보 저장
     };
 
     div.innerHTML = `
@@ -1638,6 +1642,9 @@ async function submitFeedback() {
         question: messageData.question || '',
         answer: messageData.answer || '',
         content: content || '(내용 없음)',
+        contextPrompt: messageData.contextPrompt || '',  // ★ 맥락 정보 추가 ★
+        userName: window.currentUserName || '',          // 사용자 이름
+        specialty: currentUserSpecialty || '',           // 진료과
         timestamp: new Date().toLocaleString('ko-KR')
     };
 
