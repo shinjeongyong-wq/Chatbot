@@ -448,7 +448,7 @@ class GoogleSheetsLoader {
     }
 
     // [Smart Search] - 서버 API 호출 방식으로 변경 (보안 강화)
-    async smartSearch(queryPlan, maxResults = 10, userSpecialty = null) {
+    async smartSearch(queryPlan, maxResults = 10, userSpecialty = null, signal = null) {
         if (!this.cache) await this.loadData();
 
         const finalMaxResults = maxResults || 30;
@@ -470,7 +470,8 @@ class GoogleSheetsLoader {
                     maxResults: finalMaxResults,
                     userSpecialty: userSpecialty
                     // ★ 데이터는 서버에서 직접 로드 (보안 강화)
-                })
+                }),
+                signal: signal
             });
 
             if (!response.ok) {

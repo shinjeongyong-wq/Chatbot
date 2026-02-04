@@ -100,6 +100,7 @@ let currentUserSpecialty = null; // 사용자가 선택한 진료과
 
 let sheetsLoader = null;
 let faqNavigationStack = [];
+let currentAbortController = null; // AI 답변 중단 제어용
 
 // ==========================
 // 0. ChatMemory (클라이언트 메모리 관리자) - 세션별 분리
@@ -583,6 +584,16 @@ function toggleFAQAnswer(el) {
 // 3. 채팅 및 RAG 로직
 // ==========================
 async function handleSendMessage() {
+    // 생성 중일 때 버튼 누르면 중단
+    if (sendButton.classList.contains('stop-mode')) {
+        if (currentAbortController) {
+            console.log('🛑 AI 답변 생성 중단 요청...');
+            currentAbortController.abort();
+            hideTypingIndicator(); // UI 즉시 복구
+        }
+        return;
+    }
+
     const message = userInput.value.trim();
     if (!message) return;
     sendUserMessage(message);
@@ -618,6 +629,9 @@ async function sendUserMessage(message) {
 }
 
 async function getBotResponse(userMessage) {
+    // 0. AbortController 초기화 (이전 작업이 있으면 중단시키지는 않고 새로 생성)
+    currentAbortController = new AbortController();
+
     // 피드백용으로 현재 질문 저장
     window.currentQuestion = userMessage;
 
@@ -637,7 +651,8 @@ async function getBotResponse(userMessage) {
                 sheetName: 'UserQuestions',
                 question: userMessage,
                 timestamp: new Date().toLocaleString('ko-KR')
-            })
+            }),
+            signal: currentAbortController.signal
         });
         const result = await response.json();
         if (!result.success) {
@@ -668,7 +683,8 @@ async function getBotResponse(userMessage) {
                     userSpecialty: userSpec,
                     recentContext: chatMemory.getContextPrompt(),  // 요약 + 최근 대화 전달
                     alreadyMentioned: alreadyMentioned             // 중복 제거용 데이터 추가
-                })
+                }),
+                signal: currentAbortController.signal
             });
 
             if (planResponse.ok) {
@@ -748,7 +764,7 @@ async function getBotResponse(userMessage) {
         if (queryPlan) {
             // Query Plan 기반 스마트 검색 (사용자 진료과 정보 전달)
             const userSpec = getUserSpecialty();
-            relatedContexts = await sheetsLoader.smartSearch(queryPlan, maxResults, userSpec);
+            relatedContexts = await sheetsLoader.smartSearch(queryPlan, maxResults, userSpec, currentAbortController.signal);
         } else {
             // Fallback: 기존 키워드 검색
             relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, maxResults);
@@ -841,8 +857,14 @@ async function getBotResponse(userMessage) {
         }
 
     } catch (error) {
+        hideTypingIndicator(); // 어떤 경우든 인디케이터는 제거
+
+        if (error.name === 'AbortError') {
+            console.log('✨ [System] 사용자에 의해 답변 생성이 중단되었습니다.');
+            addMessage('답변 생성이 중지되었습니다. 다른 궁금하신 점이 있다면 언제든 문의주세요 :)', 'bot');
+            return;
+        }
         console.error('Bot Response Error:', error);
-        hideTypingIndicator();
         addMessage('죄송합니다. 오류가 발생했습니다.', 'bot');
     }
 }
@@ -1022,7 +1044,8 @@ ${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t =>
             body: JSON.stringify({
                 userQuery: `질문: ${userQuery}`,
                 systemPrompt: systemPrompt
-            })
+            }),
+            signal: currentAbortController.signal
         });
 
         if (!response.ok) {
@@ -1050,6 +1073,11 @@ ${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t =>
         };
 
     } catch (error) {
+        // AbortError 체크: 사용자가 중단한 경우 친화적 메시지 반환
+        if (error.name === 'AbortError') {
+            console.log('✨ [callOpenRouterAPI] 사용자에 의해 요청이 중단되었습니다.');
+            throw error; // 상위에서 처리하도록 AbortError 그대로 throw
+        }
         console.error('AI 호출 에러:', error);
         return { text: '서버 연결에 실패했습니다.', modelName: null };
     }
@@ -1233,6 +1261,15 @@ function showTypingIndicator() {
     `;
     chatContainer.appendChild(div);
     scrollToBottom();
+
+    // 전송 버튼 -> 중지 버튼으로 변경
+    sendButton.classList.add('stop-mode');
+    sendButton.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"></rect>
+        </svg>
+    `;
+    sendButton.title = '답변 생성 중단';
 }
 
 function updateTypingStatus(message) {
@@ -1245,6 +1282,15 @@ function updateTypingStatus(message) {
 function hideTypingIndicator() {
     const el = document.getElementById('typingIndicator');
     if (el) el.remove();
+
+    // 중지 버튼 -> 전송 버튼으로 복구
+    sendButton.classList.remove('stop-mode');
+    sendButton.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+        </svg>
+    `;
+    sendButton.title = '전송';
 }
 
 function scrollToBottom() {

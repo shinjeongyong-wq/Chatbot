@@ -478,3 +478,20 @@ body {
     opacity: 0.7;
     transform: translateY(1px);
 }
+
+/* AI 생성 중 중단 버튼 스타일 */
+.send-button.stop-mode {
+    background: var(--text-primary);
+    animation: pulse 2s infinite;
+}
+
+.send-button.stop-mode:hover {
+    background: #000;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
