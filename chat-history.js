@@ -528,8 +528,8 @@ async function loadSessionMessages(sessionId) {
                 lastUserQuestion = msg.content;
                 addUserMessageToUI(msg.content);
             } else {
-                // assistant 메시지는 직전 질문과 맥락 정보 함께 전달
-                addBotMessageToUI(msg.content, lastUserQuestion, msg.context_prompt || '');
+                // assistant 메시지는 직전 질문, 맥락 정보, 메시지 타입 함께 전달
+                addBotMessageToUI(msg.content, lastUserQuestion, msg.context_prompt || '', msg.message_type || 'normal');
             }
         });
 
@@ -542,8 +542,12 @@ async function loadSessionMessages(sessionId) {
 
 /**
  * 메시지 저장
+ * @param {string} role - 'user' or 'assistant'
+ * @param {string} content - 메시지 내용
+ * @param {string} contextPrompt - 맥락 정보 (assistant only)
+ * @param {string} messageType - 메시지 타입: 'normal', 'no_data', 'out_of_scope', 'off_topic'
  */
-async function saveMessage(role, content, contextPrompt = null) {
+async function saveMessage(role, content, contextPrompt = null, messageType = 'normal') {
     if (!currentSessionId) {
         // 세션이 없으면 새로 생성
         await createNewChat();
@@ -556,9 +560,14 @@ async function saveMessage(role, content, contextPrompt = null) {
             content
         };
 
-        // assistant 메시지인 경우 맥락 정보도 저장
-        if (role === 'assistant' && contextPrompt) {
-            messageData.context_prompt = contextPrompt;
+        // assistant 메시지인 경우 맥락 정보와 메시지 타입도 저장
+        if (role === 'assistant') {
+            if (contextPrompt) {
+                messageData.context_prompt = contextPrompt;
+            }
+            if (messageType && messageType !== 'normal') {
+                messageData.message_type = messageType;
+            }
         }
 
         const { data: newMessage, error } = await supabaseClient
@@ -641,8 +650,12 @@ function addUserMessageToUI(content) {
 /**
  * 봇 메시지 UI에 추가 (저장 없이)
  * 마크다운 → HTML 변환 적용
+ * @param {string} content - 메시지 내용
+ * @param {string} question - 직전 사용자 질문
+ * @param {string} contextPrompt - 맥락 정보
+ * @param {string} messageType - 메시지 타입: 'normal', 'no_data', 'out_of_scope', 'off_topic'
  */
-function addBotMessageToUI(content, question = '', contextPrompt = '') {
+function addBotMessageToUI(content, question = '', contextPrompt = '', messageType = 'normal') {
     const chatContainer = document.getElementById('chatContainer');
     if (!chatContainer) return;
 
@@ -692,9 +705,37 @@ function addBotMessageToUI(content, question = '', contextPrompt = '') {
             // **주제** 형태의 굵은 글씨를 클릭 가능한 링크로 변환
             const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
-            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')"></${escapeHtml(topic)}</strong>`;
+            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
             html = html.replace(regex, clickableLink);
         });
+    }
+
+    // ★ 플래너 버튼 추가 (no_data, out_of_scope 타입인 경우) ★
+    let plannerButton = '';
+    if (messageType === 'no_data' || messageType === 'out_of_scope') {
+        const buttonText = messageType === 'out_of_scope' ? '📞 플래너에게 연결하기' : '☎️ 플래너에게 연락하기';
+        plannerButton = `
+            <p style="margin: 20px 0 16px 0; color: #64748b; font-size: 14px;">
+                질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
+            </p>
+            <button class="contact-planner-btn" onclick="openContactModal()" style="
+                background-color: #536db1;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.2s;
+                margin-bottom: 16px;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            ">
+                ${buttonText}
+            </button>
+        `;
     }
 
     // 피드백 버튼 + 복사 버튼 추가
@@ -719,7 +760,7 @@ function addBotMessageToUI(content, question = '', contextPrompt = '') {
     div.className = 'message bot';
     div.innerHTML = `
         <div class="message-avatar">AI</div>
-        <div class="message-content formatted-response">${html}${feedbackButtons}</div>
+        <div class="message-content formatted-response">${html}${plannerButton}${feedbackButtons}</div>
     `;
     chatContainer.appendChild(div);
 }

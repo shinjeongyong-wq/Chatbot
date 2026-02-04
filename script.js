@@ -714,8 +714,10 @@ async function getBotResponse(userMessage) {
                         console.log(`🎯 [${queryPlan.intent}] 검색 스킵, 즉시 답변 출력`);
 
                         // ★ OUT_OF_SCOPE 전용 처리: 플래너 연결 버튼 포함 UI ★
+                        let messageType = 'normal';
                         if (queryPlan.intent === 'OUT_OF_SCOPE') {
                             addOutOfScopeMessage(queryPlan.directAnswer);
+                            messageType = 'out_of_scope';
                         } else if (queryPlan.intent === 'AMBIGUOUS') {
                             // ★ AMBIGUOUS 전용 처리: 관련 주제 추천 ★
                             const relatedTopics = findRelatedAnchorTopics(userMessage, 5);
@@ -734,7 +736,7 @@ async function getBotResponse(userMessage) {
 
                         // Supabase 저장 (user는 sendUserMessage에서 이미 저장됨)
                         if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-                            window.chatHistory.saveMessage('assistant', queryPlan.directAnswer, chatMemory.getContextPrompt()).catch(() => { });
+                            window.chatHistory.saveMessage('assistant', queryPlan.directAnswer, chatMemory.getContextPrompt(), messageType).catch(() => { });
                         }
 
                         return; // ★ 검색 로직 완전 스킵 ★
@@ -824,12 +826,16 @@ async function getBotResponse(userMessage) {
             responseText = responseText.replace(/\[TOPIC:\s*[^\]]+\]\n?/, '').trim();
         }
 
+        // ★ 메시지 타입 추적 (플래너 버튼 복원용) ★
+        let messageType = 'normal';
+
         if (responseText.includes('[OFF_TOPIC]')) {
             let cleanText = responseText.replace('[OFF_TOPIC]', '').trim();
             // Rambling 방지: [번호] 인용이 포함되어 있다면 제거 (Off-topic엔 불필요)
             cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
             addOffTopicMessage(cleanText);
             responseText = cleanText;
+            messageType = 'off_topic';
         } else if (responseText.includes('[NO_DATA]')) {
             let cleanText = responseText.replace('[NO_DATA]', '').trim();
             // 인용 번호 제거
@@ -837,6 +843,7 @@ async function getBotResponse(userMessage) {
 
             addNoDataMessage(cleanText);
             responseText = cleanText;
+            messageType = 'no_data';
         } else {
             // ★ 모든 인용 주석 제거 (v2.3.1) ★
             // [1], [2, 3], [ID: 1], [ID: 2, 3] 등 모든 형태
@@ -851,7 +858,7 @@ async function getBotResponse(userMessage) {
 
         // Supabase에 AI 응답 저장 (user는 sendUserMessage에서 이미 저장됨)
         if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-            window.chatHistory.saveMessage('assistant', responseText, chatMemory.getContextPrompt()).catch(err => {
+            window.chatHistory.saveMessage('assistant', responseText, chatMemory.getContextPrompt(), messageType).catch(err => {
                 console.warn('AI 응답 DB 저장 실패:', err);
             });
         }
@@ -1642,13 +1649,12 @@ async function submitFeedback() {
         question: messageData.question || '',
         answer: messageData.answer || '',
         content: content || '(내용 없음)',
-        contextPrompt: messageData.contextPrompt || '',  // ★ 맥락 정보 추가 ★
-        userName: window.currentUserName || '',          // 사용자 이름
-        specialty: currentUserSpecialty || '',           // 진료과
-        timestamp: new Date().toLocaleString('ko-KR')
+        context_prompt: messageData.contextPrompt || '',
+        user_name: window.currentUserName || '',
+        specialty: currentUserSpecialty || ''
     };
 
-    console.log('📤 피드백 전송 시도:', feedback);
+    console.log('📤 피드백 Supabase 저장 시도:', feedback);
 
     // 버튼 비활성화로 중복 방지
     if (submitBtn) {
@@ -1657,31 +1663,23 @@ async function submitFeedback() {
     }
 
     try {
-        const requestBody = {
-            sheetName: 'Feedback',
-            ...feedback
-        };
+        // Supabase에 직접 저장
+        const { data, error } = await supabaseClient
+            .from('feedback')
+            .insert([feedback])
+            .select();
 
-        const response = await fetch('/api/collect', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody)
-        });
-
-        const result = await response.json();
-        console.log('📥 API 응답 데이터:', result);
-
-        if (response.ok && result.success) {
-            closeFeedbackModal();
-            showSuccessModal('피드백 전달이 완료되었습니다. 감사합니다.');
-        } else {
-            const errorMsg = result.error || '저장 중 문제가 발생했습니다.';
-            console.error('⚠️ 피드백 저장 실패:', result);
-            alert(`피드백 저장 실패\n\n상태: ${response.status}\n메시지: ${errorMsg}\n\n이 메시지를 캡처해서 전달해주세요.`);
+        if (error) {
+            throw error;
         }
+
+        console.log('✅ 피드백 저장 완료:', data);
+        closeFeedbackModal();
+        showSuccessModal('피드백 전달이 완료되었습니다. 감사합니다.');
+
     } catch (error) {
         console.error('❌ 피드백 저장 오류:', error);
-        alert('피드백 제출 중 시스템 오류가 발생했습니다: ' + error.message);
+        alert('피드백 제출 중 오류가 발생했습니다: ' + error.message);
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
