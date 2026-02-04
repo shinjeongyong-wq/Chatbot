@@ -494,17 +494,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Initial Load Error:', error);
     }
 
-    // topics.json 로드 (앵커 주제)
-    try {
-        const topicsResponse = await fetch('/data/topics.json');
-        if (topicsResponse.ok) {
-            const topicsData = await topicsResponse.json();
-            anchorTopics = topicsData.topics || [];
-            console.log(`✅ 앵커 주제 로드 완료: ${anchorTopics.length}개`);
-        }
-    } catch (error) {
-        console.warn('topics.json 로드 실패:', error);
-    }
+    // topics_shortened.json은 이미 loadAnchorTopics()에서 로드됨 (Line 30)
     setupEventListeners();
 });
 
