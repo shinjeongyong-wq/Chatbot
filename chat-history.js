@@ -483,12 +483,15 @@ async function loadSessionMessages(sessionId) {
             return;
         }
 
-        // 메시지 렌더링
+        // 메시지 렌더링 (질문-답변 쌍으로 맥락 전달)
+        let lastUserQuestion = '';
         messages.forEach(msg => {
             if (msg.role === 'user') {
+                lastUserQuestion = msg.content;
                 addUserMessageToUI(msg.content);
             } else {
-                addBotMessageToUI(msg.content);
+                // assistant 메시지는 직전 질문과 맥락 정보 함께 전달
+                addBotMessageToUI(msg.content, lastUserQuestion, msg.context_prompt || '');
             }
         });
 
@@ -502,20 +505,27 @@ async function loadSessionMessages(sessionId) {
 /**
  * 메시지 저장
  */
-async function saveMessage(role, content) {
+async function saveMessage(role, content, contextPrompt = null) {
     if (!currentSessionId) {
         // 세션이 없으면 새로 생성
         await createNewChat();
     }
 
     try {
+        const messageData = {
+            session_id: currentSessionId,
+            role,
+            content
+        };
+
+        // assistant 메시지인 경우 맥락 정보도 저장
+        if (role === 'assistant' && contextPrompt) {
+            messageData.context_prompt = contextPrompt;
+        }
+
         const { data: newMessage, error } = await supabaseClient
             .from('messages')
-            .insert([{
-                session_id: currentSessionId,
-                role,
-                content
-            }])
+            .insert([messageData])
             .select()
             .single();
 
@@ -594,7 +604,7 @@ function addUserMessageToUI(content) {
  * 봇 메시지 UI에 추가 (저장 없이)
  * 마크다운 → HTML 변환 적용
  */
-function addBotMessageToUI(content) {
+function addBotMessageToUI(content, question = '', contextPrompt = '') {
     const chatContainer = document.getElementById('chatContainer');
     if (!chatContainer) return;
 
@@ -644,7 +654,7 @@ function addBotMessageToUI(content) {
             // **주제** 형태의 굵은 글씨를 클릭 가능한 링크로 변환
             const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
-            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
+            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')"></${escapeHtml(topic)}</strong>`;
             html = html.replace(regex, clickableLink);
         });
     }
@@ -659,11 +669,12 @@ function addBotMessageToUI(content) {
         </div>
     `;
 
-    // 메시지 데이터 저장 (복사/피드백용)
+    // 메시지 데이터 저장 (복사/피드백용) - ★ 질문 + 답변 + 맥락 모두 저장 ★
     window.lastMessages = window.lastMessages || {};
     window.lastMessages[messageId] = {
-        question: '', // 기록에서는 질문 정보가 없음
-        answer: content.substring(0, 500)
+        question: question,           // 직전 사용자 질문
+        answer: content,              // 전체 답변 (제한 없음)
+        contextPrompt: contextPrompt  // 맥락 정보 (요약 + 최근 대화)
     };
 
     const div = document.createElement('div');

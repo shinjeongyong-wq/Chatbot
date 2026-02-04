@@ -734,7 +734,7 @@ async function getBotResponse(userMessage) {
 
                         // Supabase 저장 (user는 sendUserMessage에서 이미 저장됨)
                         if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-                            window.chatHistory.saveMessage('assistant', queryPlan.directAnswer).catch(() => { });
+                            window.chatHistory.saveMessage('assistant', queryPlan.directAnswer, chatMemory.getContextPrompt()).catch(() => { });
                         }
 
                         return; // ★ 검색 로직 완전 스킵 ★
@@ -851,7 +851,7 @@ async function getBotResponse(userMessage) {
 
         // Supabase에 AI 응답 저장 (user는 sendUserMessage에서 이미 저장됨)
         if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-            window.chatHistory.saveMessage('assistant', responseText).catch(err => {
+            window.chatHistory.saveMessage('assistant', responseText, chatMemory.getContextPrompt()).catch(err => {
                 console.warn('AI 응답 DB 저장 실패:', err);
             });
         }
