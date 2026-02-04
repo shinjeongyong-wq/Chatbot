@@ -5,17 +5,21 @@ const CONFIG = {
     CHAT_ENDPOINT: '/api/chat'
 };
 
-// ★ 앵커 주제 (topics.json에서 로드) ★
+// ★ 앵커 주제 (topics_shortened.json에서 로드) ★
 let anchorTopics = [];
 
-// topics.json 로드
+// topics_shortened.json 로드 (축약된 주제 사용)
 async function loadAnchorTopics() {
     try {
-        const response = await fetch('/data/topics.json');
+        const response = await fetch('/topics_shortened.json');
         if (response.ok) {
             const data = await response.json();
-            anchorTopics = data.topics || [];
-            console.log(`✅ 앵커 주제 ${anchorTopics.length}개 로드 완료`);
+            // shortened 필드를 question으로 매핑하여 기존 코드 호환성 유지
+            anchorTopics = data.map(item => ({
+                id: item.id,
+                question: item.shortened  // 축약된 주제 사용
+            }));
+            console.log(`✅ 앵커 주제 ${anchorTopics.length}개 로드 완료 (축약됨)`);
         }
     } catch (error) {
         console.error('앵커 주제 로드 실패:', error);
@@ -24,6 +28,7 @@ async function loadAnchorTopics() {
 
 // 페이지 로드 시 앵커 주제 로드
 loadAnchorTopics();
+
 
 // ★ Phase 4: 진료과별 키워드 확장 ★
 const SPECIALTIES = {
@@ -1674,6 +1679,10 @@ async function submitFeedback() {
         }
 
         console.log('✅ 피드백 저장 완료:', data);
+
+        // ★ 피드백 10개 도달 체크 및 Slack 알림 ★
+        checkFeedbackCountAndNotify();
+
         closeFeedbackModal();
         showSuccessModal('피드백 전달이 완료되었습니다. 감사합니다.');
 
@@ -1685,6 +1694,48 @@ async function submitFeedback() {
             submitBtn.disabled = false;
             submitBtn.textContent = '제출';
         }
+    }
+}
+
+/**
+ * 피드백 10개 도달 체크 및 Slack 알림
+ */
+async function checkFeedbackCountAndNotify() {
+    try {
+        // 처리되지 않은 피드백 개수 조회
+        const { count, error } = await supabaseClient
+            .from('feedback')
+            .select('*', { count: 'exact', head: true })
+            .is('processed', null);  // processed 컬럼이 null인 것만
+
+        if (error) {
+            console.warn('피드백 카운트 조회 실패:', error);
+            return;
+        }
+
+        console.log(`📊 미처리 피드백: ${count}개`);
+
+        // 10개 이상이면 Slack 알림
+        if (count >= 10) {
+            console.log('🔔 피드백 10개 도달! Slack 알림 전송...');
+
+            const response = await fetch('/api/slack-notify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    count: count,
+                    message: `🔔 *피드백 자동화 알림*\n\n*${count}개*의 새로운 피드백이 쌓였습니다!\n\n👉 AI 채팅창에 \`/feedback-auto\` 를 입력하여 자동 개선을 시작하세요.`
+                })
+            });
+
+            if (response.ok) {
+                console.log('✅ Slack 알림 전송 완료');
+            } else {
+                console.warn('⚠️ Slack 알림 전송 실패');
+            }
+        }
+    } catch (err) {
+        console.warn('피드백 카운트 체크 오류:', err);
     }
 }
 
