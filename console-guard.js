@@ -3,7 +3,10 @@
         || window.location.hostname === '127.0.0.1'
         || window.location.hostname.includes('192.168.');
 
-    if (!isLocal) {
+    const isStaging = window.location.hostname.includes('staging')
+        || window.location.hostname.includes('-git-staging-');
+
+    if (!isLocal && !isStaging) {
         console.log = () => { };
         console.debug = () => { };
         console.info = () => { };
