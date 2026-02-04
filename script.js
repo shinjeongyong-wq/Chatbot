@@ -11,7 +11,7 @@ let anchorTopics = [];
 // topics_shortened.json 로드 (축약된 주제 사용)
 async function loadAnchorTopics() {
     try {
-        const response = await fetch('/topics_shortened.json');
+        const response = await fetch('/data/topics_shortened.json');
         if (response.ok) {
             const data = await response.json();
             // shortened 필드를 question으로 매핑하여 기존 코드 호환성 유지
