@@ -483,6 +483,44 @@ async function loadSessionMessages(sessionId) {
             return;
         }
 
+        // ★ chatMemory에 로드된 대화 채우기 (맥락 유지 핵심!) ★
+        if (window.chatMemory) {
+            // 질문-답변 쌍 추출
+            const qaPairs = [];
+            let currentQuestion = '';
+
+            messages.forEach(msg => {
+                if (msg.role === 'user') {
+                    currentQuestion = msg.content;
+                } else if (msg.role === 'assistant' && currentQuestion) {
+                    qaPairs.push({
+                        user: currentQuestion,
+                        assistant: msg.content
+                    });
+                    currentQuestion = '';
+                }
+            });
+
+            // 최근 3턴만 recentBuffer에, 나머지는 요약으로 처리
+            if (qaPairs.length > 0) {
+                const recentTurns = qaPairs.slice(-3);  // 최근 3턴
+                const olderTurns = qaPairs.slice(0, -3); // 그 이전 턴들
+
+                // recentBuffer 직접 설정
+                window.chatMemory.recentBuffer = recentTurns;
+
+                // 이전 대화가 많으면 간단한 요약 생성
+                if (olderTurns.length > 0) {
+                    const summaryText = olderTurns.map(qa =>
+                        `Q: ${qa.user.substring(0, 50)}... → A: ${qa.assistant.substring(0, 100)}...`
+                    ).join('\n');
+                    window.chatMemory.contextSummary = `[이전 ${olderTurns.length}턴 대화]\n${summaryText}`;
+                }
+
+                console.log(`🧠 [ChatMemory] 히스토리에서 ${recentTurns.length}턴 로드됨 (이전 ${olderTurns.length}턴 요약)`);
+            }
+        }
+
         // 메시지 렌더링 (질문-답변 쌍으로 맥락 전달)
         let lastUserQuestion = '';
         messages.forEach(msg => {
