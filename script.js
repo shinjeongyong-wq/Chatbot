@@ -17,7 +17,9 @@ async function loadAnchorTopics() {
             // shortened 필드를 question으로 매핑하여 기존 코드 호환성 유지
             anchorTopics = data.map(item => ({
                 id: item.id,
-                question: item.shortened  // 축약된 주제 사용
+                question: item.shortened || '',  // 축약된 주제 사용
+                category: '',     // 호환성용 빈 값
+                subCategory: ''   // 호환성용 빈 값
             }));
             console.log(`✅ 앵커 주제 ${anchorTopics.length}개 로드 완료 (축약됨)`);
         }
