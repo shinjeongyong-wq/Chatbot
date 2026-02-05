@@ -671,6 +671,11 @@ async function getBotResponse(userMessage) {
             // ★ 현재까지 언급된 항목들 추출 ★
             const alreadyMentioned = extractMentionedKeywords();
 
+            // ★ 디버그: 현재 세션과 맥락 확인 ★
+            console.log('🔍 [DEBUG] 현재 세션:', chatMemory.currentSessionId?.substring(0, 8));
+            console.log('🔍 [DEBUG] recentBuffer 길이:', chatMemory.recentBuffer.length);
+            console.log('🔍 [DEBUG] 맥락 내용 (앞 200자):', chatMemory.getContextPrompt().substring(0, 200));
+
             const planResponse = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
