@@ -262,6 +262,8 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         return topicMatch || categoryMatch || keywordMatch;
     });
 
+    console.log(`[Search] T+C+K 필터링: ${data.length}개 → ${candidates.length}개 (${((1 - candidates.length / data.length) * 100).toFixed(1)}% 감소)`);
+
     // 1. 제외 키워드 필터링
     candidates = candidates.filter(item => {
         if (!excludeKeywords || excludeKeywords.length === 0) return true;
