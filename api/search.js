@@ -278,7 +278,7 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         const subIntents = Array.isArray(queryPlan.subIntent) ? queryPlan.subIntent : [queryPlan.subIntent];
         const isPartnerIntent = subIntents.includes('파트너사목록');
         if (isPartnerIntent && itemPath.startsWith('partners')) {
-            score = score + 0.8;  // 파트너사 보너스 (0.8)
+            score = score + 0.4;  // 파트너사 보너스 (0.4)
         }
 
 
