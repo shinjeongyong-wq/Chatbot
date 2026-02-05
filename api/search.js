@@ -274,11 +274,11 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
             }
         }
 
-        // ★ 파트너사 가중치: subIntent에 '파트너사목록'이 포함될 때 적용 - 배열 지원 ★
+        // ★ 파트너사 가중치: subIntent에 '파트너사목록'이 포함될 때 적용 ★
         const subIntents = Array.isArray(queryPlan.subIntent) ? queryPlan.subIntent : [queryPlan.subIntent];
         const isPartnerIntent = subIntents.includes('파트너사목록');
         if (isPartnerIntent && itemPath.startsWith('partners')) {
-            score = score + 0.4;  // 파트너사 보너스 (0.4)
+            score = score + 0.2;  // 파트너사 보너스 (0.2)
         }
 
 
