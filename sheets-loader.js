@@ -481,6 +481,10 @@ class GoogleSheetsLoader {
             const result = await response.json();
 
             if (result.success && result.results) {
+                // T+C+K 필터링 정보 출력
+                if (result.filterInfo) {
+                    console.log(`   📊 T+C+K 필터링: ${result.filterInfo.originalCount}개 → ${result.filterInfo.filteredCount}개 (${result.filterInfo.reduction} 감소)`);
+                }
                 console.log(`   최종 결과: ${result.count}개`);
                 return result.results;
             } else {

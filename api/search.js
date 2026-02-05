@@ -262,7 +262,13 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         return topicMatch || categoryMatch || keywordMatch;
     });
 
-    console.log(`[Search] T+C+K 필터링: ${data.length}개 → ${candidates.length}개 (${((1 - candidates.length / data.length) * 100).toFixed(1)}% 감소)`);
+    // 필터링 정보 저장 (응답에 포함용)
+    const filterInfo = {
+        originalCount: data.length,
+        filteredCount: candidates.length,
+        reduction: ((1 - candidates.length / data.length) * 100).toFixed(1) + '%'
+    };
+    console.log(`[Search] T+C+K 필터링: ${filterInfo.originalCount}개 → ${filterInfo.filteredCount}개 (${filterInfo.reduction} 감소)`);
 
     // 1. 제외 키워드 필터링
     candidates = candidates.filter(item => {
@@ -356,7 +362,9 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         results = results.filter(r => r.score >= cutoffThreshold);
     }
 
-    return results.slice(0, finalMaxResults);
+    const finalResults = results.slice(0, finalMaxResults);
+    finalResults._filterInfo = filterInfo;  // 필터링 정보 첨부
+    return finalResults;
 }
 
 // ========== API Handler ==========
@@ -395,7 +403,8 @@ module.exports = async (req, res) => {
                 success: true,
                 results: results,
                 count: results.length,
-                dataSource: 'server' // 클라이언트에서 확인용
+                dataSource: 'server',
+                filterInfo: results._filterInfo || null  // T+C+K 필터링 정보
             });
         }
 
