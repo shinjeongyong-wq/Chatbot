@@ -272,8 +272,8 @@ ${userSpecialtyContext}${conversationContext}
 
     try {
         const models = [
-            { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
-            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' }
+            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },  // 속도 최적화: 2.5 Flash 우선
+            { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' }
         ];
 
         let content = null;
