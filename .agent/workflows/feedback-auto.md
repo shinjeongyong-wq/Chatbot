@@ -2,7 +2,7 @@
 description: 피드백 10개 자동 분석 및 개선 프로세스
 ---
 
-# 피드백 자동화 워크플로우
+# 피드백 자동화 워크플로우 (v2 - Supabase)
 
 ## 🔔 트리거
 - 사용자가 `/feedback-auto` 입력 시 실행
@@ -20,15 +20,19 @@ git pull origin staging
 git checkout -b feature/auto-feedback-batch-{YYYYMMDD-HHMM}
 ```
 
-### 2. 피드백 데이터 수집
-1. Google Sheets "Feedback" 시트에서 최근 10개 피드백 수집
-2. 각 피드백의 다음 정보 확인:
-   - type (Good/Bad)
-   - question (질문)
-   - answer (답변)
-   - content (상세내용)
-   - contextPrompt (맥락정보)
-   - userName, specialty
+### 2. 피드백 데이터 수집 (Supabase)
+```bash
+// turbo
+node fetch-feedback.js
+```
+- Supabase `feedback` 테이블에서 `processed = null` 인 피드백 조회
+- 각 피드백의 다음 정보 확인:
+  - type (Good/Bad)
+  - question (질문)
+  - answer (답변)
+  - content (상세내용)
+  - context_prompt (맥락정보)
+  - user_name, specialty
 
 ### 3. 피드백 분석
 1. Bad 피드백 우선 분석
@@ -72,7 +76,10 @@ WHILE (미해결 피드백 존재) AND (반복 횟수 < 5):
     5. 반복 횟수 += 1
 ```
 
-### 7. 결과 보고
+### 7. 피드백 처리 완료 표시
+Supabase에서 처리된 피드백들의 `processed` 컬럼을 `true`로 업데이트
+
+### 8. 결과 보고
 사용자에게 다음 내용 보고:
 
 ```markdown
@@ -94,7 +101,7 @@ WHILE (미해결 피드백 존재) AND (반복 횟수 < 5):
 - 총 N회 반복
 ```
 
-### 8. 사용자 승인 및 배포
+### 9. 사용자 승인 및 배포
 ```
 사용자 응답:
 ├─ "OK" / "승인" → staging merge & push

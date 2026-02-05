@@ -4,5 +4,8 @@
   },
   "devDependencies": {
     "javascript-obfuscator": "^5.2.1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.94.0"
   }
 }
