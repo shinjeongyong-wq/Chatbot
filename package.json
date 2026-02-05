@@ -6,6 +6,8 @@
     "javascript-obfuscator": "^5.2.1"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.94.0"
+    "@supabase/supabase-js": "^2.94.0",
+    "dotenv": "^17.2.3",
+    "googleapis": "^171.2.0"
   }
 }
