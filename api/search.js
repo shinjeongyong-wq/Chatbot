@@ -174,11 +174,17 @@ function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strate
         score += Math.min((expandHits / expandedKeywords.length) * 0.25, 0.25);
     }
 
-    // 3. 토픽 매칭 (+0.1)
-    if (topic && topic !== '기타') {
-        const searchTopic = topic.toLowerCase();
-        if (field.includes(searchTopic) || question.includes(searchTopic)) {
-            score += 0.1;
+    // 3. 토픽 매칭 (+0.1) - 배열 지원
+    if (topic) {
+        const topics = Array.isArray(topic) ? topic : [topic];
+        for (const t of topics) {
+            if (t && t !== '기타') {
+                const searchTopic = t.toLowerCase();
+                if (field.includes(searchTopic) || question.includes(searchTopic)) {
+                    score += 0.1;
+                    break; // 하나만 매칭되면 OK
+                }
+            }
         }
     }
 
@@ -253,20 +259,24 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         const itemPath = item.metadata?.categoryPath || '';
         const itemSubPath = item.metadata?.structuredSubCategory || '';
 
-        // 토픽 매칭 보너스 (키워드 기반만 유지, categoryPath 제거)
-        if (topic && topic !== '기타') {
-            const searchTopic = topic.toLowerCase();
-
-            // 토픽이 문서 메타데이터에 포함된 경우 보너스
-            if (itemTopic.toLowerCase().includes(searchTopic) || itemField.includes(searchTopic)) {
-                score = score + 0.5;
+        // 토픽 매칭 보너스 - 배열 지원
+        if (topic) {
+            const topics = Array.isArray(topic) ? topic : [topic];
+            for (const t of topics) {
+                if (t && t !== '기타') {
+                    const searchTopic = t.toLowerCase();
+                    // 토픽이 문서 메타데이터에 포함된 경우 보너스
+                    if (itemTopic.toLowerCase().includes(searchTopic) || itemField.includes(searchTopic)) {
+                        score = score + 0.5;
+                        break;
+                    }
+                }
             }
-
-            // 인테리어/간판 혼동 방지 패널티 제거됨 (v2.3.1)
         }
 
-        // ★ 파트너사 가중치: subIntent가 '파트너사목록'일 때만 적용 ★
-        const isPartnerIntent = intent === '파트너사목록';
+        // ★ 파트너사 가중치: subIntent에 '파트너사목록'이 포함될 때 적용 - 배열 지원 ★
+        const subIntents = Array.isArray(queryPlan.subIntent) ? queryPlan.subIntent : [queryPlan.subIntent];
+        const isPartnerIntent = subIntents.includes('파트너사목록');
         if (isPartnerIntent && itemPath.startsWith('partners')) {
             score = score + 1.5;
         }
@@ -285,9 +295,10 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         .filter(r => r.score > 0.05)
         .sort((a, b) => b.score - a.score);
 
-    // 진료과 민감 카테고리 페널티
+    // 진료과 민감 카테고리 페널티 - 배열 지원
     const specialtySensitiveCategories = ['partners', 'medical_device'];
-    const isSpecialtySensitive = specialtySensitiveCategories.includes(targetCategory);
+    const targetCategories = Array.isArray(targetCategory) ? targetCategory : [targetCategory];
+    const isSpecialtySensitive = targetCategories.some(cat => specialtySensitiveCategories.includes(cat));
 
     if (userSpecialty && userSpecialty.code) {
         const userSpecCode = userSpecialty.code.toLowerCase();
