@@ -519,7 +519,67 @@ function setupEventListeners() {
             if (question) sendUserMessage(question);
         }
     });
+
+    // 모바일 UI 초기화
+    initMobileUI();
 }
+
+/**
+ * 모바일 UI 초기화 (햄버거 버튼 & 오버레이)
+ */
+function initMobileUI() {
+    // 이미 추가되었으면 스킵
+    if (document.getElementById('mobileHamburger')) return;
+
+    // 1. 모바일 햄버거 버튼 생성
+    const header = document.querySelector('.header');
+    if (header) {
+        const hamburgerBtn = document.createElement('button');
+        hamburgerBtn.id = 'mobileHamburger';
+        hamburgerBtn.className = 'mobile-hamburger';
+        hamburgerBtn.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18"/>
+            </svg>
+        `;
+        hamburgerBtn.onclick = toggleMobileSidebar;
+        header.insertBefore(hamburgerBtn, header.firstChild);
+    }
+
+    // 2. 오버레이 생성
+    const overlay = document.createElement('div');
+    overlay.id = 'sidebarOverlay';
+    overlay.className = 'sidebar-overlay';
+    overlay.onclick = closeMobileSidebar;
+    document.body.appendChild(overlay);
+}
+
+/**
+ * 모바일 사이드바 토글
+ */
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('historySidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (sidebar && overlay) {
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('active');
+    }
+}
+
+/**
+ * 모바일 사이드바 닫기
+ */
+function closeMobileSidebar() {
+    const sidebar = document.getElementById('historySidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (sidebar && overlay) {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+    }
+}
+
 
 // ==========================
 // 2. FAQ 네비게이션

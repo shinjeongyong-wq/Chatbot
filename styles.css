@@ -703,3 +703,116 @@ body {
         padding: var(--spacing-sm) var(--spacing-md);
     }
 }
+
+/* ========================================
+   모바일 사이드바 & 레이아웃 (v2.4.2)
+   ======================================== */
+
+/* 모바일 헤더에 햄버거 버튼 추가 */
+.mobile-hamburger {
+    display: none;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: background 0.2s;
+}
+
+.mobile-hamburger:hover {
+    background: var(--surface-secondary);
+}
+
+/* 768px 이하 - 모바일 사이드바 */
+@media (max-width: 768px) {
+    /* 모바일 햄버거 표시 */
+    .mobile-hamburger {
+        display: flex;
+    }
+    
+    /* 기존 사이드바를 오버레이로 변경 */
+    .history-sidebar {
+        position: fixed !important;
+        left: -100%;
+        top: 0;
+        height: 100vh;
+        width: 85% !important;
+        max-width: 320px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    }
+    
+    .history-sidebar.mobile-open {
+        left: 0;
+    }
+    
+    /* 사이드바 열렸을 때 배경 오버레이 */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    /* 채팅 영역 패딩 축소 (Gemini 스타일) */
+    .chat-container {
+        padding: 8px !important;
+    }
+    
+    /* 메시지 간격 최소화 */
+    .message {
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .message-content {
+        max-width: 90% !important;
+    }
+    
+    /* 헤더 레이아웃 */
+    .header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .header .logo {
+        flex: 1;
+    }
+}
+
+/* 480px 이하 - 더 공격적 축소 */
+@media (max-width: 480px) {
+    .chat-container {
+        padding: 4px 8px !important;
+    }
+    
+    .message {
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+    
+    .message-avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+    }
+    
+    .message-content {
+        max-width: 92% !important;
+        padding: 8px 10px;
+    }
+}
