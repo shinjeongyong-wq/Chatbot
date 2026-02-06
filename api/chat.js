@@ -1,9 +1,6 @@
 // Vercel Serverless Function - Google Gemini API Proxy
 // API 키가 환경변수에 저장되어 노출되지 않음
 
-const { supabase } = require('../lib/supabase');
-const crypto = require('crypto');
-
 export default async function handler(req, res) {
     // CORS 헤더
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -457,24 +454,58 @@ ${systemPrompt}
 // ========== 캐시 관련 함수 ==========
 
 /**
- * 캐시 키 생성 (Query Plan 기반)
+ * 캐시 키 생성 (Query Plan 기반) - 간단한 해시
  */
 function generateCacheKey(queryPlan, specialty, hasContext) {
     const topicSorted = [...(queryPlan.topic || [])].sort();
     const subIntentSorted = [...(queryPlan.subIntent || [])].sort();
 
-    const keyData = {
+    const keyData = JSON.stringify({
         topic: topicSorted,
         subIntent: subIntentSorted,
         specialty: specialty?.code || 'none',
         hasContext: !!hasContext
+    });
+
+    // 간단한 해시 함수 (crypto 없이)
+    let hash = 0;
+    for (let i = 0; i < keyData.length; i++) {
+        const char = keyData.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16).padStart(16, '0').substring(0, 16);
+}
+
+/**
+ * Supabase REST API 호출 헬퍼
+ */
+async function supabaseQuery(table, method, options = {}) {
+    const url = new URL(`${process.env.SUPABASE_URL}/rest/v1/${table}`);
+
+    if (options.select) {
+        url.searchParams.set('select', options.select);
+    }
+    if (options.eq) {
+        for (const [key, value] of Object.entries(options.eq)) {
+            url.searchParams.set(key, `eq.${value}`);
+        }
+    }
+
+    const headers = {
+        'apikey': process.env.SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': method === 'POST' ? 'return=representation' : ''
     };
 
-    return crypto
-        .createHash('sha256')
-        .update(JSON.stringify(keyData))
-        .digest('hex')
-        .substring(0, 16);
+    const fetchOptions = { method, headers };
+    if (options.body) {
+        fetchOptions.body = JSON.stringify(options.body);
+    }
+
+    const response = await fetch(url.toString(), fetchOptions);
+    return response.json();
 }
 
 /**
@@ -490,31 +521,41 @@ async function handleCacheCheck(req, res) {
     try {
         const cacheKey = generateCacheKey(queryPlan, specialty, hasContext);
 
-        const { data, error } = await supabase
-            .from('query_cache')
-            .select('answer, original_question, hit_count')
-            .eq('cache_key', cacheKey)
-            .single();
+        const url = `${process.env.SUPABASE_URL}/rest/v1/query_cache?cache_key=eq.${cacheKey}&select=answer,original_question,hit_count`;
+        const response = await fetch(url, {
+            headers: {
+                'apikey': process.env.SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`
+            }
+        });
 
-        if (error || !data) {
+        const data = await response.json();
+
+        if (!data || data.length === 0) {
             console.log(`[Cache] MISS: ${cacheKey}`);
             return res.json({ hit: false, cacheKey });
         }
 
-        // 히트 카운트 증가 (비동기)
-        supabase.from('query_cache')
-            .update({ hit_count: data.hit_count + 1 })
-            .eq('cache_key', cacheKey)
-            .then(() => { })
-            .catch(() => { });
+        const cached = data[0];
+
+        // 히트 카운트 증가 (비동기, 응답 기다리지 않음)
+        fetch(`${process.env.SUPABASE_URL}/rest/v1/query_cache?cache_key=eq.${cacheKey}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': process.env.SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ hit_count: cached.hit_count + 1 })
+        }).catch(() => { });
 
         console.log(`[Cache] HIT: ${cacheKey}`);
         return res.json({
             hit: true,
             cacheKey,
-            answer: data.answer,
-            originalQuestion: data.original_question,
-            hitCount: data.hit_count
+            answer: cached.answer,
+            originalQuestion: cached.original_question,
+            hitCount: cached.hit_count
         });
 
     } catch (err) {
@@ -536,9 +577,16 @@ async function handleCacheSave(req, res) {
     try {
         const cacheKey = generateCacheKey(queryPlan, specialty, hasContext);
 
-        const { error } = await supabase
-            .from('query_cache')
-            .upsert({
+        const url = `${process.env.SUPABASE_URL}/rest/v1/query_cache`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'apikey': process.env.SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'resolution=merge-duplicates'
+            },
+            body: JSON.stringify({
                 cache_key: cacheKey,
                 topic: queryPlan.topic || [],
                 sub_intent: queryPlan.subIntent || [],
@@ -546,13 +594,14 @@ async function handleCacheSave(req, res) {
                 has_context: !!hasContext,
                 answer: answer,
                 original_question: originalQuestion,
-                hit_count: 0,
-                created_at: new Date().toISOString()
-            }, { onConflict: 'cache_key' });
+                hit_count: 0
+            })
+        });
 
-        if (error) {
-            console.error('[Cache] Save error:', error.message);
-            return res.json({ success: false, error: error.message });
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('[Cache] Save error:', errorText);
+            return res.json({ success: false, error: errorText });
         }
 
         console.log(`[Cache] SAVED: ${cacheKey}`);
