@@ -525,63 +525,71 @@ function setupEventListeners() {
 }
 
 /**
- * 모바일 UI 초기화 (햄버거 버튼, 오버레이, 플래너 버튼)
+ * 모바일 UI 초기화 (최종 안정화 버전)
  */
 function initMobileUI() {
     // 모바일인지 확인 (768px 이하)
     if (window.innerWidth > 768) return;
 
-    // 이미 노출되었으면 스킵
-    const firstMobileBtn = document.querySelector('.mobile-only');
-    if (firstMobileBtn && firstMobileBtn.style.display === 'flex') return;
-
     console.log('📱 모바일 UI 초기화 시작...');
 
-    // 1. HTML에 미리 작성해둔 모바일 전용 버튼들 노출
-    const mobileBtns = document.querySelectorAll('.mobile-only');
-    mobileBtns.forEach(btn => {
-        btn.style.display = 'flex';
-    });
+    // 1. 모바일 전용 버튼들 노출
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const headerPlannerBtn = document.getElementById('headerPlannerBtn');
 
-    // 2. 오버레이 생성 (없을 경우만)
+    if (mobileMenuBtn) {
+        mobileMenuBtn.style.display = 'flex';
+        // HTML의 onclick을 지우고 addEventListener로 확실하게 연결
+        mobileMenuBtn.onclick = null;
+        mobileMenuBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMobileSidebar();
+        });
+    }
+
+    if (headerPlannerBtn) {
+        headerPlannerBtn.style.display = 'flex';
+        headerPlannerBtn.onclick = null;
+        headerPlannerBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (typeof openContactModal === 'function') openContactModal();
+        });
+    }
+
+    // 2. 오버레이 생성 및 이벤트 연결
     let overlay = document.getElementById('sidebarOverlay');
     if (!overlay) {
         overlay = document.createElement('div');
         overlay.id = 'sidebarOverlay';
         overlay.className = 'sidebar-overlay';
-        overlay.onclick = closeMobileSidebar;
         document.body.appendChild(overlay);
     }
+    overlay.onclick = null;
+    overlay.addEventListener('click', function (e) {
+        closeMobileSidebar();
+    });
 
-    // 3. 하단 중복 플래너 상담 버튼 숨기기 (모바일)
+    // 3. 하단 중복 버튼 숨김
     const bottomPlannerBtn = document.querySelector('.input-container .planner-btn, .input-container [onclick*="openContactModal"]:not(.header-planner-btn)');
     if (bottomPlannerBtn) {
         bottomPlannerBtn.style.display = 'none';
     }
 
-    console.log('✅ 모바일 UI 초기화 완료');
+    console.log('✅ 모바일 UI 초기화 완료 (Event Listeners Bound)');
 }
-
 
 /**
  * 모바일 사이드바 토글
  */
 function toggleMobileSidebar() {
     const sidebar = document.getElementById('historySidebar');
+    const overlay = document.getElementById('sidebarOverlay');
 
-    // 오버레이가 없으면 생성
-    let overlay = document.getElementById('sidebarOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'sidebarOverlay';
-        overlay.className = 'sidebar-overlay';
-        overlay.onclick = closeMobileSidebar;
-        document.body.appendChild(overlay);
-    }
-
-    if (sidebar) {
+    if (sidebar && overlay) {
         sidebar.classList.toggle('mobile-open');
         overlay.classList.toggle('active');
+        console.log('🎯 사이드바 상태:', sidebar.classList.contains('mobile-open') ? '열림' : '닫힘');
     }
 }
 
@@ -592,15 +600,11 @@ function closeMobileSidebar() {
     const sidebar = document.getElementById('historySidebar');
     const overlay = document.getElementById('sidebarOverlay');
 
-    if (sidebar) {
-        sidebar.classList.remove('mobile-open');
-    }
-    if (overlay) {
-        overlay.classList.remove('active');
-    }
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (overlay) overlay.classList.remove('active');
 }
 
-// 전역 노출 (난독화 후에도 onclick에서 호출 가능하도록)
+// 전역 노출 (최후의 보루)
 window.toggleMobileSidebar = toggleMobileSidebar;
 window.closeMobileSidebar = closeMobileSidebar;
 

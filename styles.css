@@ -1538,3 +1538,105 @@ body {
         padding-right: 0 !important;
     }
 }
+
+/* ==========================================================================
+   SUPER FINAL RESOLUTION (v5.0.0)
+   - PC: Keep Avatars, Hide Mobile Header Icons
+   - Mobile: Hide Avatars, Show Header Icons, Handle Overlay
+   ========================================================================== */
+
+/* 1. Standard Desktop State (769px+) */
+@media (min-width: 769px) {
+    /* Always show avatars on PC */
+    .message-avatar {
+        display: flex !important;
+    }
+
+    /* Hide the mobile header buttons I added */
+    .mobile-menu-btn,
+    .header-planner-btn,
+    .mobile-only {
+        display: none !important;
+    }
+}
+
+/* 2. Mobile State (768px and below) */
+@media (max-width: 768px) {
+    /* Always hide avatars on mobile for Gemini Style */
+    .message-avatar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    /* Messages should be tight to edges */
+    .message {
+        gap: 0 !important;
+        margin-bottom: 12px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .message.user .message-content {
+        margin-right: 8px !important;
+        max-width: 82% !important;
+    }
+
+    .message.bot .message-content {
+        margin-left: 8px !important;
+        max-width: 88% !important;
+    }
+
+    /* Mobile Header Layout */
+    .header {
+        padding: 8px 12px !important;
+        padding-top: max(8px, env(safe-area-inset-top)) !important;
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+
+    /* Show Mobile-only buttons */
+    .mobile-menu-btn,
+    .header-planner-btn {
+        display: flex !important;
+    }
+
+    /* Hide redundant elements */
+    .header-faq-btn,
+    #hamburgerBtn,
+    .desktop-only {
+        display: none !important;
+    }
+
+    /* Sidebar and Overlay */
+    .history-sidebar {
+        position: fixed !important;
+        left: -100% !important;
+        top: 0 !important;
+        height: 100vh !important;
+        width: 80% !important;
+        max-width: 300px !important;
+        z-index: 10001 !important;
+        transition: left 0.3s ease-out !important;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.2) !important;
+    }
+
+    .history-sidebar.mobile-open {
+        left: 0 !important;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 10000 !important;
+    }
+
+    .sidebar-overlay.active {
+        display: block !important;
+    }
+}
