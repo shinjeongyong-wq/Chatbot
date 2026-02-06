@@ -2827,25 +2827,28 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
     let plannerButton = '';
     if (isNoData) {
         plannerButton = `
-            <div class="planner-contact-container" style="margin-top: 16px; text-align: center;">
-                <a href="https://pf.kakao.com/_WxjrxkG" target="_blank" class="planner-contact-btn" style="
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 12px 24px;
-                    background: linear-gradient(135deg, #FEE500 0%, #F5D900 100%);
-                    color: #3C1E1E;
-                    font-weight: 600;
-                    border-radius: 12px;
-                    text-decoration: none;
-                    box-shadow: 0 4px 12px rgba(254, 229, 0, 0.3);
-                    transition: all 0.3s ease;
-                ">
-                    💬 플래너에게 문의하기
-                </a>
-            </div>
+            <p style="margin: 20px 0 16px 0; color: #64748b; font-size: 14px;">
+                질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
+            </p>
+            <button class="contact-planner-btn" onclick="openContactModal()" style="
+                background-color: #536db1;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.2s;
+                margin-bottom: 16px;
+            ">
+                <span style="font-size: 16px;">☎️</span> 플래너에게 연락하기
+            </button>
         `;
     }
+
 
     // 질문/답변 + 맥락 저장 (피드백용)
     window.lastMessages = window.lastMessages || {};
