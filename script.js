@@ -831,6 +831,15 @@ async function getBotResponse(userMessage) {
                 result.modelName
             );
 
+            // ★ 답변 완료 후: 사용자 질문이 화면 최상단에 오도록 스크롤 ★
+            const chatContainer = document.getElementById('chatContainer');
+            const userMessages = chatContainer.querySelectorAll('.message.user');
+            if (userMessages.length > 0) {
+                const lastUserMessage = userMessages[userMessages.length - 1];
+                lastUserMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+
             // 최종 응답 텍스트 결정
             let responseText = result.text;
 
@@ -2541,11 +2550,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
                 const displayedText = receivedBuffer.substring(0, displayedIndex);
                 contentDiv.innerHTML = renderMarkdownSafe(displayedText);
 
-                // 스크롤 유지
-                const messagesContainer = document.getElementById('chatContainer');
-                if (messagesContainer) {
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }
+                // 스트리밍 중에는 자동 스크롤 하지 않음 (사용자 자유 스크롤 허용)
             } else if (streamComplete) {
                 // 스트림 완료 & 모든 글자 표시 완료
                 clearInterval(typingInterval);
