@@ -530,3 +530,176 @@ body {
     color: var(--text-secondary);
     opacity: 0.7;
 }
+
+/* ========================================
+   모바일 최적화 (v2.4.1)
+   ======================================== */
+
+/* 터치 최적화 기본 설정 */
+@media (hover: none) and (pointer: coarse) {
+    /* 터치 디바이스에서 호버 효과 제거 */
+    .suggestion-chip:hover,
+    .send-button:hover,
+    .clickable-topic:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    /* 터치 하이라이트 색상 */
+    * {
+        -webkit-tap-highlight-color: rgba(83, 109, 177, 0.2);
+    }
+}
+
+/* 768px 이하 - 태블릿/모바일 */
+@media (max-width: 768px) {
+    /* 입력창 터치 최적화 */
+    .send-button {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .chat-input {
+        font-size: 16px; /* iOS 확대 방지 */
+    }
+    
+    /* 메시지 영역 */
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    .message-content {
+        font-size: 14px;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    /* 피드백 버튼 터치 영역 확대 */
+    .feedback-btn {
+        min-height: 44px;
+        padding: 10px 16px;
+    }
+    
+    /* 플래너 버튼 터치 영역 확대 */
+    .contact-planner-btn {
+        min-height: 48px;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* 웰컴 메시지 */
+    .welcome-message {
+        padding: 0 var(--spacing-md);
+    }
+    
+    .welcome-message p {
+        font-size: 14px;
+    }
+    
+    /* 제안 칩 터치 영역 */
+    .suggestion-chip {
+        min-height: 48px;
+        padding: var(--spacing-md);
+    }
+}
+
+/* 480px 이하 - 소형 모바일 */
+@media (max-width: 480px) {
+    /* 헤더 축소 */
+    .header {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .logo-text {
+        font-size: 16px;
+    }
+    
+    .header-subtitle {
+        display: none;
+    }
+    
+    /* 채팅 영역 */
+    .chat-container {
+        padding: var(--spacing-md);
+    }
+    
+    .message {
+        gap: var(--spacing-sm);
+    }
+    
+    .message-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+    
+    .message-content {
+        max-width: 88%;
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+    
+    /* 입력 영역 */
+    .input-container {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .input-wrapper {
+        padding: 6px;
+    }
+    
+    .input-hint {
+        display: none;
+    }
+    
+    /* 웰컴 메시지 */
+    .welcome-message h2 {
+        font-size: 20px;
+    }
+    
+    .welcome-icon svg {
+        width: 48px;
+        height: 48px;
+    }
+    
+    /* 피드백 버튼 풀와이드 */
+    .feedback-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .feedback-btn {
+        flex: 1;
+        min-width: 80px;
+        font-size: 13px;
+    }
+    
+    /* 타이핑 인디케이터 */
+    .typing-dots {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+}
+
+/* iOS 안전 영역 대응 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .input-container {
+        padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+    }
+}
+
+/* 가로 모드 대응 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .header {
+        padding: var(--spacing-xs) var(--spacing-md);
+    }
+    
+    .welcome-message {
+        margin: var(--spacing-md) auto;
+    }
+    
+    .input-container {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+}
