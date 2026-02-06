@@ -1,14 +1,8 @@
 // Vercel Serverless Function - Google Gemini API Proxy
 // API 키가 환경변수에 저장되어 노출되지 않음
 
-import { createClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
-
-// Supabase 클라이언트 (캐시용)
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
-);
+const { supabase } = require('../lib/supabase');
+const crypto = require('crypto');
 
 export default async function handler(req, res) {
     // CORS 헤더
