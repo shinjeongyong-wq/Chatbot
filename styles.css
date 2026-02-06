@@ -495,3 +495,38 @@ body {
     100% { transform: scale(1); }
 }
 
+
+/* ========================================
+   스트리밍 메시지 스타일
+   ======================================== */
+
+.message.streaming .streaming-content {
+    min-height: 30px;
+}
+
+/* 스트리밍 중 커서 애니메이션 */
+.message.streaming .streaming-content::after {
+    content: '';
+    animation: blink 1s step-end infinite;
+    color: var(--primary-color);
+    margin-left: 2px;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+/* 스트리밍 완료 후 커서 제거 */
+.message:not(.streaming) .streaming-content::after {
+    content: none;
+}
+
+/* 모델 정보 표시 */
+.model-info {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0.7;
+}

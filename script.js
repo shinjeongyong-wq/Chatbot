@@ -805,65 +805,136 @@ async function getBotResponse(userMessage) {
         console.log(`📚 최종 문서: ${relatedContexts.length}개 (Notion: ${sourceCounts.notion || 0}, Q&A: ${sourceCounts.qa || 0}, FAQ: ${sourceCounts.faq || 0})`);
 
 
-        // ========== Stage 3: Answer Generation ==========
-        startTypingMessageRolling('stage3');
-        console.log('💬 Stage 3: 답변 생성 시작...');
-        const result = await callOpenRouterAPI(userMessage, relatedContexts);
+        // ========== Stage 3: Answer Generation (Streaming) ==========
+        console.log('💬 Stage 3: 스트리밍 답변 생성 시작...');
 
+        // 스트리밍 메시지 컨테이너 생성
+        const { container: streamingContainer, contentDiv: streamingContent } = createStreamingMessageContainer();
+
+        // 타이핑 인디케이터 숨기기 (스트리밍 시작 시)
         hideTypingIndicator();
 
-        // AI 응답 태그 감지
-        let responseText = result.text;
+        let accumulatedText = '';
+        let finalModelName = null;
+        let streamingContexts = relatedContexts;
 
-        // ★ 토픽 태그 파싱 및 세션 제목 업데이트 ★
-        const topicMatch = responseText.match(/\[TOPIC:\s*([^\]]+)\]/);
-        if (topicMatch && topicMatch[1]) {
-            const topic = topicMatch[1].trim();
-            console.log(`📌 토픽 감지: ${topic}`);
-            // chat-history.js의 updateCurrentSessionTitle 함수 호출
-            if (typeof updateCurrentSessionTitle === 'function') {
-                updateCurrentSessionTitle(topic);
+        try {
+            const result = await callOpenRouterAPIWithStreaming(
+                userMessage,
+                relatedContexts,
+                // onSentence: 문장 완성 시 호출
+                (sentence) => {
+                    accumulatedText += sentence;
+                    updateStreamingMessage(streamingContent, accumulatedText);
+                },
+                // onComplete: 스트리밍 완료 시 호출
+                (fullText, modelName) => {
+                    finalModelName = modelName;
+                    streamingContexts = result?.filteredContexts || relatedContexts;
+                }
+            );
+
+            // 스트리밍 완료 후 최종 포맷팅 적용
+            finalizeStreamingMessage(
+                streamingContainer,
+                accumulatedText,
+                result.filteredContexts || relatedContexts,
+                finalModelName
+            );
+
+            // 최종 응답 텍스트 결정
+            let responseText = accumulatedText;
+
+            // ★ 토픽 태그 파싱 및 세션 제목 업데이트 ★
+            const topicMatch = responseText.match(/\[TOPIC:\s*([^\]]+)\]/);
+            if (topicMatch && topicMatch[1]) {
+                const topic = topicMatch[1].trim();
+                console.log(`📌 토픽 감지: ${topic}`);
+                if (typeof updateCurrentSessionTitle === 'function') {
+                    updateCurrentSessionTitle(topic);
+                }
+                responseText = responseText.replace(/\[TOPIC:\s*[^\]]+\]\n?/, '').trim();
             }
-            // 토픽 태그 제거 (UI에 보이지 않도록)
-            responseText = responseText.replace(/\[TOPIC:\s*[^\]]+\]\n?/, '').trim();
-        }
 
-        // ★ 메시지 타입 추적 (플래너 버튼 복원용) ★
-        let messageType = 'normal';
+            // ★ 메시지 타입 추적 (플래너 버튼 복원용) ★
+            let messageType = 'normal';
 
-        if (responseText.includes('[OFF_TOPIC]')) {
-            let cleanText = responseText.replace('[OFF_TOPIC]', '').trim();
-            // Rambling 방지: [번호] 인용이 포함되어 있다면 제거 (Off-topic엔 불필요)
-            cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
-            addOffTopicMessage(cleanText);
-            responseText = cleanText;
-            messageType = 'off_topic';
-        } else if (responseText.includes('[NO_DATA]')) {
-            let cleanText = responseText.replace('[NO_DATA]', '').trim();
-            // 인용 번호 제거
-            cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
+            if (responseText.includes('[OFF_TOPIC]')) {
+                messageType = 'off_topic';
+                responseText = responseText.replace('[OFF_TOPIC]', '').trim();
+            } else if (responseText.includes('[NO_DATA]')) {
+                messageType = 'no_data';
+                responseText = responseText.replace('[NO_DATA]', '').trim();
+            }
 
-            addNoDataMessage(cleanText);
-            responseText = cleanText;
-            messageType = 'no_data';
-        } else {
-            // ★ 모든 인용 주석 제거 (v2.3.1) ★
-            // [1], [2, 3], [ID: 1], [ID: 2, 3] 등 모든 형태
+            // [1], [2] 등 모든 인용 주석 제거 (v2.3.1)
             responseText = responseText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').trim();
-            // 필터링된 컨텍스트를 사용하여 포매팅
-            addFormattedMessage(responseText, result.filteredContexts || relatedContexts, result.modelName);
+
+            // 대화 히스토리에 저장
+            chatMemory.addTurn(userMessage, responseText);
+
+            // Supabase에 AI 응답 저장
+            if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+                window.chatHistory.saveMessage('assistant', responseText, chatMemory.getContextPrompt(), messageType).catch(err => {
+                    console.warn('AI 응답 DB 저장 실패:', err);
+                });
+            }
+
+        } catch (streamError) {
+            if (streamError.name === 'AbortError') {
+                // 사용자가 중단한 경우 스트리밍 컨테이너 제거
+                streamingContainer.remove();
+                throw streamError;
+            }
+
+            // 스트리밍 실패 시 기존 방식으로 fallback
+            console.warn('⚠️ 스트리밍 실패, 기존 방식으로 fallback:', streamError.message);
+            streamingContainer.remove();
+
+            // 기존 방식으로 재시도
+            startTypingMessageRolling('stage3');
+            const result = await callOpenRouterAPI(userMessage, relatedContexts);
+            hideTypingIndicator();
+
+            let responseText = result.text;
+
+            const topicMatch = responseText.match(/\[TOPIC:\s*([^\]]+)\]/);
+            if (topicMatch && topicMatch[1]) {
+                const topic = topicMatch[1].trim();
+                if (typeof updateCurrentSessionTitle === 'function') {
+                    updateCurrentSessionTitle(topic);
+                }
+                responseText = responseText.replace(/\[TOPIC:\s*[^\]]+\]\n?/, '').trim();
+            }
+
+            let messageType = 'normal';
+
+            if (responseText.includes('[OFF_TOPIC]')) {
+                let cleanText = responseText.replace('[OFF_TOPIC]', '').trim();
+                cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
+                addOffTopicMessage(cleanText);
+                responseText = cleanText;
+                messageType = 'off_topic';
+            } else if (responseText.includes('[NO_DATA]')) {
+                let cleanText = responseText.replace('[NO_DATA]', '').trim();
+                cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
+                addNoDataMessage(cleanText);
+                responseText = cleanText;
+                messageType = 'no_data';
+            } else {
+                responseText = responseText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').trim();
+                addFormattedMessage(responseText, result.filteredContexts || relatedContexts, result.modelName);
+            }
+
+            chatMemory.addTurn(userMessage, responseText);
+
+            if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+                window.chatHistory.saveMessage('assistant', responseText, chatMemory.getContextPrompt(), messageType).catch(err => {
+                    console.warn('AI 응답 DB 저장 실패:', err);
+                });
+            }
         }
 
-        // 대화 히스토리에 저장 (맥락 유지 + 요약 자동 트리거)
-        // 텍스트를 자르지 않고 저장하여 나중에 키워드 추출 시 누락이 없도록 함
-        chatMemory.addTurn(userMessage, responseText);
-
-        // Supabase에 AI 응답 저장 (user는 sendUserMessage에서 이미 저장됨)
-        if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-            window.chatHistory.saveMessage('assistant', responseText, chatMemory.getContextPrompt(), messageType).catch(err => {
-                console.warn('AI 응답 DB 저장 실패:', err);
-            });
-        }
 
     } catch (error) {
         hideTypingIndicator(); // 어떤 경우든 인디케이터는 제거
@@ -2391,4 +2462,320 @@ function toggleFaqPanel() {
     if (faqPanel) {
         faqPanel.classList.toggle('active');
     }
+}
+
+// ============================================
+// 스트리밍 답변 생성
+// ============================================
+
+/**
+ * 스트리밍 API 호출 (문장 단위 버퍼링)
+ * @param {string} userQuery - 사용자 질문
+ * @param {Array} contexts - 참고 문서 배열
+ * @param {Function} onSentence - 문장 완성 시 콜백
+ * @param {Function} onComplete - 스트리밍 완료 시 콜백
+ * @returns {Promise<{text: string, modelName: string, filteredContexts: Array}>}
+ */
+async function callOpenRouterAPIWithStreaming(userQuery, contexts, onSentence, onComplete) {
+    // ★ 기존 callOpenRouterAPI에서 systemPrompt 생성 로직 재사용 ★
+    const userSpec = getUserSpecialty();
+    let contextText = '';
+
+    let filteredContexts = [];
+    if (contexts && contexts.length > 0) {
+        const maxDocs = Math.min(contexts.length, 30);
+        filteredContexts = contexts.slice(0, maxDocs);
+
+        const formatDoc = (item, idx) => {
+            let prefix = `[${idx}]`;
+            if (item.specialty && item.specialty !== '공통' && item.specialty !== 'ALL') {
+                prefix += ` (특화: ${item.specialty})`;
+            }
+            return `${prefix} Q: ${item.question}\nA: ${item.answer}`;
+        };
+
+        contextText = filteredContexts.map((item, idx) => formatDoc(item, idx)).join('\n\n---\n\n');
+    }
+
+    // 진료과 정보
+    const specialtyInfo = userSpec ?
+        `**${userSpec.label}** 개원을 준비 중인 원장님입니다. 이 진료과에 맞는 정보를 우선적으로 제공하세요.` : '';
+
+    // 대화 히스토리
+    const historyText = chatMemory.getContextPrompt();
+
+    // 첫 대화인지 확인
+    const isFirstMessage = !historyText || historyText === '(첫 대화)' || chatMemory.recentBuffer.length === 0;
+    const topicGenerationRule = isFirstMessage ? `
+# ⭐ 토픽 생성 (첫 대화일 때만)
+- 이 대화의 주제를 한글 10자 이내로 요약하여 답변의 **맨 첫 줄**에 다음 형식으로 작성하세요: \`[TOPIC: 주제]\`
+` : '';
+
+    const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변해주세요.
+
+${specialtyInfo ? '# 사용자 진료과\n' + specialtyInfo + '\n' : ''}
+${topicGenerationRule}
+# 이전 대화
+${historyText ? historyText : '(첫 대화)'}
+
+# 참고문서
+${contextText ? contextText : '(관련 데이터 없음)'}
+
+# 핵심 규칙
+1. 참고문서 내용 기반으로만 답변 (할루시네이션 금지)
+2. 병원 개원과 무관한 질문 → "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
+3. 정보가 없으면 → "[NO_DATA]질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
+4. **볼드체** 적극 활용, 가독성 좋게 줄바꿈
+5. 정중하고 전문적인 말투 (~요, ~습니다)`;
+
+    try {
+        console.log('🌊 스트리밍 API 호출 시작...');
+
+        const response = await fetch('/api/chat-stream', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userQuery: `질문: ${userQuery}`,
+                systemPrompt: systemPrompt
+            }),
+            signal: currentAbortController.signal
+        });
+
+        if (!response.ok) {
+            throw new Error(`스트리밍 API 오류: ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        let fullText = '';
+        let buffer = '';  // 문장 단위 버퍼
+        let modelName = null;
+
+        // 문장 종결 패턴 (마침표, 느낌표, 물음표 + 공백/줄바꿈)
+        const sentenceEndPattern = /([.!?。]\s*|\n\n)/;
+
+        while (true) {
+            const { done, value } = await reader.read();
+
+            if (done) {
+                // 남은 버퍼 처리
+                if (buffer.trim()) {
+                    onSentence(buffer);
+                    fullText += buffer;
+                }
+                break;
+            }
+
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+                if (line.startsWith('event: model')) {
+                    continue;
+                }
+                if (line.startsWith('data: ')) {
+                    const jsonStr = line.slice(6).trim();
+                    if (jsonStr === '[DONE]') continue;
+
+                    try {
+                        const data = JSON.parse(jsonStr);
+
+                        if (data.model) {
+                            modelName = data.model;
+                            console.log(`🤖 스트리밍 모델: ${modelName}`);
+                        }
+
+                        if (data.text) {
+                            buffer += data.text;
+
+                            // 문장 단위로 분리하여 전달
+                            let match;
+                            while ((match = sentenceEndPattern.exec(buffer)) !== null) {
+                                const sentenceEnd = match.index + match[0].length;
+                                const sentence = buffer.substring(0, sentenceEnd);
+
+                                if (sentence.trim()) {
+                                    onSentence(sentence);
+                                    fullText += sentence;
+                                }
+
+                                buffer = buffer.substring(sentenceEnd);
+                            }
+                        }
+                    } catch (e) {
+                        // JSON 파싱 실패 무시
+                    }
+                }
+            }
+        }
+
+        console.log('✅ 스트리밍 완료');
+        onComplete(fullText, modelName);
+
+        return {
+            text: fullText,
+            modelName: modelName,
+            filteredContexts: filteredContexts
+        };
+
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            console.log('✨ 스트리밍 중단됨');
+            throw error;
+        }
+        console.error('스트리밍 에러:', error);
+        throw error;
+    }
+}
+
+/**
+ * 스트리밍 메시지 컨테이너 생성
+ * @returns {{container: HTMLElement, contentDiv: HTMLElement}}
+ */
+function createStreamingMessageContainer() {
+    const container = document.createElement('div');
+    container.className = 'message bot streaming';
+    container.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content streaming-content"></div>
+    `;
+
+    const messagesContainer = document.getElementById('messages');
+    messagesContainer.appendChild(container);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    return {
+        container: container,
+        contentDiv: container.querySelector('.streaming-content')
+    };
+}
+
+/**
+ * 마크다운을 HTML로 변환 (스트리밍용 - 부분 텍스트에서도 안전하게)
+ * @param {string} text - 마크다운 텍스트
+ * @returns {string} HTML
+ */
+function renderMarkdownSafe(text) {
+    return text
+        .replace(/```[\s\S]*?```/g, '')  // 코드 블록 제거
+        .replace(/^### (.+)$/gm, '<h4 class="response-heading">$1</h4>')
+        .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^\* (.+)$/gm, '<li>$1</li>')
+        .replace(/^---$/gm, '<hr>')
+        .replace(/\n/g, '<br>');
+}
+
+/**
+ * 스트리밍 메시지 업데이트 (문장 추가)
+ * @param {HTMLElement} contentDiv - 콘텐츠 div
+ * @param {string} fullText - 현재까지의 전체 텍스트
+ */
+function updateStreamingMessage(contentDiv, fullText) {
+    // 전체 텍스트를 마크다운 렌더링하여 교체
+    contentDiv.innerHTML = renderMarkdownSafe(fullText);
+
+    // 스크롤 유지
+    const messagesContainer = document.getElementById('messages');
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+/**
+ * 스트리밍 완료 후 최종 포맷팅 적용
+ * @param {HTMLElement} container - 메시지 컨테이너
+ * @param {string} finalText - 최종 텍스트
+ * @param {Array} contexts - 참고 문서
+ * @param {string} modelName - 모델명
+ */
+function finalizeStreamingMessage(container, finalText, contexts, modelName) {
+    // streaming 클래스 제거
+    container.classList.remove('streaming');
+
+    // 기존 addFormattedMessage 로직 적용 (인용, 관련 주제 등)
+    // 전체 메시지를 다시 렌더링
+    const contentDiv = container.querySelector('.message-content');
+
+    // [TOPIC] 태그 처리
+    let processedText = finalText;
+    const topicMatch = processedText.match(/\[TOPIC:\s*([^\]]+)\]/);
+    if (topicMatch && topicMatch[1]) {
+        const topic = topicMatch[1].trim();
+        if (typeof updateCurrentSessionTitle === 'function') {
+            updateCurrentSessionTitle(topic);
+        }
+        processedText = processedText.replace(/\[TOPIC:\s*[^\]]+\]\n?/, '').trim();
+    }
+
+    // [RELATED_TOPICS] 추출
+    let relatedTopics = [];
+    const topicsMatch = processedText.match(/\[RELATED_TOPICS\]([\s\S]*?)\[\/RELATED_TOPICS\]/);
+    if (topicsMatch) {
+        const topicsBlock = topicsMatch[1].trim();
+        if (topicsBlock.includes('|')) {
+            relatedTopics = topicsBlock.split('|').map(t => t.trim()).filter(t => t.length > 0);
+        }
+        processedText = processedText.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
+    }
+
+    // [ID: n] 인용 처리
+    const idCitationRegex = /\[ID:\s*(\d+)\]/g;
+    const foundIds = [];
+    let match;
+    while ((match = idCitationRegex.exec(processedText)) !== null) {
+        const id = parseInt(match[1]);
+        if (!isNaN(id) && !foundIds.includes(id)) {
+            foundIds.push(id);
+        }
+    }
+
+    const idToNewNumMap = {};
+    foundIds.forEach((sourceId, idx) => {
+        idToNewNumMap[sourceId] = idx + 1;
+    });
+
+    const activeContexts = foundIds.map(sourceId => contexts[sourceId]).filter(ctx => ctx);
+
+    processedText = processedText.replace(idCitationRegex, (match, idStr) => {
+        const id = parseInt(idStr);
+        const newNum = idToNewNumMap[id];
+        return newNum ? `[${newNum}]` : '';
+    });
+
+    // [1], [2] 등 모든 인용 주석 제거 (v2.3.1)
+    processedText = processedText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').trim();
+
+    // 마크다운 렌더링
+    let html = renderMarkdownSafe(processedText);
+
+    // 관련 주제 클릭 가능 링크
+    if (relatedTopics.length > 0) {
+        relatedTopics.forEach(topic => {
+            const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
+            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
+            html = html.replace(regex, clickableLink);
+        });
+    }
+
+    // 툴팁 생성 (인용이 있는 경우)
+    const sortedNewNums = Object.values(idToNewNumMap).sort((a, b) => b - a);
+    sortedNewNums.forEach(num => {
+        const ctx = activeContexts[num - 1];
+        if (!ctx) return;
+
+        const answerPreview = ctx.answer.length > 200 ? ctx.answer.substring(0, 200) + '...' : ctx.answer;
+        const tooltip = `<strong>Q:</strong> ${escapeHtml(ctx.question)}<br><br><strong>A:</strong> ${escapeHtml(answerPreview)}`;
+        const citationHtml = `<span class="cite-ref">[${num}]<span class="cite-tooltip">${tooltip}</span></span>`;
+
+        const regex = new RegExp(`\\[${num}\\]`, 'g');
+        html = html.replace(regex, citationHtml);
+    });
+
+    // 모델 이름 표시
+    if (modelName) {
+        html += `<div class="model-info">🤖 ${modelName}</div>`;
+    }
+
+    contentDiv.innerHTML = html;
 }
