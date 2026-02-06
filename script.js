@@ -2525,8 +2525,8 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
     let streamComplete = false;
     let modelName = null;
 
-    const TYPING_SPEED = 15;  // 밀리초 (한 글자당)
-    const CHARS_PER_TICK = 2; // 한 번에 추가할 글자 수
+    const TYPING_SPEED = 30;  // 밀리초 (한 글자당) - 읽기 편한 속도
+    const CHARS_PER_TICK = 1; // 한 번에 추가할 글자 수
 
     // 타이핑 효과 시작
     const startTypingEffect = () => {
@@ -2795,10 +2795,24 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
         html = html.replace(regex, citationHtml);
     });
 
-    // 모델 이름 표시
-    if (modelName) {
-        html += `<div class="model-info">🤖 ${modelName}</div>`;
-    }
+    // 피드백 버튼 + 복사 버튼 추가
+    const messageId = Date.now();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사">📋</button>
+        </div>
+    `;
 
-    contentDiv.innerHTML = html;
+    // 질문/답변 + 맥락 저장 (피드백용)
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: window.currentQuestion || '',
+        answer: finalText,
+        contexts: contexts,
+        messageType: 'normal'
+    };
+
+    contentDiv.innerHTML = html + feedbackButtons;
 }
