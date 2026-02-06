@@ -816,3 +816,55 @@ body {
         padding: 8px 10px;
     }
 }
+
+/* ========================================
+   모바일 패딩 완전 제거 (v2.4.3)
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* 채팅 컨테이너 패딩 완전 제거 */
+    .chat-container {
+        padding: 0 !important;
+    }
+    
+    /* 메시지 가장자리 붙이기 */
+    .message {
+        padding: 8px 4px;
+        margin-bottom: 8px;
+    }
+    
+    .message-avatar {
+        margin-left: 4px;
+    }
+    
+    .message.user .message-avatar {
+        margin-right: 4px;
+    }
+    
+    .message-content {
+        max-width: 85% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-container {
+        padding: 0 !important;
+    }
+    
+    .message {
+        padding: 4px 2px;
+        margin-bottom: 6px;
+    }
+    
+    .message-avatar {
+        margin-left: 2px;
+    }
+    
+    .message.user .message-avatar {
+        margin-right: 2px;
+    }
+    
+    .message-content {
+        max-width: 90% !important;
+    }
+}
