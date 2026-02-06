@@ -916,6 +916,8 @@ async function getBotResponse(userMessage) {
                 const userSpec = getUserSpecialty();
                 const hasContext = chatMemory.getContextPrompt().length > 50;
 
+                console.log('💾 [Cache] 저장 시도 중...', { cacheKey: queryPlan.topic });
+
                 fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -931,12 +933,18 @@ async function getBotResponse(userMessage) {
                     .then(data => {
                         if (data.success) {
                             console.log(`💾 [Cache] 저장 완료: ${data.cacheKey}`);
+                        } else {
+                            console.error('❌ [Cache] 저장 실패:', data.error || data);
                         }
                     })
-                    .catch(() => { }); // 캐시 저장 실패해도 무시
+                    .catch(err => {
+                        console.error('❌ [Cache] 저장 에러:', err.message);
+                    });
             } catch (e) {
-                // 캐시 저장 실패해도 무시
+                console.error('❌ [Cache] 저장 예외:', e.message);
             }
+        } else {
+            console.log('⏭️ [Cache] 저장 스킵 (requiresSearch:', queryPlan?.requiresSearch, ')');
         }
 
     } catch (error) {
