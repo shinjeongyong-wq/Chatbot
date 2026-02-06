@@ -661,7 +661,7 @@ async function getBotResponse(userMessage) {
 
     try {
         // ========== Stage 1: Query Planning ==========
-        updateTypingStatus('질문의 의도와 맥락을 분석하고 있습니다...');
+        startTypingMessageRolling('stage1');
         console.log('🧠 Stage 1: Query Planning 시작...');
         let queryPlan = null;
         let relatedContexts = [];
@@ -758,7 +758,7 @@ async function getBotResponse(userMessage) {
 
         // ========== Stage 2: Smart Search ==========
         // (SPECIFIC intent만 여기까지 도달)
-        updateTypingStatus('데이터베이스에서 최적의 정보를 검색하고 있습니다...');
+        startTypingMessageRolling('stage2');
         console.log('🔍 Stage 2: Smart Search 시작...');
 
         // 성능 최적화: 검색 결과 한도 조정 (파트너사 15개로 확대)
@@ -806,7 +806,7 @@ async function getBotResponse(userMessage) {
 
 
         // ========== Stage 3: Answer Generation ==========
-        updateTypingStatus('찾은 정보를 바탕으로 답변을 작성하고 있습니다...');
+        startTypingMessageRolling('stage3');
         console.log('💬 Stage 3: 답변 생성 시작...');
         const result = await callOpenRouterAPI(userMessage, relatedContexts);
 
@@ -1302,7 +1302,66 @@ function updateTypingStatus(message) {
     }
 }
 
+// ============ Stage별 롤링 문구 시스템 ============
+const STAGE_MESSAGES = {
+    stage1: [
+        '질문의 의도와 맥락을 분석하고 있습니다...',
+        '어떤 정보가 필요한지 파악하고 있어요...',
+        '질문을 이해하고 검색 전략을 세우는 중입니다...',
+        '개원 관련 키워드를 추출하고 있어요...'
+    ],
+    stage2: [
+        '데이터베이스에서 최적의 정보를 검색하고 있습니다...',
+        '900개 이상의 문서에서 관련 정보를 찾고 있어요...',
+        '진료과에 맞는 맞춤 정보를 선별 중입니다...',
+        '가장 정확한 답변을 위해 자료를 수집하고 있어요...'
+    ],
+    stage3: [
+        '찾은 정보를 바탕으로 답변을 작성하고 있습니다...',
+        '개원에 필요한 핵심 정보를 정리하고 있어요...',
+        '최적의 답변을 구성하고 있습니다...',
+        '거의 다 됐어요! 조금만 기다려주세요...',
+        '꼼꼼하게 검토하며 답변을 완성하고 있어요...'
+    ]
+};
+
+let typingMessageInterval = null;
+let currentMessageIndex = 0;
+
+/**
+ * 롤링 문구 시작
+ * @param {string} stage - 'stage1', 'stage2', 'stage3'
+ */
+function startTypingMessageRolling(stage) {
+    stopTypingMessageRolling(); // 기존 타이머 정리
+
+    const messages = STAGE_MESSAGES[stage];
+    if (!messages || messages.length === 0) return;
+
+    currentMessageIndex = 0;
+    updateTypingStatus(messages[0]); // 첫 문구 즉시 표시
+
+    // 2초마다 문구 변경
+    typingMessageInterval = setInterval(() => {
+        currentMessageIndex = (currentMessageIndex + 1) % messages.length;
+        updateTypingStatus(messages[currentMessageIndex]);
+    }, 2000);
+}
+
+/**
+ * 롤링 문구 중지
+ */
+function stopTypingMessageRolling() {
+    if (typingMessageInterval) {
+        clearInterval(typingMessageInterval);
+        typingMessageInterval = null;
+    }
+    currentMessageIndex = 0;
+}
+
 function hideTypingIndicator() {
+    stopTypingMessageRolling(); // 롤링 문구 타이머 정리
+
     const el = document.getElementById('typingIndicator');
     if (el) el.remove();
 
