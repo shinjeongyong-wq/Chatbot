@@ -910,3 +910,114 @@ body {
         margin-right: 0 !important;
     }
 }
+
+/* ========================================
+   모바일 UI 최종 수정 (v2.5.0)
+   ======================================== */
+
+/* 헤더 플래너 버튼 스타일 */
+.header-planner-btn {
+    display: none;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--primary);
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.header-planner-btn:hover {
+    transform: scale(1.1);
+    background: var(--primary-dark);
+}
+
+@media (max-width: 768px) {
+    /* 헤더 플래너 버튼 표시 */
+    .header-planner-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* 하단 플래너 버튼 숨기기 */
+    .input-container .planner-btn,
+    .input-container > button[onclick*="openContactModal"],
+    .ai-disclaimer + button {
+        display: none !important;
+    }
+    
+    /* 모바일 햄버거 확실하게 표시 */
+    .mobile-hamburger {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 8px;
+        color: var(--text-primary);
+        flex-shrink: 0;
+    }
+    
+    .mobile-hamburger:active {
+        background: var(--surface-secondary);
+    }
+    
+    /* 아바타 완전 밀착 - 모든 간격 제거 */
+    .chat-container {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .message {
+        gap: 6px !important;
+        padding: 6px 4px !important;
+        margin: 0 0 4px 0 !important;
+    }
+    
+    /* AI 아바타 - 작게 + 밀착 */
+    .message-avatar {
+        width: 24px !important;
+        height: 24px !important;
+        min-width: 24px !important;
+        font-size: 10px !important;
+        margin: 0 !important;
+        flex-shrink: 0;
+    }
+    
+    /* 사용자 메시지 - 우측 밀착 */
+    .message.user {
+        padding-right: 4px !important;
+    }
+    
+    /* AI 메시지 - 좌측 밀착 */
+    .message.bot {
+        padding-left: 4px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .message {
+        gap: 4px !important;
+        padding: 4px 2px !important;
+    }
+    
+    .message-avatar {
+        width: 20px !important;
+        height: 20px !important;
+        min-width: 20px !important;
+        font-size: 9px !important;
+    }
+    
+    .message.user {
+        padding-right: 2px !important;
+    }
+    
+    .message.bot {
+        padding-left: 2px !important;
+    }
+}
