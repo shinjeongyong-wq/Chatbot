@@ -2777,9 +2777,8 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
     } else if (isNoData) {
         messageType = 'no_data';
         processedText = processedText.replace('[NO_DATA]', '').trim();
-        // "플래너에게 연락" 문구 제거 (버튼으로 대체)
-        processedText = processedText.replace(/질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다\.?/g, '').trim();
     }
+
 
 
     // [TOPIC] 태그 처리
@@ -2833,9 +2832,6 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
     let plannerButton = '';
     if (isNoData) {
         plannerButton = `
-            <p style="margin: 20px 0 16px 0; color: #64748b; font-size: 14px;">
-                질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
-            </p>
             <button class="contact-planner-btn" onclick="openContactModal()" style="
                 background-color: #536db1;
                 color: white;
@@ -2848,12 +2844,14 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
                 align-items: center;
                 gap: 8px;
                 transition: background 0.2s;
+                margin-top: 16px;
                 margin-bottom: 16px;
             ">
                 <span style="font-size: 16px;">☎️</span> 플래너에게 연락하기
             </button>
         `;
     }
+
 
 
     // 질문/답변 + 맥락 저장 (피드백용)
