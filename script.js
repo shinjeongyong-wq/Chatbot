@@ -2686,6 +2686,9 @@ function renderMarkdownSafe(text) {
         // [1], [2, 3], [ID: 1], [id:1], [ID:1, 2] 등 모든 형태
         .replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '')
         .replace(/`\[\d+\]`/g, '')  // 백틱으로 감싼 인용도 제거
+        // [NO_DATA], [OFF_TOPIC] 태그 제거 (스트리밍 중 노출 방지)
+        .replace(/\[NO_DATA\]/gi, '')
+        .replace(/\[OFF_TOPIC\]/gi, '')
         .replace(/```[\s\S]*?```/g, '')  // 코드 블록 제거
         .replace(/^### (.+)$/gm, '<h4 class="response-heading">$1</h4>')
         .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
@@ -2694,6 +2697,7 @@ function renderMarkdownSafe(text) {
         .replace(/^---$/gm, '<hr>')
         .replace(/\n/g, '<br>');
 }
+
 
 
 /**
@@ -2721,12 +2725,23 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
     // streaming 클래스 제거
     container.classList.remove('streaming');
 
-    // 기존 addFormattedMessage 로직 적용 (인용, 관련 주제 등)
-    // 전체 메시지를 다시 렌더링
     const contentDiv = container.querySelector('.message-content');
+    let processedText = finalText;
+
+    // ★ NO_DATA / OFF_TOPIC 감지 ★
+    let messageType = 'normal';
+    let isNoData = processedText.includes('[NO_DATA]');
+    let isOffTopic = processedText.includes('[OFF_TOPIC]');
+
+    if (isOffTopic) {
+        messageType = 'off_topic';
+        processedText = processedText.replace('[OFF_TOPIC]', '').trim();
+    } else if (isNoData) {
+        messageType = 'no_data';
+        processedText = processedText.replace('[NO_DATA]', '').trim();
+    }
 
     // [TOPIC] 태그 처리
-    let processedText = finalText;
     const topicMatch = processedText.match(/\[TOPIC:\s*([^\]]+)\]/);
     if (topicMatch && topicMatch[1]) {
         const topic = topicMatch[1].trim();
@@ -2747,31 +2762,7 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
         processedText = processedText.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
     }
 
-    // [ID: n] 인용 처리
-    const idCitationRegex = /\[ID:\s*(\d+)\]/g;
-    const foundIds = [];
-    let match;
-    while ((match = idCitationRegex.exec(processedText)) !== null) {
-        const id = parseInt(match[1]);
-        if (!isNaN(id) && !foundIds.includes(id)) {
-            foundIds.push(id);
-        }
-    }
-
-    const idToNewNumMap = {};
-    foundIds.forEach((sourceId, idx) => {
-        idToNewNumMap[sourceId] = idx + 1;
-    });
-
-    const activeContexts = foundIds.map(sourceId => contexts[sourceId]).filter(ctx => ctx);
-
-    processedText = processedText.replace(idCitationRegex, (match, idStr) => {
-        const id = parseInt(idStr);
-        const newNum = idToNewNumMap[id];
-        return newNum ? `[${newNum}]` : '';
-    });
-
-    // [1], [2] 등 모든 인용 주석 제거 (v2.3.1)
+    // 모든 인용 번호 제거
     processedText = processedText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').trim();
 
     // 마크다운 렌더링
@@ -2787,23 +2778,9 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
         });
     }
 
-    // 툴팁 생성 (인용이 있는 경우)
-    const sortedNewNums = Object.values(idToNewNumMap).sort((a, b) => b - a);
-    sortedNewNums.forEach(num => {
-        const ctx = activeContexts[num - 1];
-        if (!ctx) return;
-
-        const answerPreview = ctx.answer.length > 200 ? ctx.answer.substring(0, 200) + '...' : ctx.answer;
-        const tooltip = `<strong>Q:</strong> ${escapeHtml(ctx.question)}<br><br><strong>A:</strong> ${escapeHtml(answerPreview)}`;
-        const citationHtml = `<span class="cite-ref">[${num}]<span class="cite-tooltip">${tooltip}</span></span>`;
-
-        const regex = new RegExp(`\\[${num}\\]`, 'g');
-        html = html.replace(regex, citationHtml);
-    });
-
     // 피드백 버튼 + 복사 버튼 추가
     const messageId = Date.now();
-    const feedbackButtons = `
+    let feedbackButtons = `
         <div class="feedback-buttons" data-message-id="${messageId}">
             <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
             <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
@@ -2811,14 +2788,39 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
         </div>
     `;
 
+    // ★ NO_DATA일 경우 플래너 버튼 추가 ★
+    let plannerButton = '';
+    if (isNoData) {
+        plannerButton = `
+            <div class="planner-contact-container" style="margin-top: 16px; text-align: center;">
+                <a href="https://pf.kakao.com/_WxjrxkG" target="_blank" class="planner-contact-btn" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 12px 24px;
+                    background: linear-gradient(135deg, #FEE500 0%, #F5D900 100%);
+                    color: #3C1E1E;
+                    font-weight: 600;
+                    border-radius: 12px;
+                    text-decoration: none;
+                    box-shadow: 0 4px 12px rgba(254, 229, 0, 0.3);
+                    transition: all 0.3s ease;
+                ">
+                    💬 플래너에게 문의하기
+                </a>
+            </div>
+        `;
+    }
+
     // 질문/답변 + 맥락 저장 (피드백용)
     window.lastMessages = window.lastMessages || {};
     window.lastMessages[messageId] = {
         question: window.currentQuestion || '',
         answer: finalText,
         contexts: contexts,
-        messageType: 'normal'
+        messageType: messageType
     };
 
-    contentDiv.innerHTML = html + feedbackButtons;
+    contentDiv.innerHTML = html + plannerButton + feedbackButtons;
 }
+
