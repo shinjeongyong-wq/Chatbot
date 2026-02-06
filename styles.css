@@ -1,4 +1,4 @@
-/* Design System - Matching opndoctor.com */
+﻿/* Design System - Matching opndoctor.com */
 :root {
     /* Colors */
     --primary-color: #536db1;
@@ -458,7 +458,7 @@ body {
     }
 }
 /* ========================================
-   ?�릭 가?�한 주제 링크 ?��???
+   ?�릭 가?�한 주제 링크 ?��???
    ======================================== */
 
 .clickable-topic {
@@ -497,14 +497,14 @@ body {
 
 
 /* ========================================
-   ��Ʈ���� �޽��� ��Ÿ��
+   ��Ʈ���� �޽��� ��Ÿ��
    ======================================== */
 
 .message.streaming .streaming-content {
     min-height: 30px;
 }
 
-/* ��Ʈ���� �� Ŀ�� �ִϸ��̼� */
+/* ��Ʈ���� �� Ŀ�� �ִϸ��̼� */
 .message.streaming .streaming-content::after {
     content: '';
     animation: blink 1s step-end infinite;
@@ -516,12 +516,12 @@ body {
     50% { opacity: 0; }
 }
 
-/* ��Ʈ���� �Ϸ� �� Ŀ�� ���� */
+/* ��Ʈ���� �Ϸ� �� Ŀ�� ���� */
 .message:not(.streaming) .streaming-content::after {
     content: none;
 }
 
-/* �� ���� ǥ�� */
+/* �� ���� ǥ�� */
 .model-info {
     margin-top: 12px;
     padding-top: 8px;
@@ -648,967 +648,62 @@ body {
     .input-wrapper {
         padding: 6px;
     }
-    
-    .input-hint {
-        display: none;
-    }
-    
-    /* 웰컴 메시지 */
-    .welcome-message h2 {
-        font-size: 20px;
-    }
-    
-    .welcome-icon svg {
-        width: 48px;
-        height: 48px;
-    }
-    
-    /* 피드백 버튼 풀와이드 */
-    .feedback-buttons {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    
-    .feedback-btn {
-        flex: 1;
-        min-width: 80px;
-        font-size: 13px;
-    }
-    
-    /* 타이핑 인디케이터 */
-    .typing-dots {
-        padding: var(--spacing-sm) var(--spacing-md);
-    }
-}
 
-/* iOS 안전 영역 대응 */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-    .input-container {
-        padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
-    }
-}
+/* ==========================================================================
+   MOBILE UI FINAL FIX (v6.0.0)
+   ========================================================================== */
 
-/* 가로 모드 대응 */
-@media (max-height: 500px) and (orientation: landscape) {
-    .header {
-        padding: var(--spacing-xs) var(--spacing-md);
-    }
-    
-    .welcome-message {
-        margin: var(--spacing-md) auto;
-    }
-    
-    .input-container {
-        padding: var(--spacing-sm) var(--spacing-md);
-    }
-}
-
-/* ========================================
-   모바일 사이드바 & 레이아웃 (v2.4.2)
-   ======================================== */
-
-/* 모바일 헤더에 햄버거 버튼 추가 */
-.mobile-hamburger {
-    display: none;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    border-radius: 8px;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-primary);
-    transition: background 0.2s;
-}
-
-.mobile-hamburger:hover {
-    background: var(--surface-secondary);
-}
-
-/* 768px 이하 - 모바일 사이드바 */
+/* --- 1. Mobile Avatar Hidden (Gemini Style) --- */
 @media (max-width: 768px) {
-    /* 모바일 햄버거 표시 */
-    .mobile-hamburger {
-        display: flex;
-    }
-    
-    /* 기존 사이드바를 오버레이로 변경 */
-    .history-sidebar {
-        position: fixed !important;
-        left: -100%;
-        top: 0;
-        height: 100vh;
-        width: 85% !important;
-        max-width: 320px;
-        z-index: 1000;
-        transition: left 0.3s ease;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-    }
-    
-    .history-sidebar.mobile-open {
-        left: 0;
-    }
-    
-    /* 사이드바 열렸을 때 배경 오버레이 */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 999;
-    }
-    
-    .sidebar-overlay.active {
-        display: block;
-    }
-    
-    /* 채팅 영역 패딩 축소 (Gemini 스타일) */
-    .chat-container {
-        padding: 8px !important;
-    }
-    
-    /* 메시지 간격 최소화 */
-    .message {
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-    
-    .message-content {
-        max-width: 90% !important;
-    }
-    
-    /* 헤더 레이아웃 */
-    .header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    
-    .header .logo {
-        flex: 1;
-    }
-}
-
-/* 480px 이하 - 더 공격적 축소 */
-@media (max-width: 480px) {
-    .chat-container {
-        padding: 4px 8px !important;
-    }
-    
-    .message {
-        gap: 6px;
-        margin-bottom: 10px;
-    }
-    
-    .message-avatar {
-        width: 24px;
-        height: 24px;
-        font-size: 10px;
-    }
-    
-    .message-content {
-        max-width: 92% !important;
-        padding: 8px 10px;
-    }
-}
-
-/* ========================================
-   모바일 패딩 완전 제거 (v2.4.3)
-   ======================================== */
-
-@media (max-width: 768px) {
-    /* 채팅 컨테이너 패딩 완전 제거 */
-    .chat-container {
-        padding: 0 !important;
-    }
-    
-    /* 메시지 가장자리 붙이기 */
-    .message {
-        padding: 8px 4px;
-        margin-bottom: 8px;
-    }
-    
-    .message-avatar {
-        margin-left: 4px;
-    }
-    
-    .message.user .message-avatar {
-        margin-right: 4px;
-    }
-    
-    .message-content {
-        max-width: 85% !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .chat-container {
-        padding: 0 !important;
-    }
-    
-    .message {
-        padding: 4px 2px;
-        margin-bottom: 6px;
-    }
-    
-    .message-avatar {
-        margin-left: 2px;
-    }
-    
-    .message.user .message-avatar {
-        margin-right: 2px;
-    }
-    
-    .message-content {
-        max-width: 90% !important;
-    }
-}
-
-/* ========================================
-   모바일 완전 밀착 (v2.4.4 - FINAL)
-   ======================================== */
-
-@media (max-width: 768px) {
-    .chat-container {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    
-    .message {
-        gap: 4px !important;
-        padding: 6px 0 !important;
-        margin: 0 !important;
-    }
-    
-    .message-avatar {
-        margin: 0 !important;
-        margin-left: 0 !important;
-    }
-    
-    .message.user .message-avatar {
-        margin: 0 !important;
-        margin-right: 0 !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .message {
-        gap: 2px !important;
-        padding: 4px 0 !important;
-    }
-    
-    .message-avatar {
-        margin-left: 0 !important;
-    }
-    
-    .message.user .message-avatar {
-        margin-right: 0 !important;
-    }
-}
-
-/* ========================================
-   모바일 UI 최종 수정 (v2.5.0)
-   ======================================== */
-
-/* 헤더 플래너 버튼 스타일 */
-.header-planner-btn {
-    display: none;
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: var(--primary);
-    border-radius: 50%;
-    font-size: 16px;
-    cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
-}
-
-.header-planner-btn:hover {
-    transform: scale(1.1);
-    background: var(--primary-dark);
-}
-
-@media (max-width: 768px) {
-    /* 헤더 플래너 버튼 표시 */
-    .header-planner-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    /* 하단 플래너 버튼 숨기기 */
-    .input-container .planner-btn,
-    .input-container > button[onclick*="openContactModal"],
-    .ai-disclaimer + button {
-        display: none !important;
-    }
-    
-    /* 모바일 햄버거 확실하게 표시 */
-    .mobile-hamburger {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border: none;
-        background: transparent;
-        cursor: pointer;
-        border-radius: 8px;
-        color: var(--text-primary);
-        flex-shrink: 0;
-    }
-    
-    .mobile-hamburger:active {
-        background: var(--surface-secondary);
-    }
-    
-    /* 아바타 완전 밀착 - 모든 간격 제거 */
-    .chat-container {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    
-    .message {
-        gap: 6px !important;
-        padding: 6px 4px !important;
-        margin: 0 0 4px 0 !important;
-    }
-    
-    /* AI 아바타 - 작게 + 밀착 */
-    .message-avatar {
-        width: 24px !important;
-        height: 24px !important;
-        min-width: 24px !important;
-        font-size: 10px !important;
-        margin: 0 !important;
-        flex-shrink: 0;
-    }
-    
-    /* 사용자 메시지 - 우측 밀착 */
-    .message.user {
-        padding-right: 4px !important;
-    }
-    
-    /* AI 메시지 - 좌측 밀착 */
-    .message.bot {
-        padding-left: 4px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .message {
-        gap: 4px !important;
-        padding: 4px 2px !important;
-    }
-    
-    .message-avatar {
-        width: 20px !important;
-        height: 20px !important;
-        min-width: 20px !important;
-        font-size: 9px !important;
-    }
-    
-    .message.user {
-        padding-right: 2px !important;
-    }
-    
-    .message.bot {
-        padding-left: 2px !important;
-    }
-}
-
-/* ========================================
-   모바일 Gemini 스타일 UI (v3.0.0)
-   ======================================== */
-
-/* iOS Safe Area */
-.chat-interface {
-    padding-top: env(safe-area-inset-top);
-}
-
-/* 모바일 메뉴 버튼 */
-.mobile-menu-btn {
-    display: none;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    border-radius: 8px;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-primary);
-    flex-shrink: 0;
-}
-
-.mobile-menu-btn:active {
-    background: rgba(0,0,0,0.1);
-}
-
-/* 헤더 플래너 버튼 */
-.header-planner-btn {
-    display: none;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: var(--primary);
-    cursor: pointer;
-    border-radius: 50%;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    flex-shrink: 0;
-    transition: transform 0.2s;
-}
-
-.header-planner-btn:active {
-    transform: scale(0.95);
-}
-
-/* 데스크탑 전용 */
-.desktop-only {
-    display: flex;
-}
-
-@media (max-width: 768px) {
-    /* iOS Safe Area */
-    .header {
-        padding-top: max(8px, env(safe-area-inset-top)) !important;
-    }
-    
-    /* 모바일 메뉴 버튼 표시 */
-    .mobile-menu-btn {
-        display: flex !important;
-    }
-    
-    /* 플래너 버튼 표시 */
-    .header-planner-btn {
-        display: flex !important;
-    }
-    
-    /* 데스크탑 전용 숨김 */
-    .desktop-only {
-        display: none !important;
-    }
-    
-    /* 헤더 레이아웃 */
-    .header {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        gap: 8px !important;
-        padding: 8px 12px !important;
-    }
-    
-    .logo {
-        flex: 1 !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-    }
-    
-    .logo-text {
-        font-size: 16px !important;
-    }
-    
-    /* 사이드바 오버레이 */
-    .history-sidebar {
-        position: fixed !important;
-        left: -100% !important;
-        top: 0 !important;
-        height: 100vh !important;
-        width: 85% !important;
-        max-width: 320px !important;
-        z-index: 1000 !important;
-        transition: left 0.3s ease !important;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.15) !important;
-    }
-    
-    .history-sidebar.mobile-open {
-        left: 0 !important;
-    }
-    
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 999;
-    }
-    
-    .sidebar-overlay.active {
-        display: block;
-    }
-    
-    /* ============ Gemini 스타일 채팅 ============ */
-    
-    /* 채팅 컨테이너 패딩 제거 */
-    .chat-container {
-        padding: 8px !important;
-    }
-    
-    /* 아바타 숨기기 */
-    .message-avatar {
-        display: none !important;
-    }
-    
-    /* 메시지 기본 */
-    .message {
-        gap: 0 !important;
-        margin-bottom: 12px !important;
-        padding: 0 !important;
-    }
-    
-    /* 사용자 메시지 - 우측 정렬 */
-    .message.user {
-        justify-content: flex-end !important;
-    }
-    
-    .message.user .message-content {
-        background: var(--primary) !important;
-        color: white !important;
-        border-radius: 18px 18px 4px 18px !important;
-        max-width: 80% !important;
-    }
-    
-    /* AI 메시지 - 좌측 정렬 */
-    .message.bot {
-        justify-content: flex-start !important;
-    }
-    
-    .message.bot .message-content {
-        background: var(--surface) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: 18px 18px 18px 4px !important;
-        max-width: 90% !important;
-    }
-    
-    /* 하단 플래너 버튼 숨기기 */
-    .input-container .planner-btn,
-    .ai-disclaimer + button,
-    button[onclick*="openContactModal"]:not(.header-planner-btn) {
-        display: none !important;
-    }
-    
-    /* 입력 영역 */
-    .input-container {
-        padding: 8px 12px !important;
-        padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .logo-text {
-        font-size: 14px !important;
-    }
-    
-    .header {
-        padding: 6px 8px !important;
-    }
-    
-    .mobile-menu-btn,
-    .header-planner-btn {
-        width: 36px !important;
-        height: 36px !important;
-    }
-    
-    .message.user .message-content,
-    .message.bot .message-content {
-        max-width: 85% !important;
-        padding: 10px 14px !important;
-        font-size: 14px !important;
-    }
-}
-
-/* ========================================
-   모바일 중복 요소 숨김 (v3.0.1 - 긴급 수정)
-   ======================================== */
-
-@media (max-width: 768px) {
-    /* 사이드바 자체를 완전히 숨김 (모바일에서는 오버레이로만) */
-    .history-sidebar:not(.mobile-open) {
-        left: -100% !important;
-    }
-    
-    /* 사이드바 내부 햄버거 숨김 */
-    .sidebar-top-controls .hamburger-btn,
-    #hamburgerBtn {
-        display: none !important;
-    }
-    
-    /* FAQ 버튼 숨김 */
-    .header-faq-btn,
-    .header-right {
-        display: none !important;
-    }
-    
-    /* AI 아바타 강제 숨김 */
     .message-avatar {
         display: none !important;
         width: 0 !important;
         height: 0 !important;
-    }
-    
-    /* initMobileUI에서 생성된 버튼 숨김 (중복 방지) */
-    #mobileHamburger,
-    #headerPlannerBtn:not(.mobile-menu-btn):not(.header-planner-btn) {
-        display: none !important;
-    }
-    
-    /* 헤더에 직접 추가한 버튼만 표시 */
-    .mobile-menu-btn,
-    .header-planner-btn {
-        display: flex !important;
-    }
-    
-    /* 입력창 하단 safe-area */
-    .input-container {
-        padding-bottom: max(12px, calc(env(safe-area-inset-bottom) + 8px)) !important;
-    }
-}
-
-/* ========================================
-   PC 버전 - 모바일 버튼 숨김 (v3.0.2)
-   ======================================== */
-
-/* 기본: 모바일 전용 버튼 숨김 (PC에서) */
-.mobile-menu-btn {
-    display: none !important;
-}
-
-.header-planner-btn {
-    display: none !important;
-}
-
-/* 768px 이하에서만 표시 */
-@media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: flex !important;
-    }
-    
-    .header-planner-btn {
-        display: flex !important;
-    }
-}
-
-/* ==========================================================================
-   UI Optimization v3.2.0 (Gemini Style & PC/Mobile Fix)
-   ========================================================================== */
-
-/* [공통] 아바타 완전 제거 (Gemini 스타일) */
-.message-avatar {
-    display: none !important;
-}
-
-/* [공통] 채팅 말풍선 정렬 */
-.message {
-    gap: 0 !important;
-    margin-bottom: 16px !important;
-    padding: 0 !important;
-}
-
-.message.user {
-    justify-content: flex-end !important;
-}
-
-.message.user .message-content {
-    background: var(--primary) !important;
-    color: white !important;
-    border-radius: 18px 18px 4px 18px !important;
-    max-width: 80%;
-    margin-right: 8px;
-}
-
-.message.bot {
-    justify-content: flex-start !important;
-}
-
-.message.bot .message-content {
-    background: var(--surface) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 18px 18px 18px 4px !important;
-    max-width: 85%;
-    margin-left: 8px;
-}
-
-/* --------------------------------------------------------------------------
-   PC 버전 설정 (768px 초과)
-   -------------------------------------------------------------------------- */
-@media (min-width: 769px) {
-    /* [PC] 헤더의 모바일 전용 버튼들 절대 숨김 */
-    .mobile-menu-btn,
-    .header-planner-btn,
-    .mobile-only {
-        display: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
-    /* [PC] 기존 사이드바 햄버거 버튼 유지 */
-    .sidebar-top-controls .hamburger-btn,
-    #hamburgerBtn {
-        display: flex !important;
-    }
-
-    /* [PC] FAQ 버튼 표시 */
-    .header-faq-btn {
-        display: flex !important;
-    }
-}
-
-/* --------------------------------------------------------------------------
-   모바일 버전 설정 (768px 이하)
-   -------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-    /* [모바일] 헤더 레이아웃 조정 */
-    .header {
-        padding: 8px 12px !important;
-        padding-top: max(8px, env(safe-area-inset-top)) !important;
-    }
-
-    /* [모바일] 헤더 버튼들 노출 */
-    .mobile-menu-btn,
-    .header-planner-btn {
-        display: flex !important;
-    }
-
-    /* [모바일] 데스크탑 전용 숨김 */
-    .desktop-only,
-    .header-faq-btn {
-        display: none !important;
-    }
-
-    /* [모바일] 사이드바 오버레이 모드 */
-    .history-sidebar {
-        position: fixed !important;
-        left: -100% !important;
-        top: 0 !important;
-        height: 100vh !important;
-        width: 80% !important;
-        max-width: 320px !important;
-        z-index: 1000 !important;
-        transition: left 0.3s ease !important;
-    }
-
-    .history-sidebar.mobile-open {
-        left: 0 !important;
-    }
-
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 999;
-    }
-
-    .sidebar-overlay.active {
-        display: block;
-    }
-
-    /* [모바일] 사이드바 내부 햄버거 숨김 */
-    .sidebar-top-controls .hamburger-btn,
-    #hamburgerBtn {
-        display: none !important;
-    }
-
-    /* [모바일] 채팅방 밀착 */
-    .chat-container {
-        padding: 4px 8px !important;
-    }
-
-    .message-content {
-        max-width: 90% !important;
-        font-size: 14px !important;
-    }
-
-    /* [모바일] 하단 입력창 safe-area */
-    .input-container {
-        padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
-    }
-
-    /* [모바일] 하단 중복 플래너 버튼 숨김 */
-    .input-container .planner-btn,
-    button[onclick*="openContactModal"]:not(.header-planner-btn) {
-        display: none !important;
-    }
-}
-
-/* ==========================================================================
-   FINAL UI NORMALIZATION (v4.0.0)
-   ========================================================================== */
-
-/* 1. Global: Remove Avatars (Gemini Style) */
-.message-avatar {
-    display: none !important;
-}
-
-/* 2. PC Specific (769px+) - Hide Mobile Icons */
-@media (min-width: 769px) {
-    .mobile-only,
-    .mobile-menu-btn,
-    .header-planner-btn {
-        display: none !important;
-    }
-}
-
-/* 3. Mobile Specific (768px-) - Show Icons & Tight Layout */
-@media (max-width: 768px) {
-    .mobile-only,
-    .mobile-menu-btn,
-    .header-planner-btn {
-        display: flex !important;
-    }
-
-    /* Hide Desktop-only FAQ button in header */
-    .header-faq-btn,
-    .desktop-only {
-        display: none !important;
-    }
-
-    /* Mobile Header Layout */
-    .header {
-        padding: 8px 12px !important;
-        padding-top: max(8px, env(safe-area-inset-top)) !important;
-        display: flex !important;
-        justify-content: space-between !important;
-    }
-
-    /* Message Bubbles - Gemini Style */
     .message {
         gap: 0 !important;
         margin-bottom: 12px !important;
-    }
-
-    .message.user .message-content {
-        background: var(--primary) !important;
-        color: white !important;
-        border-radius: 18px 18px 4px 18px !important;
-        max-width: 80%;
-    }
-
-    .message.bot .message-content {
-        background: var(--surface) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: 18px 18px 18px 4px !important;
-        max-width: 85%;
-    }
-}
-
-/* ==========================================================================
-   SUPER FINAL UI FIX (v4.2.0)
-   ========================================================================== */
-
-/* Remove ALL avatars globally */
-.message-avatar, 
-.message-avatar-wrapper,
-.message .message-avatar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-
-/* PC Specific Fix: NEVER show mobile header buttons */
-@media (min-width: 769px) {
-    .mobile-only,
-    .mobile-menu-btn,
-    .header-planner-btn {
-        display: none !important;
-    }
-    
-    #hamburgerBtn,
-    .sidebar-top-controls .hamburger-btn {
-        display: flex !important;
-    }
-}
-
-/* Gemini Style: Clear margin/padding for messages without avatars */
-@media (max-width: 768px) {
-    .message {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
-}
-
-/* ==========================================================================
-   SUPER FINAL RESOLUTION (v5.0.0)
-   - PC: Keep Avatars, Hide Mobile Header Icons
-   - Mobile: Hide Avatars, Show Header Icons, Handle Overlay
-   ========================================================================== */
-
-/* 1. Standard Desktop State (769px+) */
-@media (min-width: 769px) {
-    /* Always show avatars on PC */
-    .message-avatar {
-        display: flex !important;
-    }
-
-    /* Hide the mobile header buttons I added */
-    .mobile-menu-btn,
-    .header-planner-btn,
-    .mobile-only {
-        display: none !important;
-    }
-}
-
-/* 2. Mobile State (768px and below) */
-@media (max-width: 768px) {
-    /* Always hide avatars on mobile for Gemini Style */
-    .message-avatar {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-    }
-
-    /* Messages should be tight to edges */
-    .message {
-        gap: 0 !important;
-        margin-bottom: 12px !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
     }
 
     .message.user .message-content {
         margin-right: 8px !important;
         max-width: 82% !important;
+        border-radius: 18px 18px 4px 18px !important;
     }
 
     .message.bot .message-content {
         margin-left: 8px !important;
         max-width: 88% !important;
+        border-radius: 18px 18px 18px 4px !important;
     }
+}
 
-    /* Mobile Header Layout */
-    .header {
-        padding: 8px 12px !important;
-        padding-top: max(8px, env(safe-area-inset-top)) !important;
-        display: flex !important;
-        justify-content: space-between !important;
-    }
-
-    /* Show Mobile-only buttons */
+/* --- 2. Mobile Header Buttons --- */
+@media (max-width: 768px) {
     .mobile-menu-btn,
     .header-planner-btn {
         display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
-    /* Hide redundant elements */
     .header-faq-btn,
     #hamburgerBtn,
     .desktop-only {
         display: none !important;
     }
 
-    /* Sidebar and Overlay */
+    .header {
+        padding: 8px 12px !important;
+        padding-top: max(8px, env(safe-area-inset-top)) !important;
+    }
+}
+
+/* --- 3. Mobile Sidebar Overlay --- */
+@media (max-width: 768px) {
     .history-sidebar {
         position: fixed !important;
         left: -100% !important;
@@ -1633,10 +728,30 @@ body {
         right: 0;
         bottom: 0;
         background: rgba(0,0,0,0.5);
-        z-index: 10000 !important;
+        z-index: 10000;
     }
 
     .sidebar-overlay.active {
         display: block !important;
+    }
+}
+
+/* --- 4. Mobile Bottom Input Safe Area Fix --- */
+@media (max-width: 768px) {
+    .input-container {
+        padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
+    }
+}
+
+/* --- 5. PC Avatar Visible (Default) --- */
+@media (min-width: 769px) {
+    .message-avatar {
+        display: flex !important;
+    }
+
+    .mobile-menu-btn,
+    .header-planner-btn,
+    .mobile-only {
+        display: none !important;
     }
 }

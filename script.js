@@ -608,6 +608,14 @@ function closeMobileSidebar() {
 window.toggleMobileSidebar = toggleMobileSidebar;
 window.closeMobileSidebar = closeMobileSidebar;
 
+// 안전장치: 페이지 완전 로드 후 한 번 더 initMobileUI 호출
+window.addEventListener('load', function () {
+    if (window.innerWidth <= 768) {
+        console.log('🔄 window.load에서 initMobileUI 재호출');
+        initMobileUI();
+    }
+});
+
 
 // ==========================
 // 2. FAQ 네비게이션

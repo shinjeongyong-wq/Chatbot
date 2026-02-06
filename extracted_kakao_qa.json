@@ -1,0 +1,540 @@
+{
+  "source": "kakao_chat",
+  "extractedAt": "2026-02-06T08:57:26.036Z",
+  "count": 41,
+  "items": [
+    {
+      "id": "kakao-0",
+      "question": "팀장님 MRI 실 아래쪽벽을 최대한 실외기 발코니로 나가는 문쪽으로 내릴수 있을까요??",
+      "answer": "벽체 내리려면 소방배관쪽도 다시 확인이 필요해서 내일 한번더 확인해보고 말씀드리겠습니다!",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "홍진영과장",
+        "date": "2025-02-19 16:49:28"
+      }
+    },
+    {
+      "id": "kakao-1",
+      "question": "넵 괜찮습니다 오전 몇시에 가면 될까요?!",
+      "answer": "10시정도 괜찮으실까요~",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "홍진영과장",
+        "date": "2025-02-27 15:31:17"
+      }
+    },
+    {
+      "id": "kakao-2",
+      "question": "넵 시창 위치 잡을때 제가 현장와서 직접 말씀드려도 될까요?!",
+      "answer": "아넵 ct실은 업체랑 얘기후 뚫어두긴했습니다!",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "홍진영과장",
+        "date": "2025-02-28 21:44:50"
+      }
+    },
+    {
+      "id": "kakao-3",
+      "question": "7. 2층 직원실에 서버랑 세탁기,건조기 사이에 판은 두께랑 높이가 혹시 어떻게 되나요?!",
+      "answer": "초음파실 도어는 시공팀에 가능하지 물어볼께요",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "양지수",
+        "responder": "김인철팀장(무아디자인)",
+        "date": "2025-03-06 10:48:17"
+      }
+    },
+    {
+      "id": "kakao-4",
+      "question": "10. 어제 말씀해주신대로 2층 데스크에 서랍장 중 하나는 동전칸 마련 부탁드립니다.",
+      "answer": "초음파실 도어는 시공팀에 가능하지 물어볼께요",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "양지수",
+        "responder": "김인철팀장(무아디자인)",
+        "date": "2025-03-06 10:51:23"
+      }
+    },
+    {
+      "id": "kakao-5",
+      "question": "이외에 어제 수정하기로 결정한 사항 중 제가 적지 않은 부분 있으면 말씀 부탁드립니다~",
+      "answer": "초음파실 도어는 시공팀에 가능하지 물어볼께요",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "양지수",
+        "responder": "김인철팀장(무아디자인)",
+        "date": "2025-03-06 10:51:51"
+      }
+    },
+    {
+      "id": "kakao-6",
+      "question": "네넵 두께는 그대로 해도 괜찮을까요?! 공간여유가 있어서 좀더 두껍게 가능하면 두껍게 부탁드립니다",
+      "answer": "일단 인건비정도 들어가는데 크게 어려운 작업은 아닐것같아 서비스로 해드리겠습니다~",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "양지수",
+        "responder": "홍진영과장",
+        "date": "2025-03-06 12:10:59"
+      }
+    },
+    {
+      "id": "kakao-7",
+      "question": "아 넵넵 감사합니다!! 혹시 단열 기능도 잘 될까요??!",
+      "answer": "안에 단열재 안에 넣어서 시공하도록 하겠습니다~",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "양지수",
+        "responder": "홍진영과장",
+        "date": "2025-03-06 12:19:13"
+      }
+    },
+    {
+      "id": "kakao-8",
+      "question": "1진료실 벽장 부분 포함해서 추가되는 견적 시간되실때 부탁드립니다~",
+      "answer": "가구시공비, 조명시공까지 160가량 나올것같습니다~",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "양지수",
+        "responder": "홍진영과장",
+        "date": "2025-03-06 12:22:55"
+      }
+    },
+    {
+      "id": "kakao-9",
+      "question": "탈의실에는 원래대로 오픈된 상태로부탁드립니다",
+      "answer": "원장님한테 말씀드렸는데 800정도 폭이 나와서요. 장을 사용하실려면 300정도는 사용하셔야 하는데 이동동선이 500밖에 안나오시면 불편하실거같아요",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "양지수",
+        "responder": "김인철팀장(무아디자인)",
+        "date": "2025-03-06 15:59:24"
+      }
+    },
+    {
+      "id": "kakao-10",
+      "question": "파란표시 부분은 초음파 기계가 600정도 폭이라고 할때 초음파기계랑 상하부장 사이 공간은 얼마나 되나요? (상하부장 폭도 300정도로 하면요!)",
+      "answer": "도면 보시면 초음파 기계폭이 560입니다",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "양지수",
+        "responder": "김인철팀장(무아디자인)",
+        "date": "2025-03-06 16:03:24"
+      }
+    },
+    {
+      "id": "kakao-11",
+      "question": "수납장 폭/가로길이가 어떻게 되나요?",
+      "answer": "지금 나온 치수는 300*600사이즈입니다",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "김인철팀장(무아디자인)",
+        "date": "2025-03-06 16:13:03"
+      }
+    },
+    {
+      "id": "kakao-12",
+      "question": "높이는 달라도 상관없는걸까요?",
+      "answer": "둘다 에러가 있는거같아요",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "김인철팀장(무아디자인)",
+        "date": "2025-03-07 11:49:55"
+      }
+    },
+    {
+      "id": "kakao-13",
+      "question": "상 폭을 600으로 바꿨는데 이거는 500인데 상관 없나요?",
+      "answer": "ㅜ 실수가 있요 ㅠㅠ",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "김인철팀장(무아디자인)",
+        "date": "2025-03-07 11:51:30"
+      }
+    },
+    {
+      "id": "kakao-14",
+      "question": "이부분도 확인한번 부탁드립니다",
+      "answer": "왼쪽에 하시면 불편하실거에요~벽쪽에 찍힘방지 실리콘 붙혀드리겠습니다",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "홍진영과장",
+        "date": "2025-03-07 12:00:51"
+      }
+    },
+    {
+      "id": "kakao-15",
+      "question": "나중에 내시경실 하려면 자동문이 낫나요??",
+      "answer": "안하시는 경우도 있긴합니다~ 저희가 기본적으로 넣어드리긴 하는데 그냥 여는 문으로 하시는 경우도 있으세요~",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "김인철팀장(무아디자인)",
+        "date": "2025-03-07 16:14:46"
+      }
+    },
+    {
+      "id": "kakao-16",
+      "question": "책상에 이런 전선 구멍 가능할까요??",
+      "answer": "상판에 뚫어드립니다",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "홍진영과장",
+        "date": "2025-03-19 10:49:30"
+      }
+    },
+    {
+      "id": "kakao-17",
+      "question": "팀장님 책상 배치 도면 볼수 있을까요?!",
+      "answer": "확인해서 말씀드리겠습니다~",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "홍진영과장",
+        "date": "2025-03-19 10:57:26"
+      }
+    },
+    {
+      "id": "kakao-18",
+      "question": "개설 신고 도면 층별 전체 면적 나온거로 다시 보내주실수 있을까요?? 보건소에서 요청해서요",
+      "answer": "아래 드로잉 넘버가",
+      "metadata": {
+        "field": "인테리어",
+        "specialty": "공통",
+        "source": "kakao",
+        "asker": "김  인겸원장님",
+        "responder": "김인철팀장(무아디자인)",
+        "date": "2025-03-27 12:25:22"
+      }
+    },
+    {
+      "id": "kakao-19",
+      "question": "대표님, 우리 원장님 레지움 피부과 잘 부탁드려요!",
+      "answer": "우선 로고 원본 부탁드립니다^^",
+      "metadata": {
+        "field": "간판",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "Ji One Jeon",
+        "responder": "유영호대표",
+        "date": "2025-01-23 12:02:04"
+      }
+    },
+    {
+      "id": "kakao-20",
+      "question": "원장님 진료시간 문에서 빼시는거 어떠셔요..?",
+      "answer": "알겠습니다. 제외 하겠습니다.",
+      "metadata": {
+        "field": "간판",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "Ji One Jeon",
+        "responder": "유영호대표",
+        "date": "2025-02-11 13:22:29"
+      }
+    },
+    {
+      "id": "kakao-21",
+      "question": "대표님 문에 붙이는것 제작하셨을까요?",
+      "answer": "문에 문구는 수정 가능합니다.",
+      "metadata": {
+        "field": "간판",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "유영호대표",
+        "date": "2025-02-17 11:42:37"
+      }
+    },
+    {
+      "id": "kakao-22",
+      "question": "아 네 제가 8시 나오면 되나요?",
+      "answer": "힘드시겠지만 컴펌때문에요",
+      "metadata": {
+        "field": "간판",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "유영호대표",
+        "date": "2025-04-04 18:34:11"
+      }
+    },
+    {
+      "id": "kakao-23",
+      "question": "얘네가 등받이 인조가죽이 밝은 톤으로도 가능한가요?",
+      "answer": "원단 천갈이 가능하다고 공장에 확인 받았습니다만 제가 바로 한번만 더 확인 하겠습니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-13 11:47:57"
+      }
+    },
+    {
+      "id": "kakao-24",
+      "question": "또는 요거 다른 색깔 섞인 버젼이 있을까요",
+      "answer": "아 알겠습니다. 그러면 바닥으로 선이 내려갈 구멍만 있으면 될것 같습니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-14 16:47:05"
+      }
+    },
+    {
+      "id": "kakao-25",
+      "question": "노트북이랑 모니터 쓸수도 있긴한데 차이가 있나요?",
+      "answer": "아 내려가는 선들 양이 많아지면 구멍 너비가 커지는것 때매 말씀드리긴 했습니다만. 일반적인 수준으로해도 문제 없을것 같습니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-14 17:55:26"
+      }
+    },
+    {
+      "id": "kakao-26",
+      "question": "요거가 마음이 들긴하는데요 혹시 같은 작가 작품 시리즈로 더 있나요?",
+      "answer": "저희가 보내드렸던 ALT중에서 ALT6,ALT8이 같은 작가분 작품입니다! 현재는 이렇게 3가지랑 아래 2개가 더 가능합니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-17 13:13:08"
+      }
+    },
+    {
+      "id": "kakao-27",
+      "question": "alt3는 무슨 작품인가요?",
+      "answer": "오리지날은 ANNE GRIFFITHS라는 CANADA 작가입니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-17 13:39:18"
+      }
+    },
+    {
+      "id": "kakao-28",
+      "question": "그림크기가 원래 어느정도 사이즈였나요?",
+      "answer": "너비 1800 높이 900입니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-17 13:59:32"
+      }
+    },
+    {
+      "id": "kakao-29",
+      "question": "놓으면 에서 좌측벽이 나을까요 정면 벽이 나을까요?",
+      "answer": "너비 1800 높이 900입니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-17 14:00:15"
+      }
+    },
+    {
+      "id": "kakao-30",
+      "question": "근데 커텐말고 블라인드 추천주신 이유는 방이 작아서 일까요?",
+      "answer": "일단은 저희가 오늘까지 컨펌해주신 내용들로 견적서 수정하여 업데이트 한번 드리겠습니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-17 14:17:08"
+      }
+    },
+    {
+      "id": "kakao-31",
+      "question": "근데 본체보관함 넣어주셔도 되는데 그게 문제일까요?",
+      "answer": "아 아닙니다 본체 따로 안쓰신다고 해서 빼려고 했는데 그냥 진행하여도 문제 없습니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-18 10:19:57"
+      }
+    },
+    {
+      "id": "kakao-32",
+      "question": "요게 생기면서 책상이 좀더 세로로 커진다는 말씀이지요?",
+      "answer": "말씀하신것처럼 하부공간때문에 상판을 50mm 늘렸습니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-18 10:32:42"
+      }
+    },
+    {
+      "id": "kakao-33",
+      "question": "그리고 견적서 주신것 봤는데 직원실 의자가 원래 인조가죽으로 주셨던가요?",
+      "answer": "처음에 인조가죽으로 드렸었는데 혹시 패브릭으로 변경필요하실까요? 금액은 동일합니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-19 13:43:15"
+      }
+    },
+    {
+      "id": "kakao-34",
+      "question": "아 패브릭보단 인조가죽이 낫긴한데 더 싼의자 없나 싶어가지구요.. 요건 제작인가요?",
+      "answer": "퍼시스 제품입니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-19 13:44:39"
+      }
+    },
+    {
+      "id": "kakao-35",
+      "question": "아 네 우드등좌판이면 가격이 다른지요?",
+      "answer": "잠시만요 제가 금액 맞게 드린건지 확인 한번만 해보겠습니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-19 13:49:57"
+      }
+    },
+    {
+      "id": "kakao-36",
+      "question": "네 그럼 그렇게 부탁드립니다",
+      "answer": "견적서 수정해서 보내드릴게요~",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-19 13:58:29"
+      }
+    },
+    {
+      "id": "kakao-37",
+      "question": "여기 안에 카드키로 열면 돼서 전달부탁드립니다",
+      "answer": "알겠습니다! 감사합니다^^",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-24 16:35:24"
+      }
+    },
+    {
+      "id": "kakao-38",
+      "question": "오셨을때 상담실1 책상에 구멍뚫는거 부탁드릴수 있을까요? 제가 비용지불할게요!",
+      "answer": "아 아닙니다 원장님 어차피 서비스테이블 할때 같이 할 수 있도록 저희 시공팀에게 얘기하겠습니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-25 17:48:41"
+      }
+    },
+    {
+      "id": "kakao-39",
+      "question": "혹시 액자 걸때 실 블라인드브라켓 하나 고정해주실수 있을까요?",
+      "answer": "알겠습니다! 작업자분께 얘기드리겠습니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-02-27 12:36:01"
+      }
+    },
+    {
+      "id": "kakao-40",
+      "question": "안녕하세요 제안주신 올리브컬러 라운지 소파 예뻐서 하려고 하는데 요건 주문제작인가요?",
+      "answer": "가능합니다! 한세트 해보시고 나중에 추가 발주해주셔도 됩니다!",
+      "metadata": {
+        "field": "가구",
+        "specialty": "미용",
+        "source": "kakao",
+        "asker": "박지현원장님",
+        "responder": "김동범책임",
+        "date": "2025-03-10 16:58:10"
+      }
+    }
+  ]
+}
