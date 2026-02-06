@@ -2641,7 +2641,7 @@ function createStreamingMessageContainer() {
         <div class="message-content streaming-content"></div>
     `;
 
-    const messagesContainer = document.getElementById('messages');
+    const messagesContainer = document.getElementById('chatContainer');
     messagesContainer.appendChild(container);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
@@ -2677,7 +2677,7 @@ function updateStreamingMessage(contentDiv, fullText) {
     contentDiv.innerHTML = renderMarkdownSafe(fullText);
 
     // 스크롤 유지
-    const messagesContainer = document.getElementById('messages');
+    const messagesContainer = document.getElementById('chatContainer');
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
