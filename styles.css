@@ -1442,3 +1442,64 @@ body {
         display: none !important;
     }
 }
+
+/* ==========================================================================
+   FINAL UI NORMALIZATION (v4.0.0)
+   ========================================================================== */
+
+/* 1. Global: Remove Avatars (Gemini Style) */
+.message-avatar {
+    display: none !important;
+}
+
+/* 2. PC Specific (769px+) - Hide Mobile Icons */
+@media (min-width: 769px) {
+    .mobile-only,
+    .mobile-menu-btn,
+    .header-planner-btn {
+        display: none !important;
+    }
+}
+
+/* 3. Mobile Specific (768px-) - Show Icons & Tight Layout */
+@media (max-width: 768px) {
+    .mobile-only,
+    .mobile-menu-btn,
+    .header-planner-btn {
+        display: flex !important;
+    }
+
+    /* Hide Desktop-only FAQ button in header */
+    .header-faq-btn,
+    .desktop-only {
+        display: none !important;
+    }
+
+    /* Mobile Header Layout */
+    .header {
+        padding: 8px 12px !important;
+        padding-top: max(8px, env(safe-area-inset-top)) !important;
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+
+    /* Message Bubbles - Gemini Style */
+    .message {
+        gap: 0 !important;
+        margin-bottom: 12px !important;
+    }
+
+    .message.user .message-content {
+        background: var(--primary) !important;
+        color: white !important;
+        border-radius: 18px 18px 4px 18px !important;
+        max-width: 80%;
+    }
+
+    .message.bot .message-content {
+        background: var(--surface) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 18px 18px 18px 4px !important;
+        max-width: 85%;
+    }
+}
