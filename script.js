@@ -814,36 +814,26 @@ async function getBotResponse(userMessage) {
         // 타이핑 인디케이터 숨기기 (스트리밍 시작 시)
         hideTypingIndicator();
 
-        let accumulatedText = '';
-        let finalModelName = null;
-        let streamingContexts = relatedContexts;
-
         try {
+            // 스트리밍 + 타이핑 효과
             const result = await callOpenRouterAPIWithStreaming(
                 userMessage,
                 relatedContexts,
-                // onSentence: 문장 완성 시 호출
-                (sentence) => {
-                    accumulatedText += sentence;
-                    updateStreamingMessage(streamingContent, accumulatedText);
-                },
-                // onComplete: 스트리밍 완료 시 호출
-                (fullText, modelName) => {
-                    finalModelName = modelName;
-                    streamingContexts = result?.filteredContexts || relatedContexts;
-                }
+                streamingContent,
+                currentAbortController.signal
             );
 
             // 스트리밍 완료 후 최종 포맷팅 적용
             finalizeStreamingMessage(
                 streamingContainer,
-                accumulatedText,
+                result.text,
                 result.filteredContexts || relatedContexts,
-                finalModelName
+                result.modelName
             );
 
             // 최종 응답 텍스트 결정
-            let responseText = accumulatedText;
+            let responseText = result.text;
+
 
             // ★ 토픽 태그 파싱 및 세션 제목 업데이트 ★
             const topicMatch = responseText.match(/\[TOPIC:\s*([^\]]+)\]/);
@@ -2469,14 +2459,14 @@ function toggleFaqPanel() {
 // ============================================
 
 /**
- * 스트리밍 API 호출 (문장 단위 버퍼링)
+ * 스트리밍 API 호출 + 타이핑 효과
  * @param {string} userQuery - 사용자 질문
  * @param {Array} contexts - 참고 문서 배열
- * @param {Function} onSentence - 문장 완성 시 콜백
- * @param {Function} onComplete - 스트리밍 완료 시 콜백
+ * @param {HTMLElement} contentDiv - 렌더링할 div
+ * @param {AbortSignal} signal - 취소 시그널
  * @returns {Promise<{text: string, modelName: string, filteredContexts: Array}>}
  */
-async function callOpenRouterAPIWithStreaming(userQuery, contexts, onSentence, onComplete) {
+async function callOpenRouterAPIWithStreaming(userQuery, contexts, contentDiv, signal) {
     // ★ 기존 callOpenRouterAPI에서 systemPrompt 생성 로직 재사용 ★
     const userSpec = getUserSpecialty();
     let contextText = '';
@@ -2528,6 +2518,42 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 4. **볼드체** 적극 활용, 가독성 좋게 줄바꿈
 5. 정중하고 전문적인 말투 (~요, ~습니다)`;
 
+    // 타이핑 효과를 위한 변수
+    let receivedBuffer = '';  // API에서 받은 전체 텍스트
+    let displayedIndex = 0;   // 현재까지 표시된 인덱스
+    let typingInterval = null;
+    let streamComplete = false;
+    let modelName = null;
+
+    const TYPING_SPEED = 15;  // 밀리초 (한 글자당)
+    const CHARS_PER_TICK = 2; // 한 번에 추가할 글자 수
+
+    // 타이핑 효과 시작
+    const startTypingEffect = () => {
+        if (typingInterval) return;
+
+        typingInterval = setInterval(() => {
+            if (displayedIndex < receivedBuffer.length) {
+                // 한 번에 CHARS_PER_TICK 글자씩 추가
+                const endIndex = Math.min(displayedIndex + CHARS_PER_TICK, receivedBuffer.length);
+                displayedIndex = endIndex;
+
+                const displayedText = receivedBuffer.substring(0, displayedIndex);
+                contentDiv.innerHTML = renderMarkdownSafe(displayedText);
+
+                // 스크롤 유지
+                const messagesContainer = document.getElementById('chatContainer');
+                if (messagesContainer) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            } else if (streamComplete) {
+                // 스트림 완료 & 모든 글자 표시 완료
+                clearInterval(typingInterval);
+                typingInterval = null;
+            }
+        }, TYPING_SPEED);
+    };
+
     try {
         console.log('🌊 스트리밍 API 호출 시작...');
 
@@ -2538,7 +2564,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
                 userQuery: `질문: ${userQuery}`,
                 systemPrompt: systemPrompt
             }),
-            signal: currentAbortController.signal
+            signal: signal
         });
 
         if (!response.ok) {
@@ -2548,22 +2574,14 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
 
-        let fullText = '';
-        let buffer = '';  // 문장 단위 버퍼
-        let modelName = null;
-
-        // 문장 종결 패턴 (마침표, 느낌표, 물음표 + 공백/줄바꿈)
-        const sentenceEndPattern = /([.!?。]\s*|\n\n)/;
+        // 타이핑 효과 시작
+        startTypingEffect();
 
         while (true) {
             const { done, value } = await reader.read();
 
             if (done) {
-                // 남은 버퍼 처리
-                if (buffer.trim()) {
-                    onSentence(buffer);
-                    fullText += buffer;
-                }
+                streamComplete = true;
                 break;
             }
 
@@ -2587,21 +2605,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
                         }
 
                         if (data.text) {
-                            buffer += data.text;
-
-                            // 문장 단위로 분리하여 전달
-                            let match;
-                            while ((match = sentenceEndPattern.exec(buffer)) !== null) {
-                                const sentenceEnd = match.index + match[0].length;
-                                const sentence = buffer.substring(0, sentenceEnd);
-
-                                if (sentence.trim()) {
-                                    onSentence(sentence);
-                                    fullText += sentence;
-                                }
-
-                                buffer = buffer.substring(sentenceEnd);
-                            }
+                            receivedBuffer += data.text;
                         }
                     } catch (e) {
                         // JSON 파싱 실패 무시
@@ -2610,16 +2614,34 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
             }
         }
 
-        console.log('✅ 스트리밍 완료');
-        onComplete(fullText, modelName);
+        // 타이핑 완료 대기
+        await new Promise(resolve => {
+            const checkComplete = setInterval(() => {
+                if (displayedIndex >= receivedBuffer.length) {
+                    clearInterval(checkComplete);
+                    if (typingInterval) {
+                        clearInterval(typingInterval);
+                        typingInterval = null;
+                    }
+                    resolve();
+                }
+            }, 50);
+        });
+
+        console.log('✅ 스트리밍 + 타이핑 완료');
 
         return {
-            text: fullText,
+            text: receivedBuffer,
             modelName: modelName,
             filteredContexts: filteredContexts
         };
 
     } catch (error) {
+        // 타이머 정리
+        if (typingInterval) {
+            clearInterval(typingInterval);
+        }
+
         if (error.name === 'AbortError') {
             console.log('✨ 스트리밍 중단됨');
             throw error;
@@ -2628,6 +2650,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
         throw error;
     }
 }
+
 
 /**
  * 스트리밍 메시지 컨테이너 생성
