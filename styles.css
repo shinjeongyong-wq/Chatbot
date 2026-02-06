@@ -1503,3 +1503,38 @@ body {
         max-width: 85%;
     }
 }
+
+/* ==========================================================================
+   SUPER FINAL UI FIX (v4.2.0)
+   ========================================================================== */
+
+/* Remove ALL avatars globally */
+.message-avatar, 
+.message-avatar-wrapper,
+.message .message-avatar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* PC Specific Fix: NEVER show mobile header buttons */
+@media (min-width: 769px) {
+    .mobile-only,
+    .mobile-menu-btn,
+    .header-planner-btn {
+        display: none !important;
+    }
+    
+    #hamburgerBtn,
+    .sidebar-top-controls .hamburger-btn {
+        display: flex !important;
+    }
+}
+
+/* Gemini Style: Clear margin/padding for messages without avatars */
+@media (max-width: 768px) {
+    .message {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}

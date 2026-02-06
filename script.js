@@ -531,63 +531,37 @@ function initMobileUI() {
     // 모바일인지 확인 (768px 이하)
     if (window.innerWidth > 768) return;
 
-    // 이미 추가되었으면 스킵
-    if (document.getElementById('mobileHamburger')) return;
+    // 이미 노출되었으면 스킵
+    const firstMobileBtn = document.querySelector('.mobile-only');
+    if (firstMobileBtn && firstMobileBtn.style.display === 'flex') return;
 
     console.log('📱 모바일 UI 초기화 시작...');
 
-    // 1. 모바일 햄버거 버튼 생성
-    const header = document.querySelector('.header');
-    if (header) {
-        const hamburgerBtn = document.createElement('button');
-        hamburgerBtn.id = 'mobileHamburger';
-        hamburgerBtn.className = 'mobile-hamburger';
-        hamburgerBtn.setAttribute('type', 'button');
-        hamburgerBtn.innerHTML = `
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 12h18M3 6h18M3 18h18"/>
-            </svg>
-        `;
-        hamburgerBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMobileSidebar();
-        });
-        header.insertBefore(hamburgerBtn, header.firstChild);
+    // 1. HTML에 미리 작성해둔 모바일 전용 버튼들 노출
+    const mobileBtns = document.querySelectorAll('.mobile-only');
+    mobileBtns.forEach(btn => {
+        btn.style.display = 'flex';
+    });
 
-        // 2. 플래너 상담 버튼을 헤더 우측에 추가
-        const plannerBtn = document.createElement('button');
-        plannerBtn.id = 'headerPlannerBtn';
-        plannerBtn.className = 'header-planner-btn';
-        plannerBtn.setAttribute('type', 'button');
-        plannerBtn.innerHTML = '📞';
-        plannerBtn.title = '플래너 상담';
-        plannerBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (typeof openContactModal === 'function') {
-                openContactModal();
-            }
-        });
-        header.appendChild(plannerBtn);
-
-        console.log('✅ 햄버거 버튼 & 플래너 버튼 추가 완료');
+    // 2. 오버레이 생성 (없을 경우만)
+    let overlay = document.getElementById('sidebarOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'sidebarOverlay';
+        overlay.className = 'sidebar-overlay';
+        overlay.onclick = closeMobileSidebar;
+        document.body.appendChild(overlay);
     }
 
-    // 3. 오버레이 생성
-    const overlay = document.createElement('div');
-    overlay.id = 'sidebarOverlay';
-    overlay.className = 'sidebar-overlay';
-    overlay.addEventListener('click', closeMobileSidebar);
-    document.body.appendChild(overlay);
-
-    // 4. 하단 플래너 상담 버튼 숨기기 (모바일)
-    const bottomPlannerBtn = document.querySelector('.input-container .planner-btn, .input-container [onclick*="openContactModal"]');
+    // 3. 하단 중복 플래너 상담 버튼 숨기기 (모바일)
+    const bottomPlannerBtn = document.querySelector('.input-container .planner-btn, .input-container [onclick*="openContactModal"]:not(.header-planner-btn)');
     if (bottomPlannerBtn) {
         bottomPlannerBtn.style.display = 'none';
     }
 
     console.log('✅ 모바일 UI 초기화 완료');
 }
+
 
 /**
  * 모바일 사이드바 토글
