@@ -756,6 +756,51 @@ async function getBotResponse(userMessage) {
             console.warn('Query Planning 실패, 기본 검색으로 fallback:', planError);
         }
 
+        // ========== ★ 캐시 조회 (Query Plan 기반) ★ ==========
+        if (queryPlan && queryPlan.requiresSearch) {
+            try {
+                const userSpec = getUserSpecialty();
+                const hasContext = chatMemory.getContextPrompt().length > 50;
+
+                const cacheResponse = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'cache-check',
+                        queryPlan: queryPlan,
+                        specialty: userSpec,
+                        hasContext: hasContext
+                    }),
+                    signal: currentAbortController.signal
+                });
+
+                const cacheResult = await cacheResponse.json();
+
+                if (cacheResult.hit) {
+                    // ★ 캐시 히트! Stage 2, 3 스킵 ★
+                    console.log(`✅ [Cache HIT] 캐시된 답변 사용 (히트 카운트: ${cacheResult.hitCount})`);
+                    hideTypingIndicator();
+
+                    // 캐시된 답변 출력
+                    addFormattedMessage(cacheResult.answer, []);
+
+                    // ChatMemory에 저장
+                    await chatMemory.addTurn(userMessage, cacheResult.answer);
+
+                    // Supabase 저장
+                    if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+                        window.chatHistory.saveMessage('assistant', cacheResult.answer, chatMemory.getContextPrompt(), 'cached').catch(() => { });
+                    }
+
+                    return; // ★ 캐시 히트 시 여기서 종료 ★
+                } else {
+                    console.log(`❌ [Cache MISS] 캐시 키: ${cacheResult.cacheKey}`);
+                }
+            } catch (cacheError) {
+                console.warn('캐시 조회 실패, 정상 진행:', cacheError.message);
+            }
+        }
+
         // ========== Stage 2: Smart Search ==========
         // (SPECIFIC intent만 여기까지 도달)
         startTypingMessageRolling('stage2');
@@ -863,6 +908,35 @@ async function getBotResponse(userMessage) {
             window.chatHistory.saveMessage('assistant', responseText, chatMemory.getContextPrompt(), messageType).catch(err => {
                 console.warn('AI 응답 DB 저장 실패:', err);
             });
+        }
+
+        // ★ Query Plan 캐시 저장 (비동기, 응답에 영향 없음) ★
+        if (queryPlan && queryPlan.requiresSearch) {
+            try {
+                const userSpec = getUserSpecialty();
+                const hasContext = chatMemory.getContextPrompt().length > 50;
+
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'cache-save',
+                        queryPlan: queryPlan,
+                        specialty: userSpec,
+                        hasContext: hasContext,
+                        answer: responseText,
+                        originalQuestion: userMessage
+                    })
+                }).then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log(`💾 [Cache] 저장 완료: ${data.cacheKey}`);
+                        }
+                    })
+                    .catch(() => { }); // 캐시 저장 실패해도 무시
+            } catch (e) {
+                // 캐시 저장 실패해도 무시
+            }
         }
 
     } catch (error) {

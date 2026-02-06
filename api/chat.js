@@ -1,6 +1,15 @@
 // Vercel Serverless Function - Google Gemini API Proxy
 // API 키가 환경변수에 저장되어 노출되지 않음
 
+import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
+
+// Supabase 클라이언트 (캐시용)
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
+);
+
 export default async function handler(req, res) {
     // CORS 헤더
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,6 +25,14 @@ export default async function handler(req, res) {
     }
 
     const { userQuery, systemPrompt, mode } = req.body;
+
+    // ★ 캐시 모드 - Query Plan 기반 캐시 조회/저장 ★
+    if (mode === 'cache-check') {
+        return await handleCacheCheck(req, res);
+    }
+    if (mode === 'cache-save') {
+        return await handleCacheSave(req, res);
+    }
 
     if (!userQuery) {
         return res.status(400).json({ error: 'userQuery is required' });
@@ -441,4 +458,114 @@ ${systemPrompt}
             lastErrorMessage: lastError
         }
     });
+}
+
+// ========== 캐시 관련 함수 ==========
+
+/**
+ * 캐시 키 생성 (Query Plan 기반)
+ */
+function generateCacheKey(queryPlan, specialty, hasContext) {
+    const topicSorted = [...(queryPlan.topic || [])].sort();
+    const subIntentSorted = [...(queryPlan.subIntent || [])].sort();
+
+    const keyData = {
+        topic: topicSorted,
+        subIntent: subIntentSorted,
+        specialty: specialty?.code || 'none',
+        hasContext: !!hasContext
+    };
+
+    return crypto
+        .createHash('sha256')
+        .update(JSON.stringify(keyData))
+        .digest('hex')
+        .substring(0, 16);
+}
+
+/**
+ * 캐시 조회 핸들러
+ */
+async function handleCacheCheck(req, res) {
+    const { queryPlan, specialty, hasContext } = req.body;
+
+    if (!queryPlan) {
+        return res.status(400).json({ error: 'queryPlan is required' });
+    }
+
+    try {
+        const cacheKey = generateCacheKey(queryPlan, specialty, hasContext);
+
+        const { data, error } = await supabase
+            .from('query_cache')
+            .select('answer, original_question, hit_count')
+            .eq('cache_key', cacheKey)
+            .single();
+
+        if (error || !data) {
+            console.log(`[Cache] MISS: ${cacheKey}`);
+            return res.json({ hit: false, cacheKey });
+        }
+
+        // 히트 카운트 증가 (비동기)
+        supabase.from('query_cache')
+            .update({ hit_count: data.hit_count + 1 })
+            .eq('cache_key', cacheKey)
+            .then(() => { })
+            .catch(() => { });
+
+        console.log(`[Cache] HIT: ${cacheKey}`);
+        return res.json({
+            hit: true,
+            cacheKey,
+            answer: data.answer,
+            originalQuestion: data.original_question,
+            hitCount: data.hit_count
+        });
+
+    } catch (err) {
+        console.error('[Cache] Check error:', err.message);
+        return res.json({ hit: false, error: err.message });
+    }
+}
+
+/**
+ * 캐시 저장 핸들러
+ */
+async function handleCacheSave(req, res) {
+    const { queryPlan, specialty, hasContext, answer, originalQuestion } = req.body;
+
+    if (!queryPlan || !answer) {
+        return res.status(400).json({ error: 'queryPlan and answer are required' });
+    }
+
+    try {
+        const cacheKey = generateCacheKey(queryPlan, specialty, hasContext);
+
+        const { error } = await supabase
+            .from('query_cache')
+            .upsert({
+                cache_key: cacheKey,
+                topic: queryPlan.topic || [],
+                sub_intent: queryPlan.subIntent || [],
+                specialty: specialty?.code || null,
+                has_context: !!hasContext,
+                answer: answer,
+                original_question: originalQuestion,
+                hit_count: 0,
+                created_at: new Date().toISOString()
+            }, { onConflict: 'cache_key' });
+
+        if (error) {
+            console.error('[Cache] Save error:', error.message);
+            return res.json({ success: false, error: error.message });
+        }
+
+        console.log(`[Cache] SAVED: ${cacheKey}`);
+        return res.json({ success: true, cacheKey });
+
+    } catch (err) {
+        console.error('[Cache] Save exception:', err.message);
+        return res.json({ success: false, error: err.message });
+    }
 }
