@@ -1298,3 +1298,147 @@ body {
         display: flex !important;
     }
 }
+
+/* ==========================================================================
+   UI Optimization v3.2.0 (Gemini Style & PC/Mobile Fix)
+   ========================================================================== */
+
+/* [공통] 아바타 완전 제거 (Gemini 스타일) */
+.message-avatar {
+    display: none !important;
+}
+
+/* [공통] 채팅 말풍선 정렬 */
+.message {
+    gap: 0 !important;
+    margin-bottom: 16px !important;
+    padding: 0 !important;
+}
+
+.message.user {
+    justify-content: flex-end !important;
+}
+
+.message.user .message-content {
+    background: var(--primary) !important;
+    color: white !important;
+    border-radius: 18px 18px 4px 18px !important;
+    max-width: 80%;
+    margin-right: 8px;
+}
+
+.message.bot {
+    justify-content: flex-start !important;
+}
+
+.message.bot .message-content {
+    background: var(--surface) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 18px 18px 18px 4px !important;
+    max-width: 85%;
+    margin-left: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   PC 버전 설정 (768px 초과)
+   -------------------------------------------------------------------------- */
+@media (min-width: 769px) {
+    /* [PC] 헤더의 모바일 전용 버튼들 절대 숨김 */
+    .mobile-menu-btn,
+    .header-planner-btn,
+    .mobile-only {
+        display: none !important;
+    }
+
+    /* [PC] 기존 사이드바 햄버거 버튼 유지 */
+    .sidebar-top-controls .hamburger-btn,
+    #hamburgerBtn {
+        display: flex !important;
+    }
+
+    /* [PC] FAQ 버튼 표시 */
+    .header-faq-btn {
+        display: flex !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   모바일 버전 설정 (768px 이하)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    /* [모바일] 헤더 레이아웃 조정 */
+    .header {
+        padding: 8px 12px !important;
+        padding-top: max(8px, env(safe-area-inset-top)) !important;
+    }
+
+    /* [모바일] 헤더 버튼들 노출 */
+    .mobile-menu-btn,
+    .header-planner-btn {
+        display: flex !important;
+    }
+
+    /* [모바일] 데스크탑 전용 숨김 */
+    .desktop-only,
+    .header-faq-btn {
+        display: none !important;
+    }
+
+    /* [모바일] 사이드바 오버레이 모드 */
+    .history-sidebar {
+        position: fixed !important;
+        left: -100% !important;
+        top: 0 !important;
+        height: 100vh !important;
+        width: 80% !important;
+        max-width: 320px !important;
+        z-index: 1000 !important;
+        transition: left 0.3s ease !important;
+    }
+
+    .history-sidebar.mobile-open {
+        left: 0 !important;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    /* [모바일] 사이드바 내부 햄버거 숨김 */
+    .sidebar-top-controls .hamburger-btn,
+    #hamburgerBtn {
+        display: none !important;
+    }
+
+    /* [모바일] 채팅방 밀착 */
+    .chat-container {
+        padding: 4px 8px !important;
+    }
+
+    .message-content {
+        max-width: 90% !important;
+        font-size: 14px !important;
+    }
+
+    /* [모바일] 하단 입력창 safe-area */
+    .input-container {
+        padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    }
+
+    /* [모바일] 하단 중복 플래너 버튼 숨김 */
+    .input-container .planner-btn,
+    button[onclick*="openContactModal"]:not(.header-planner-btn) {
+        display: none !important;
+    }
+}
