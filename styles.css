@@ -868,3 +868,45 @@ body {
         max-width: 90% !important;
     }
 }
+
+/* ========================================
+   모바일 완전 밀착 (v2.4.4 - FINAL)
+   ======================================== */
+
+@media (max-width: 768px) {
+    .chat-container {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .message {
+        gap: 4px !important;
+        padding: 6px 0 !important;
+        margin: 0 !important;
+    }
+    
+    .message-avatar {
+        margin: 0 !important;
+        margin-left: 0 !important;
+    }
+    
+    .message.user .message-avatar {
+        margin: 0 !important;
+        margin-right: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .message {
+        gap: 2px !important;
+        padding: 4px 0 !important;
+    }
+    
+    .message-avatar {
+        margin-left: 0 !important;
+    }
+    
+    .message.user .message-avatar {
+        margin-right: 0 !important;
+    }
+}
