@@ -6,7 +6,9 @@
     const isStaging = window.location.hostname.includes('staging')
         || window.location.hostname.includes('-git-staging-');
 
-    if (!isLocal && !isStaging) {
+    const isFeature = window.location.hostname.includes('-git-feature-');
+
+    if (!isLocal && !isStaging && !isFeature) {
         console.log = () => { };
         console.debug = () => { };
         console.info = () => { };
