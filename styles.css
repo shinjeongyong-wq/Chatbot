@@ -1227,3 +1227,50 @@ body {
         font-size: 14px !important;
     }
 }
+
+/* ========================================
+   모바일 중복 요소 숨김 (v3.0.1 - 긴급 수정)
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* 사이드바 자체를 완전히 숨김 (모바일에서는 오버레이로만) */
+    .history-sidebar:not(.mobile-open) {
+        left: -100% !important;
+    }
+    
+    /* 사이드바 내부 햄버거 숨김 */
+    .sidebar-top-controls .hamburger-btn,
+    #hamburgerBtn {
+        display: none !important;
+    }
+    
+    /* FAQ 버튼 숨김 */
+    .header-faq-btn,
+    .header-right {
+        display: none !important;
+    }
+    
+    /* AI 아바타 강제 숨김 */
+    .message-avatar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+    
+    /* initMobileUI에서 생성된 버튼 숨김 (중복 방지) */
+    #mobileHamburger,
+    #headerPlannerBtn:not(.mobile-menu-btn):not(.header-planner-btn) {
+        display: none !important;
+    }
+    
+    /* 헤더에 직접 추가한 버튼만 표시 */
+    .mobile-menu-btn,
+    .header-planner-btn {
+        display: flex !important;
+    }
+    
+    /* 입력창 하단 safe-area */
+    .input-container {
+        padding-bottom: max(12px, calc(env(safe-area-inset-bottom) + 8px)) !important;
+    }
+}

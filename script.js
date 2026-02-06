@@ -626,11 +626,15 @@ function closeMobileSidebar() {
     }
 }
 
+// 전역 노출 (난독화 후에도 onclick에서 호출 가능하도록)
+window.toggleMobileSidebar = toggleMobileSidebar;
+window.closeMobileSidebar = closeMobileSidebar;
 
 
 // ==========================
 // 2. FAQ 네비게이션
 // ==========================
+
 function renderFAQFields() {
     faqNavigationStack = [];
     updateFAQView('fields');
