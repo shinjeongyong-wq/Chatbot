@@ -9,11 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        
-        
         :root {
             --primary-color: #ffffff;
             --primary-hover: #e5e5e5;
@@ -29,11 +27,11 @@
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
 
-            
+
             --accent-color: #0070f3;
             --accent-hover: #0060df;
 
-            
+
             --history-bg: #fafafa;
             --history-border: #e5e5e5;
             --history-text: #171717;
@@ -43,7 +41,7 @@
             --history-user-bg: #f5f5f5;
         }
 
-        
+
 
         * {
             margin: 0;
@@ -59,8 +57,8 @@
             overflow: hidden;
         }
 
-        
-        
+
+
         .app-container {
             display: flex;
             height: 100vh;
@@ -69,14 +67,14 @@
             margin: 0;
             padding: 0;
             gap: 0;
-            
+
             background: var(--surface);
             overflow: hidden;
         }
 
-        
 
-        
+
+
         .faq-panel {
             position: fixed;
             top: 0;
@@ -134,7 +132,7 @@
             color: var(--text-primary);
         }
 
-        
+
         .search-panel {
             position: fixed;
             top: 50%;
@@ -278,7 +276,7 @@
             white-space: nowrap;
         }
 
-        
+
         .search-overlay {
             position: fixed;
             top: 0;
@@ -294,13 +292,13 @@
             display: block;
         }
 
-        
+
         .faq-nav {
             padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
             background: var(--surface);
             display: none;
-            
+
         }
 
         .faq-nav.active {
@@ -329,7 +327,7 @@
             padding: 20px 24px;
         }
 
-        
+
         .faq-item-btn {
             width: 100%;
             padding: 14px 16px;
@@ -398,7 +396,7 @@
             border-color: var(--primary-color);
         }
 
-        
+
         .chat-interface {
             flex: 1;
             display: flex;
@@ -426,7 +424,7 @@
             gap: 12px;
         }
 
-        
+
         .header-faq-btn {
             display: flex;
             align-items: center;
@@ -456,7 +454,7 @@
             color: var(--accent-color);
         }
 
-        
+
         .input-hint {
             display: flex;
             align-items: center;
@@ -468,7 +466,7 @@
             flex-wrap: wrap;
         }
 
-        
+
         .planner-consult-btn {
             padding: 6px 14px;
             background: var(--accent-color);
@@ -486,9 +484,9 @@
             transform: scale(1.02);
         }
 
-        
 
-        
+
+
         .export-dropdown {
             position: relative;
         }
@@ -581,7 +579,7 @@
             scroll-behavior: smooth;
         }
 
-        
+
         .welcome-message {
             max-width: 680px;
             margin: 40px auto;
@@ -606,7 +604,7 @@
             margin-bottom: 40px;
         }
 
-        
+
         .suggested-questions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -632,7 +630,7 @@
             color: var(--text-primary);
         }
 
-        
+
         .message {
             display: flex;
             gap: 16px;
@@ -667,7 +665,7 @@
             color: white;
         }
 
-        
+
         .message-content {
             padding: 16px 20px;
             background: var(--surface-secondary);
@@ -677,7 +675,7 @@
             line-height: 1.7;
         }
 
-        
+
         .message.user .message-content {
             background: var(--accent-color);
             color: white;
@@ -711,7 +709,7 @@
             border-color: rgba(34, 197, 94, 0.2);
         }
 
-        
+
         .feedback-buttons {
             display: flex;
             gap: 8px;
@@ -770,7 +768,7 @@
             color: #22c55e;
         }
 
-        
+
         .input-container {
             padding: 24px 32px;
             background: var(--surface);
@@ -832,7 +830,7 @@
             background: var(--accent-hover);
         }
 
-        
+
         @media (max-width: 768px) {
             .faq-sidebar {
                 position: fixed;
@@ -856,7 +854,7 @@
             }
         }
 
-        
+
         .modal {
             display: none;
             position: fixed;
@@ -957,7 +955,7 @@
             white-space: pre-wrap;
         }
 
-        
+
         @keyframes slideUp {
             from {
                 transform: translateY(20px);
@@ -970,7 +968,7 @@
             }
         }
 
-        
+
         .citation-btn {
             margin-top: 12px;
             padding: 8px 16px;
@@ -992,7 +990,7 @@
             transform: translateY(-1px);
         }
 
-        
+
         .cite-ref {
             display: inline;
             position: relative;
@@ -1049,7 +1047,7 @@
             border-color: #1e293b transparent transparent transparent;
         }
 
-        
+
         .typing-indicator {
             display: flex;
             align-items: center;
@@ -1105,7 +1103,7 @@
         }
 
 
-        
+
         .formatted-response {
             line-height: 1.6;
         }
@@ -1149,7 +1147,7 @@
             font-weight: 600;
         }
 
-        
+
         .model-info {
             margin-top: 16px;
             padding-top: 12px;
@@ -1159,7 +1157,7 @@
             text-align: right;
         }
 
-        
+
         .feedback-buttons {
             display: flex;
             gap: 8px;
@@ -1207,7 +1205,7 @@
             color: #ef4444;
         }
 
-        
+
         .feedback-modal {
             display: none;
             position: fixed;
@@ -1305,7 +1303,7 @@
             cursor: pointer;
         }
 
-        
+
         .feedback-tab {
             padding: 16px 24px;
             border-top: 1px solid #e2e8f0;
@@ -1323,7 +1321,7 @@
             background: #f1f5f9;
         }
 
-        
+
         .feedback-list-modal {
             display: none;
             position: fixed;
@@ -1428,7 +1426,7 @@
             margin-bottom: 8px;
         }
 
-        
+
         .specialty-modal {
             display: none;
             position: fixed;
@@ -1520,7 +1518,7 @@
             color: var(--text-primary);
         }
 
-        
+
         .specialty-badge {
             display: inline-flex;
             align-items: center;
@@ -1546,7 +1544,7 @@
             opacity: 0.8;
         }
 
-        
+
         .specialty-badge-inline {
             display: inline-flex;
             align-items: center;
@@ -1574,7 +1572,7 @@
             opacity: 0.7;
         }
 
-        
+
         .login-modal {
             display: none;
             position: fixed;
@@ -1734,7 +1732,7 @@
             box-shadow: none;
         }
 
-        
+
         .history-sidebar {
             width: 280px;
             background: var(--history-bg);
@@ -1746,7 +1744,7 @@
             overflow: hidden;
         }
 
-        
+
         .history-sidebar.collapsed {
             width: 56px;
         }
@@ -1763,7 +1761,7 @@
             display: none;
         }
 
-        
+
         .sidebar-top-controls {
             display: flex;
             align-items: center;
@@ -1816,7 +1814,7 @@
             gap: 8px;
         }
 
-        
+
         .faq-toggle-btn {
             width: 100%;
             height: 44px;
@@ -1840,7 +1838,7 @@
             color: var(--text-primary);
         }
 
-        
+
         .new-chat-btn {
             width: 100%;
             height: 44px;
@@ -1864,7 +1862,7 @@
             border-color: var(--text-tertiary);
         }
 
-        
+
 
         .history-list {
             flex: 1;
@@ -1872,7 +1870,7 @@
             padding: 12px;
         }
 
-        
+
         .history-item {
             height: 44px;
             padding: 0 12px;
@@ -2015,12 +2013,12 @@
             color: #0c4a6e;
         }
 
-        
+
         .history-sidebar.hidden {
             display: none;
         }
 
-        
+
         @media (max-width: 1200px) {
             .history-sidebar {
                 width: 240px;
@@ -2045,7 +2043,7 @@
 </head>
 
 <body>
-    
+
     <div id="loginModal" class="login-modal active">
         <div class="login-modal-content">
             <div class="login-logo">
@@ -2101,7 +2099,7 @@
         </div>
     </div>
 
-    
+
     <div id="specialtyModal" class="specialty-modal">
         <div class="specialty-modal-content">
             <div class="specialty-modal-title">👋 안녕하세요!</div>
@@ -2127,7 +2125,7 @@
         </div>
     </div>
 
-    
+
     <div id="citationModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -2135,12 +2133,12 @@
                 <button class="close-btn" onclick="closeCitationModal()">&times;</button>
             </div>
             <div class="modal-body" id="citationModalBody">
-                
+
             </div>
         </div>
     </div>
 
-    
+
     <div id="feedbackModal" class="feedback-modal">
         <div class="feedback-modal-content">
             <div class="feedback-modal-header">
@@ -2158,7 +2156,7 @@
         </div>
     </div>
 
-    
+
     <div id="feedbackListModal" class="feedback-list-modal">
         <div class="feedback-list-modal-content">
             <div class="feedback-list-modal-header">
@@ -2166,12 +2164,12 @@
                 <button class="feedback-modal-close" onclick="closeFeedbackListModal()">&times;</button>
             </div>
             <div class="feedback-list-modal-body" id="feedbackListContent">
-                
+
             </div>
         </div>
     </div>
 
-    
+
     <div id="successModal" class="feedback-modal">
         <div class="feedback-modal-content" style="max-width: 400px; text-align: center;">
             <div style="padding: 40px 24px;">
@@ -2186,7 +2184,7 @@
         </div>
     </div>
 
-    
+
     <div id="contactModal" class="feedback-modal">
         <div class="feedback-modal-content">
             <div class="feedback-modal-header">
@@ -2213,13 +2211,13 @@
         </div>
     </div>
 
-    
+
     <div class="search-overlay" id="searchOverlay" onclick="toggleSearchPanel()"></div>
 
     <div class="app-container">
-        
+
         <aside class="history-sidebar" id="historySidebar">
-            
+
             <div class="sidebar-top-controls">
                 <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" title="메뉴 접기/펼치기">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2237,7 +2235,7 @@
             </div>
 
             <div class="history-sidebar-header">
-                
+
                 <button class="new-chat-btn" onclick="createNewChat()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 5v14M5 12h14" />
@@ -2247,7 +2245,7 @@
             </div>
 
             <div class="history-list" id="historyList">
-                
+
                 <div style="text-align: center; padding: 40px 20px; color: #64748b;">
                     <p style="font-size: 14px;">대화 기록이 없습니다</p>
                 </div>
@@ -2272,7 +2270,7 @@
             </div>
         </aside>
 
-        
+
         <aside class="faq-panel" id="faqPanel">
             <div class="faq-panel-header">
                 <h3>
@@ -2289,7 +2287,7 @@
                 </button>
             </div>
 
-            
+
             <div class="faq-nav" id="faqNav">
                 <button class="nav-back-btn" id="faqBackBtn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2299,16 +2297,16 @@
                 </button>
             </div>
 
-            
+
             <div class="faq-content" id="faqContent">
-                
+
                 <div style="text-align: center; margin-top: 40px; color: #94a3b8;">
                     데이터 로딩 중...
                 </div>
             </div>
         </aside>
 
-        
+
         <div class="search-panel" id="searchPanel">
             <div class="search-panel-header">
                 <h3>검색</h3>
@@ -2330,31 +2328,42 @@
                 <div class="search-results-section">
                     <h4>최근</h4>
                     <div class="search-results" id="searchResults">
-                        
+
                     </div>
                 </div>
             </div>
         </div>
 
-        
+
         <main class="chat-interface">
             <header class="header">
+                <!-- 모바일 햄버거 버튼 -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileSidebar()" title="메뉴">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18" />
+                    </svg>
+                </button>
+
                 <div class="logo">
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
                         <rect width="32" height="32" rx="8" fill="#536db1" />
                         <path d="M16 8L22 12V20L16 24L10 20V12L16 8Z" fill="white" stroke="white" stroke-width="2"
                             stroke-linejoin="round" />
                         <circle cx="16" cy="16" r="3" fill="#536db1" />
                     </svg>
                     <span class="logo-text">개원 상담 챗봇</span>
-                    <div id="specialtyBadge" class="specialty-badge-inline" onclick="openSpecialtyModal()"
-                        style="display: none;">
-                        <span id="specialtyBadgeText">통증</span>
-                        <span class="change-text" title="진료과 변경">✏️</span>
-                    </div>
                 </div>
-                <div class="header-right">
-                    
+
+                <!-- 플래너 상담 버튼 -->
+                <button class="header-planner-btn" id="headerPlannerBtn" onclick="openContactModal()" title="플래너 상담">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                    </svg>
+                </button>
+
+                <!-- 데스크탑용 FAQ 버튼 (모바일 숨김) -->
+                <div class="header-right desktop-only">
                     <button class="header-faq-btn" onclick="toggleFaqPanel()" title="FAQ 보기">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
@@ -2365,6 +2374,7 @@
                     </button>
                 </div>
             </header>
+
 
             <div class="chat-container" id="chatContainer">
                 <div class="welcome-message">
@@ -2380,7 +2390,7 @@
                     <p>AI 컨설턴트가 병원 개원의 모든 것을 답변해 드립니다.<br>우측 상단에서 자주 묻는 질문을 확인하거나, 직접 물어보세요.</p>
 
                     <div class="suggested-questions" style="display: none;">
-                        
+
                     </div>
                 </div>
             </div>
@@ -2405,7 +2415,7 @@
         </main>
     </div>
 
-    
+
     <div id="confirmModal" class="confirm-modal">
         <div class="confirm-modal-content">
             <div class="confirm-modal-icon" id="confirmModalIcon">⚠️</div>
@@ -2419,7 +2429,6 @@
     </div>
 
     <style>
-        
         .confirm-modal {
             display: none;
             position: fixed;
@@ -2532,8 +2541,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="console-guard.js"></script>
-    
-    
+
+
     <script src="dist/sheets-loader.js"></script>
     <script src="dist/chat-history.js"></script>
     <script src="dist/script.js"></script>

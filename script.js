@@ -593,22 +593,21 @@ function initMobileUI() {
  * 모바일 사이드바 토글
  */
 function toggleMobileSidebar() {
-    console.log('🔄 사이드바 토글 시도...');
     const sidebar = document.getElementById('historySidebar');
-    const overlay = document.getElementById('sidebarOverlay');
 
-    console.log('sidebar:', sidebar, 'overlay:', overlay);
+    // 오버레이가 없으면 생성
+    let overlay = document.getElementById('sidebarOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'sidebarOverlay';
+        overlay.className = 'sidebar-overlay';
+        overlay.onclick = closeMobileSidebar;
+        document.body.appendChild(overlay);
+    }
 
-    if (sidebar && overlay) {
-        const isOpen = sidebar.classList.contains('mobile-open');
-        console.log('현재 상태:', isOpen ? '열림' : '닫힘');
-
+    if (sidebar) {
         sidebar.classList.toggle('mobile-open');
         overlay.classList.toggle('active');
-
-        console.log('토글 후 상태:', sidebar.classList.contains('mobile-open') ? '열림' : '닫힘');
-    } else {
-        console.error('❌ sidebar 또는 overlay를 찾을 수 없음');
     }
 }
 
@@ -619,11 +618,14 @@ function closeMobileSidebar() {
     const sidebar = document.getElementById('historySidebar');
     const overlay = document.getElementById('sidebarOverlay');
 
-    if (sidebar && overlay) {
+    if (sidebar) {
         sidebar.classList.remove('mobile-open');
+    }
+    if (overlay) {
         overlay.classList.remove('active');
     }
 }
+
 
 
 // ==========================
