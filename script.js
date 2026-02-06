@@ -700,49 +700,56 @@ async function getBotResponse(userMessage) {
 
                     // ★ MECE 6분류 기반 분기 처리 ★
                     if (queryPlan.requiresSearch === false && queryPlan.directAnswer) {
-                        // 검색 불필요: 즉시 답변 출력 후 종료
+                        // 검색 불필요: 타이핑 효과로 답변 출력
                         hideTypingIndicator();
+                        console.log(`🎯 [${queryPlan.intent}] 검색 스킵, 타이핑 효과로 답변 출력`);
 
-                        // Intent별 스타일 적용
-                        const intentStyles = {
-                            'GREETING': { icon: '👋', style: 'greeting' },
-                            'ABUSE': { icon: '🚫', style: 'warning' },
-                            'OFF_TOPIC': { icon: '💬', style: 'info' },
-                            'OUT_OF_SCOPE': { icon: '📞', style: 'referral' },
-                            'AMBIGUOUS': { icon: '❓', style: 'clarification' }
-                        };
+                        // 스트리밍 메시지 컨테이너 생성
+                        const { container: streamingContainer, contentDiv: streamingContent } = createStreamingMessageContainer();
 
-                        const intentInfo = intentStyles[queryPlan.intent] || { icon: '💡', style: 'default' };
-                        console.log(`🎯 [${queryPlan.intent}] 검색 스킵, 즉시 답변 출력`);
-
-                        // ★ OUT_OF_SCOPE 전용 처리: 플래너 연결 버튼 포함 UI ★
+                        // OUT_OF_SCOPE, AMBIGUOUS 처리
+                        let finalAnswer = queryPlan.directAnswer;
                         let messageType = 'normal';
+
                         if (queryPlan.intent === 'OUT_OF_SCOPE') {
-                            addOutOfScopeMessage(queryPlan.directAnswer);
                             messageType = 'out_of_scope';
-                        } else if (queryPlan.intent === 'AMBIGUOUS') {
-                            // ★ AMBIGUOUS 전용 처리: 관련 주제 추천 ★
-                            const relatedTopics = findRelatedAnchorTopics(userMessage, 5);
-                            let responseWithTopics = queryPlan.directAnswer;
-                            if (relatedTopics.length > 0) {
-                                responseWithTopics += '\n\n[RELATED_TOPICS]\n' + relatedTopics.map(t => `- ${t}`).join('\n') + '\n[/RELATED_TOPICS]';
+                            // [NO_DATA] 태그 추가 (플래너 버튼 표시용)
+                            if (!finalAnswer.includes('[NO_DATA]')) {
+                                finalAnswer = '[NO_DATA]' + finalAnswer;
                             }
-                            addFormattedMessage(responseWithTopics, []);
-                        } else {
-                            // 다른 intent는 일반 포맷 메시지
-                            addFormattedMessage(queryPlan.directAnswer, []);
+                        } else if (queryPlan.intent === 'AMBIGUOUS') {
+                            // 관련 주제 추천 추가
+                            const relatedTopics = findRelatedAnchorTopics(userMessage, 5);
+                            if (relatedTopics.length > 0) {
+                                finalAnswer += '\n\n[RELATED_TOPICS]\n' + relatedTopics.map(t => `- ${t}`).join('\n') + '\n[/RELATED_TOPICS]';
+                            }
+                        }
+
+                        // ★ 타이핑 효과 적용 ★
+                        await displayWithTypingEffect(streamingContent, finalAnswer);
+
+                        // 스트리밍 완료 후 최종 포맷팅 적용
+                        finalizeStreamingMessage(streamingContainer, finalAnswer, [], null);
+
+                        // ★ 답변 완료 후: 사용자 질문이 화면 최상단에 오도록 스크롤 ★
+                        const chatContainerEl = document.getElementById('chatContainer');
+                        const userMessages = chatContainerEl.querySelectorAll('.message.user');
+                        if (userMessages.length > 0) {
+                            const lastUserMessage = userMessages[userMessages.length - 1];
+                            lastUserMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
 
                         // ChatMemory에 저장 (맥락 유지용)
                         await chatMemory.addTurn(userMessage, queryPlan.directAnswer);
 
-                        // Supabase 저장 (user는 sendUserMessage에서 이미 저장됨)
+                        // Supabase 저장
                         if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
                             window.chatHistory.saveMessage('assistant', queryPlan.directAnswer, chatMemory.getContextPrompt(), messageType).catch(() => { });
                         }
 
                         return; // ★ 검색 로직 완전 스킵 ★
                     }
+
 
                     // 기존 off_topic 호환성 유지 (혹시 모를 레거시 응답 대응)
                     if (queryPlan.intent === 'off_topic') {
@@ -2673,6 +2680,34 @@ function createStreamingMessageContainer() {
         container: container,
         contentDiv: container.querySelector('.streaming-content')
     };
+}
+
+/**
+ * 텍스트에 타이핑 효과 적용 (API 호출 없이 로컬 텍스트 사용)
+ * @param {HTMLElement} contentDiv - 렌더링할 div
+ * @param {string} text - 표시할 텍스트
+ * @returns {Promise<void>}
+ */
+async function displayWithTypingEffect(contentDiv, text) {
+    const TYPING_SPEED = 30;  // 밀리초 (한 글자당)
+    const CHARS_PER_TICK = 1; // 한 번에 추가할 글자 수
+
+    return new Promise((resolve) => {
+        let displayedIndex = 0;
+
+        const typingInterval = setInterval(() => {
+            if (displayedIndex < text.length) {
+                const endIndex = Math.min(displayedIndex + CHARS_PER_TICK, text.length);
+                displayedIndex = endIndex;
+
+                const displayedText = text.substring(0, displayedIndex);
+                contentDiv.innerHTML = renderMarkdownSafe(displayedText);
+            } else {
+                clearInterval(typingInterval);
+                resolve();
+            }
+        }, TYPING_SPEED);
+    });
 }
 
 /**
