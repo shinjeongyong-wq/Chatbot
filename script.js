@@ -2765,7 +2765,10 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
 
     // ★ NO_DATA / OFF_TOPIC 감지 ★
     let messageType = 'normal';
-    let isNoData = processedText.includes('[NO_DATA]');
+    // [NO_DATA] 태그 또는 "플래너에게 연락" 문구가 포함되면 NO_DATA로 처리
+    let isNoData = processedText.includes('[NO_DATA]') ||
+        processedText.includes('플래너에게 연락') ||
+        processedText.includes('플래너에게 문의');
     let isOffTopic = processedText.includes('[OFF_TOPIC]');
 
     if (isOffTopic) {
@@ -2774,7 +2777,10 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
     } else if (isNoData) {
         messageType = 'no_data';
         processedText = processedText.replace('[NO_DATA]', '').trim();
+        // "플래너에게 연락" 문구 제거 (버튼으로 대체)
+        processedText = processedText.replace(/질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다\.?/g, '').trim();
     }
+
 
     // [TOPIC] 태그 처리
     const topicMatch = processedText.match(/\[TOPIC:\s*([^\]]+)\]/);
