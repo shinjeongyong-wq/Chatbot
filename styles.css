@@ -1274,3 +1274,27 @@ body {
         padding-bottom: max(12px, calc(env(safe-area-inset-bottom) + 8px)) !important;
     }
 }
+
+/* ========================================
+   PC 버전 - 모바일 버튼 숨김 (v3.0.2)
+   ======================================== */
+
+/* 기본: 모바일 전용 버튼 숨김 (PC에서) */
+.mobile-menu-btn {
+    display: none !important;
+}
+
+.header-planner-btn {
+    display: none !important;
+}
+
+/* 768px 이하에서만 표시 */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex !important;
+    }
+    
+    .header-planner-btn {
+        display: flex !important;
+    }
+}
