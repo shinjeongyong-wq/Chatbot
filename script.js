@@ -2921,6 +2921,12 @@ function renderMarkdownSafe(text) {
         // [NO_DATA], [OFF_TOPIC] 태그 제거 (스트리밍 중 노출 방지)
         .replace(/\[NO_DATA\]/gi, '')
         .replace(/\[OFF_TOPIC\]/gi, '')
+        // [TOPIC: ...] 태그 제거 (스트리밍 중 노출 방지)
+        .replace(/\[TOPIC:\s*[^\]]*\]\s*/gi, '')
+        // [RELATED_TOPICS]...[/RELATED_TOPICS] 블록 및 부분 태그 제거
+        .replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/gi, '')
+        .replace(/\[RELATED_TOPICS\][\s\S]*/gi, '')  // 아직 닫히지 않은 경우 (스트리밍 중간)
+        .replace(/\[\/RELATED_TOPICS\]/gi, '')
         .replace(/```[\s\S]*?```/g, '')  // 코드 블록 제거
         .replace(/^### (.+)$/gm, '<h4 class="response-heading">$1</h4>')
         .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
