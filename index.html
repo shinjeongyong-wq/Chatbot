@@ -2028,17 +2028,36 @@
         }
 
         @media (max-width: 900px) {
+
+            /* 모바일: 사이드바 기본적으로 완전 숨김 */
             .history-sidebar {
+                display: none !important;
                 position: fixed;
                 left: 0;
                 top: 0;
                 bottom: 0;
-                z-index: 1000;
+                width: 280px !important;
+                z-index: 1001;
                 transform: translateX(-100%);
+                transition: transform 0.3s ease;
             }
 
-            .history-sidebar.open {
-                transform: translateX(0);
+            /* 모바일: mobile-open 클래스 시에만 표시 (오버레이) */
+            .history-sidebar.mobile-open {
+                display: flex !important;
+                transform: translateX(0) !important;
+            }
+
+            /* collapsed 상태도 모바일에서는 무시 */
+            .history-sidebar.collapsed {
+                display: none !important;
+                width: 0 !important;
+            }
+
+            .history-sidebar.collapsed.mobile-open {
+                display: flex !important;
+                width: 280px !important;
+                transform: translateX(0) !important;
             }
         }
 
@@ -2047,7 +2066,24 @@
            ======================================== */
 
         /* 모바일: 아바타 숨김 */
+        /* 모바일: 아바타 숨김 + 레이아웃 수정 */
         @media (max-width: 768px) {
+
+            /* ★ 핵심: 상단 URL바에 가려지지 않도록 safe-area 적용 ★ */
+            .header {
+                padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+                min-height: 48px !important;
+            }
+
+            /* 채팅 영역이 전체 너비 사용 */
+            .chat-interface {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            /* 아바타 숨김 */
             .message-avatar {
                 display: none !important;
                 width: 0 !important;
@@ -2063,7 +2099,7 @@
 
             .message.user .message-content {
                 margin-right: 8px !important;
-                max-width: 82% !important;
+                max-width: 85% !important;
                 border-radius: 18px 18px 4px 18px !important;
                 overflow-wrap: break-word !important;
                 word-break: break-word !important;
@@ -2071,7 +2107,7 @@
 
             .message.bot .message-content {
                 margin-left: 8px !important;
-                max-width: 88% !important;
+                max-width: 90% !important;
                 border-radius: 18px 18px 18px 4px !important;
                 overflow-wrap: break-word !important;
                 word-break: break-word !important;
@@ -2080,11 +2116,47 @@
             /* 하단 입력창 iOS safe-area */
             .input-container {
                 padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 20px)) !important;
+                padding-left: 8px !important;
+                padding-right: 8px !important;
             }
 
-            /* 모바일 사이드바 슬라이드 */
-            .history-sidebar.mobile-open {
-                transform: translateX(0) !important;
+            /* 햄버거 버튼 스타일 */
+            .mobile-menu-btn {
+                width: 36px !important;
+                height: 36px !important;
+                padding: 6px !important;
+                border: none !important;
+                background: transparent !important;
+                border-radius: 8px !important;
+                cursor: pointer !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* 로고 텍스트 축소 방지 */
+            .logo-text {
+                font-size: 16px !important;
+                white-space: nowrap !important;
+            }
+
+            /* 사이드바 오버레이 배경 */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            /* 데스크탑 전용 숨김 */
+            .desktop-only {
+                display: none !important;
             }
         }
 
