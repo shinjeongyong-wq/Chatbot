@@ -910,13 +910,12 @@ async function getBotResponse(userMessage) {
 
 
         // ========== Stage 3: Answer Generation (Streaming) ==========
+        startTypingMessageRolling('stage3');
         console.log('💬 Stage 3: 스트리밍 답변 생성 시작...');
 
-        // 스트리밍 메시지 컨테이너 생성
+        // 스트리밍 메시지 컨테이너 생성 (아직 보이지 않음 - 첫 텍스트 도착 시 표시)
         const { container: streamingContainer, contentDiv: streamingContent } = createStreamingMessageContainer();
-
-        // 타이핑 인디케이터 숨기기 (스트리밍 시작 시)
-        hideTypingIndicator();
+        streamingContainer.style.display = 'none'; // 첫 텍스트 도착 전까지 숨김
 
         try {
             // 스트리밍 + 타이핑 효과
@@ -2632,6 +2631,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
     let displayedIndex = 0;   // 현재까지 표시된 인덱스
     let typingInterval = null;
     let streamComplete = false;
+    let firstTextReceived = false; // ★ 첫 텍스트 도착 여부
     let modelName = null;
 
     const TYPING_SPEED = 30;  // 밀리초 (한 글자당) - 읽기 편한 속도
@@ -2711,6 +2711,15 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 
                         if (data.text) {
                             receivedBuffer += data.text;
+
+                            // ★ 첫 텍스트 도착 시: 인디케이터 숨기고 스트리밍 컨테이너 표시 ★
+                            if (!firstTextReceived) {
+                                firstTextReceived = true;
+                                hideTypingIndicator();
+                                // contentDiv의 부모 컨테이너 표시
+                                const streamContainer = contentDiv.closest('.message');
+                                if (streamContainer) streamContainer.style.display = '';
+                            }
                         }
                     } catch (e) {
                         // JSON 파싱 실패 무시
