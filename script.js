@@ -548,14 +548,16 @@ function initMobileUI() {
 
     console.log('📱 모바일 UI 초기화 시작...');
 
-    // ★★★ 핵심: 사이드바를 JS로 직접 강제 숨김 ★★★
+    // ★★★ 핵심: 사이드바를 app-container에서 body로 이동 (flex layout에서 완전 제거) ★★★
     const sidebar = document.getElementById('historySidebar');
+    if (sidebar && sidebar.parentElement && sidebar.parentElement.classList.contains('app-container')) {
+        document.body.appendChild(sidebar);
+        console.log('📱 사이드바를 app-container 밖으로 이동 완료');
+    }
+
+    // 사이드바 숨김 처리
     if (sidebar) {
-        sidebar.style.display = 'none';
-        sidebar.style.width = '0';
-        sidebar.style.position = 'fixed';
-        sidebar.style.left = '-9999px';
-        sidebar.style.visibility = 'hidden';
+        sidebar.style.cssText = 'display:none !important; position:fixed; left:0; top:0; bottom:0; width:280px; z-index:1001; transform:translateX(-100%);';
     }
 
     // 1. 모바일 전용 버튼들 노출
@@ -637,21 +639,13 @@ function toggleMobileSidebar() {
     if (sidebar && overlay) {
         const isOpen = sidebar.classList.contains('mobile-open');
         if (isOpen) {
-            // 닫기: 인라인 스타일로 강제 숨김
+            // 닫기
             sidebar.classList.remove('mobile-open');
             overlay.classList.remove('active');
-            sidebar.style.display = 'none';
-            sidebar.style.width = '0';
-            sidebar.style.position = 'fixed';
-            sidebar.style.left = '-9999px';
-            sidebar.style.visibility = 'hidden';
+            sidebar.style.cssText = 'display:none !important;';
         } else {
-            // 열기: 인라인 스타일 초기화 → CSS .mobile-open이 제어
-            sidebar.style.display = '';
-            sidebar.style.width = '';
-            sidebar.style.position = '';
-            sidebar.style.left = '';
-            sidebar.style.visibility = '';
+            // 열기: 오버레이로 표시
+            sidebar.style.cssText = 'display:flex !important; position:fixed !important; left:0 !important; top:0 !important; bottom:0 !important; width:280px !important; z-index:1001 !important; background:var(--history-bg); border-right:1px solid var(--history-border); flex-direction:column; overflow:hidden;';
             sidebar.classList.add('mobile-open');
             overlay.classList.add('active');
         }
@@ -668,11 +662,7 @@ function closeMobileSidebar() {
 
     if (sidebar) {
         sidebar.classList.remove('mobile-open');
-        sidebar.style.display = 'none';
-        sidebar.style.width = '0';
-        sidebar.style.position = 'fixed';
-        sidebar.style.left = '-9999px';
-        sidebar.style.visibility = 'hidden';
+        sidebar.style.cssText = 'display:none !important;';
     }
     if (overlay) overlay.classList.remove('active');
 }

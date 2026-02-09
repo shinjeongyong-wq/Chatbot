@@ -185,13 +185,13 @@ async function onLoginSuccess() {
     // 히스토리 사이드바 표시
     historySidebar.classList.remove('hidden');
 
-    // ★ 모바일이면 사이드바 인라인 스타일로 강제 숨김 유지
+    // ★ 모바일이면 사이드바를 body로 이동 + 강제 숨김
     if (window.innerWidth <= 900) {
-        historySidebar.style.display = 'none';
-        historySidebar.style.width = '0';
-        historySidebar.style.position = 'fixed';
-        historySidebar.style.left = '-9999px';
-        historySidebar.style.visibility = 'hidden';
+        // app-container 안에 있으면 body로 이동 (flex layout 참여 방지)
+        if (historySidebar.parentElement && historySidebar.parentElement.classList.contains('app-container')) {
+            document.body.appendChild(historySidebar);
+        }
+        historySidebar.style.cssText = 'display:none !important;';
     }
 
     // 사용자 정보 표시
