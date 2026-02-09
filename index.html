@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="light">
+<html lang="ko" data-theme="light" data-version="6.2.3">
 
 <head>
     <meta charset="UTF-8">
@@ -2692,19 +2692,30 @@
     <script src="dist/chat-history.js"></script>
     <script src="dist/script.js"></script>
 
-    <!-- Mobile UI Fix - 난독화 완전 우회, 자체 완결형 -->
+    <!-- Mobile UI Fix v6.2.3 - 난독화 우회, 자체 완결형 -->
     <script>
         (function () {
             function mobileInit() {
                 if (window.innerWidth > 768) return;
 
-                var menuBtn = document.getElementById('mobileMenuBtn');
                 var sidebar = document.getElementById('historySidebar');
+                var menuBtn = document.getElementById('mobileMenuBtn');
+                if (!sidebar || !menuBtn) return;
 
-                if (!menuBtn || !sidebar) return;
-                if (menuBtn.dataset.mobileInit === 'done') return;
-                menuBtn.dataset.mobileInit = 'done';
+                // ★★★ 핵심 1: 사이드바를 app-container에서 body로 이동 ★★★
+                if (sidebar.parentElement && sidebar.parentElement.classList.contains('app-container')) {
+                    document.body.appendChild(sidebar);
+                    console.log('📱 v6.2.3: 사이드바 DOM 이동 완료');
+                }
 
+                // ★★★ 핵심 2: 사이드바 강제 숨김 (CSS 아닌 JS 직접 제어) ★★★
+                sidebar.style.cssText = 'display:none !important;';
+
+                // 중복 초기화 방지
+                if (menuBtn.dataset.mobileInit === 'v623') return;
+                menuBtn.dataset.mobileInit = 'v623';
+
+                // 햄버거 버튼 스타일
                 menuBtn.style.display = 'flex';
                 menuBtn.style.alignItems = 'center';
                 menuBtn.style.justifyContent = 'center';
@@ -2714,32 +2725,46 @@
                 menuBtn.style.padding = '8px';
                 menuBtn.removeAttribute('onclick');
 
+                // 오버레이 생성
                 var overlay = document.getElementById('sidebarOverlay');
                 if (!overlay) {
                     overlay = document.createElement('div');
                     overlay.id = 'sidebarOverlay';
-                    overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:10000;';
                     document.body.appendChild(overlay);
                 }
+                overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;';
 
+                // 사이드바 닫기 함수
+                function closeSidebar() {
+                    sidebar.style.cssText = 'display:none !important;';
+                    sidebar.classList.remove('mobile-open');
+                    overlay.style.display = 'none';
+                }
+
+                // 사이드바 열기 함수
+                function openSidebar() {
+                    sidebar.style.cssText = 'display:flex !important; position:fixed !important; left:0 !important; top:0 !important; bottom:0 !important; width:280px !important; z-index:1001 !important; flex-direction:column; overflow:hidden; background:#fff; border-right:1px solid #e5e5e5;';
+                    sidebar.classList.add('mobile-open');
+                    overlay.style.display = 'block';
+                }
+
+                // 햄버거 클릭 이벤트
                 menuBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    var isOpen = sidebar.classList.contains('mobile-open');
-                    if (isOpen) {
-                        sidebar.classList.remove('mobile-open');
-                        overlay.style.display = 'none';
+                    if (sidebar.classList.contains('mobile-open')) {
+                        closeSidebar();
                     } else {
-                        sidebar.classList.add('mobile-open');
-                        overlay.style.display = 'block';
+                        openSidebar();
                     }
                 });
 
+                // 오버레이 클릭 → 닫기
                 overlay.addEventListener('click', function () {
-                    sidebar.classList.remove('mobile-open');
-                    overlay.style.display = 'none';
+                    closeSidebar();
                 });
 
+                // 플래너 버튼 표시
                 var plannerBtn = document.getElementById('headerPlannerBtn');
                 if (plannerBtn) {
                     plannerBtn.style.display = 'flex';
@@ -2751,7 +2776,14 @@
                     plannerBtn.style.padding = '8px';
                 }
 
-                console.log('✅ 모바일 UI 인라인 초기화 완료');
+                // 전역 함수 덮어쓰기 (dist/script.js의 함수 무력화)
+                window.toggleMobileSidebar = function () {
+                    if (sidebar.classList.contains('mobile-open')) closeSidebar();
+                    else openSidebar();
+                };
+                window.closeMobileSidebar = closeSidebar;
+
+                console.log('✅ v6.2.3 모바일 UI 초기화 완료 (DOM 이동 + 직접 스타일)');
             }
 
             if (document.readyState !== 'loading') { mobileInit(); }
