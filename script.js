@@ -472,10 +472,16 @@ const faqContent = document.getElementById('faqContent');
 const faqNav = document.getElementById('faqNav');
 const faqBackBtn = document.getElementById('faqBackBtn');
 
+// ★ 데이터 로딩 상태 플래그 ★
+let isDataLoaded = false;
+
 // ==========================
 // 1. 초기화 및 이벤트
 // ==========================
 document.addEventListener('DOMContentLoaded', async () => {
+    // ★ 이벤트 리스너를 먼저 등록 (로딩 중에도 Enter 키 동작하도록) ★
+    setupEventListeners();
+
     // 진료과 확인 - 새 로그인 시스템(chat-history.js)이 없을 경우에만 기존 모달 표시
     const loginModal = document.getElementById('loginModal');
     const savedSpecialty = localStorage.getItem('userSpecialty');
@@ -488,6 +494,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         openSpecialtyModal();
     }
 
+    // ★ 로딩 중 UI 표시 ★
+    userInput.placeholder = '데이터를 불러오는 중입니다...';
+    sendButton.disabled = true;
+    sendButton.style.opacity = '0.5';
+
     sheetsLoader = new GoogleSheetsLoader();
     try {
         await sheetsLoader.loadData();
@@ -496,8 +507,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Initial Load Error:', error);
     }
 
-    // topics_shortened.json은 이미 loadAnchorTopics()에서 로드됨 (Line 30)
-    setupEventListeners();
+    // ★ 로딩 완료 → UI 복구 ★
+    isDataLoaded = true;
+    userInput.placeholder = '궁금하신 내용을 입력해주세요...';
+    sendButton.disabled = false;
+    sendButton.style.opacity = '1';
+    console.log('✅ 데이터 로딩 완료, 입력 활성화');
 });
 
 function setupEventListeners() {
@@ -678,6 +693,15 @@ function toggleFAQAnswer(el) {
 // 3. 채팅 및 RAG 로직
 // ==========================
 async function handleSendMessage() {
+    // ★ 데이터 로딩 중이면 안내 메시지 표시 ★
+    if (!isDataLoaded) {
+        const message = userInput.value.trim();
+        if (message) {
+            addMessage('데이터를 불러오는 중입니다. 잠시만 기다려주세요! 😊', 'bot');
+        }
+        return;
+    }
+
     // 생성 중일 때 버튼 누르면 중단
     if (sendButton.classList.contains('stop-mode')) {
         if (currentAbortController) {
