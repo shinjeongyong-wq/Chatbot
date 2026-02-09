@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>개원 상담 챗봇 - 오픈닥터</title>
     <meta name="description" content="병원 개원 과정의 모든 궁금증을 해결해드리는 AI 상담 챗봇">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,6 +54,7 @@
             background: var(--background);
             color: var(--text-primary);
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
         }
 
@@ -62,6 +63,7 @@
         .app-container {
             display: flex;
             height: 100vh;
+            height: 100dvh;
             width: 100vw;
             max-width: none;
             margin: 0;
@@ -2060,20 +2062,29 @@
             }
 
             .message.user .message-content {
-                margin-right: 8px;
-                max-width: 82%;
-                border-radius: 18px 18px 4px 18px;
+                margin-right: 8px !important;
+                max-width: 82% !important;
+                border-radius: 18px 18px 4px 18px !important;
+                overflow-wrap: break-word !important;
+                word-break: break-word !important;
             }
 
             .message.bot .message-content {
-                margin-left: 8px;
-                max-width: 88%;
-                border-radius: 18px 18px 18px 4px;
+                margin-left: 8px !important;
+                max-width: 88% !important;
+                border-radius: 18px 18px 18px 4px !important;
+                overflow-wrap: break-word !important;
+                word-break: break-word !important;
             }
 
             /* 하단 입력창 iOS safe-area */
             .input-container {
-                padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
+                padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 20px)) !important;
+            }
+
+            /* 모바일 사이드바 슬라이드 */
+            .history-sidebar.mobile-open {
+                transform: translateX(0) !important;
             }
         }
 
@@ -2599,6 +2610,74 @@
     <script src="dist/sheets-loader.js"></script>
     <script src="dist/chat-history.js"></script>
     <script src="dist/script.js"></script>
+
+    <!-- Mobile UI Fix - 난독화 완전 우회, 자체 완결형 -->
+    <script>
+        (function () {
+            function mobileInit() {
+                if (window.innerWidth > 768) return;
+
+                var menuBtn = document.getElementById('mobileMenuBtn');
+                var sidebar = document.getElementById('historySidebar');
+
+                if (!menuBtn || !sidebar) return;
+                if (menuBtn.dataset.mobileInit === 'done') return;
+                menuBtn.dataset.mobileInit = 'done';
+
+                menuBtn.style.display = 'flex';
+                menuBtn.style.alignItems = 'center';
+                menuBtn.style.justifyContent = 'center';
+                menuBtn.style.background = 'none';
+                menuBtn.style.border = 'none';
+                menuBtn.style.cursor = 'pointer';
+                menuBtn.style.padding = '8px';
+                menuBtn.removeAttribute('onclick');
+
+                var overlay = document.getElementById('sidebarOverlay');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.id = 'sidebarOverlay';
+                    overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:10000;';
+                    document.body.appendChild(overlay);
+                }
+
+                menuBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var isOpen = sidebar.classList.contains('mobile-open');
+                    if (isOpen) {
+                        sidebar.classList.remove('mobile-open');
+                        overlay.style.display = 'none';
+                    } else {
+                        sidebar.classList.add('mobile-open');
+                        overlay.style.display = 'block';
+                    }
+                });
+
+                overlay.addEventListener('click', function () {
+                    sidebar.classList.remove('mobile-open');
+                    overlay.style.display = 'none';
+                });
+
+                var plannerBtn = document.getElementById('headerPlannerBtn');
+                if (plannerBtn) {
+                    plannerBtn.style.display = 'flex';
+                    plannerBtn.style.alignItems = 'center';
+                    plannerBtn.style.justifyContent = 'center';
+                    plannerBtn.style.background = 'none';
+                    plannerBtn.style.border = 'none';
+                    plannerBtn.style.cursor = 'pointer';
+                    plannerBtn.style.padding = '8px';
+                }
+
+                console.log('✅ 모바일 UI 인라인 초기화 완료');
+            }
+
+            if (document.readyState !== 'loading') { mobileInit(); }
+            document.addEventListener('DOMContentLoaded', mobileInit);
+            window.addEventListener('load', mobileInit);
+        })();
+    </script>
 </body>
 
 </html>
