@@ -2039,6 +2039,56 @@
                 transform: translateX(0);
             }
         }
+
+        /* ========================================
+           모바일 Gemini 스타일 (v6.1.0)
+           ======================================== */
+
+        /* 모바일: 아바타 숨김 */
+        @media (max-width: 768px) {
+            .message-avatar {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .message {
+                gap: 0 !important;
+                margin-bottom: 12px !important;
+            }
+
+            .message.user .message-content {
+                margin-right: 8px;
+                max-width: 82%;
+                border-radius: 18px 18px 4px 18px;
+            }
+
+            .message.bot .message-content {
+                margin-left: 8px;
+                max-width: 88%;
+                border-radius: 18px 18px 18px 4px;
+            }
+
+            /* 하단 입력창 iOS safe-area */
+            .input-container {
+                padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
+            }
+        }
+
+        /* PC: 아바타 유지, 모바일 버튼 숨김 */
+        @media (min-width: 769px) {
+            .message-avatar {
+                display: flex !important;
+            }
+
+            .mobile-menu-btn,
+            .header-planner-btn,
+            .mobile-only {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 

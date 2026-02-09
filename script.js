@@ -591,7 +591,30 @@ function initMobileUI() {
         bottomPlannerBtn.style.display = 'none';
     }
 
-    console.log('✅ 모바일 UI 초기화 완료 (Event Listeners Bound)');
+    // 4. 모바일 아바타 DOM 제거 (CSS 이중 안전장치)
+    document.querySelectorAll('.message-avatar').forEach(avatar => avatar.remove());
+
+    // 5. 새 메시지가 추가될 때도 아바타 자동 제거
+    const chatContainer = document.querySelector('.chat-container');
+    if (chatContainer && !chatContainer._avatarObserver) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach(mutation => {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) {
+                        const avatars = node.querySelectorAll ? node.querySelectorAll('.message-avatar') : [];
+                        avatars.forEach(a => a.remove());
+                        if (node.classList && node.classList.contains('message-avatar')) {
+                            node.remove();
+                        }
+                    }
+                });
+            });
+        });
+        observer.observe(chatContainer, { childList: true, subtree: true });
+        chatContainer._avatarObserver = true;
+    }
+
+    console.log('✅ 모바일 UI 초기화 완료 (Event Listeners + Avatar Removal)');
 }
 
 /**
