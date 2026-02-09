@@ -2634,7 +2634,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
     let firstTextReceived = false; // ★ 첫 텍스트 도착 여부
     let modelName = null;
 
-    const TYPING_SPEED = 30;  // 밀리초 (한 글자당) - 읽기 편한 속도
+    const TYPING_SPEED = 20;  // 밀리초 (한 글자당) - 1.5배 빠른 속도 (ChatGPT 수준)
     const CHARS_PER_TICK = 1; // 한 번에 추가할 글자 수
 
     // 타이핑 효과 시작
