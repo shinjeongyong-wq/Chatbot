@@ -2078,6 +2078,20 @@
         /* 모바일: 아바타 숨김 + 레이아웃 수정 */
         @media (max-width: 768px) {
 
+            /* ★ 가로 스크롤 완전 제거 ★ */
+            html,
+            body {
+                overflow-x: hidden !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .app-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+            }
+
             /* ★ 핵심: 상단 URL바에 가려지지 않도록 safe-area 적용 ★ */
             .header {
                 padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
@@ -2090,6 +2104,8 @@
             .chat-interface {
                 width: 100% !important;
                 min-width: 0 !important;
+                max-width: 100% !important;
+                overflow-x: hidden !important;
             }
 
             /* 아바타 숨김 */
@@ -2122,11 +2138,16 @@
                 word-break: break-word !important;
             }
 
-            /* 하단 입력창 iOS safe-area */
+            /* ★ 하단 입력창 패딩 축소 + 안내문구 숨김 ★ */
             .input-container {
-                padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 20px)) !important;
+                padding-bottom: max(8px, calc(env(safe-area-inset-bottom) + 4px)) !important;
                 padding-left: 8px !important;
                 padding-right: 8px !important;
+                padding-top: 6px !important;
+            }
+
+            .input-hint {
+                display: none !important;
             }
 
             /* 햄버거 버튼 스타일 */
