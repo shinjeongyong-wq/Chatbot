@@ -185,6 +185,15 @@ async function onLoginSuccess() {
     // 히스토리 사이드바 표시
     historySidebar.classList.remove('hidden');
 
+    // ★ 모바일이면 사이드바 인라인 스타일로 강제 숨김 유지
+    if (window.innerWidth <= 900) {
+        historySidebar.style.display = 'none';
+        historySidebar.style.width = '0';
+        historySidebar.style.position = 'fixed';
+        historySidebar.style.left = '-9999px';
+        historySidebar.style.visibility = 'hidden';
+    }
+
     // 사용자 정보 표시
     userAvatar.textContent = currentUser.name.charAt(0);
     userName.textContent = currentUser.name;

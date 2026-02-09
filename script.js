@@ -548,6 +548,16 @@ function initMobileUI() {
 
     console.log('📱 모바일 UI 초기화 시작...');
 
+    // ★★★ 핵심: 사이드바를 JS로 직접 강제 숨김 ★★★
+    const sidebar = document.getElementById('historySidebar');
+    if (sidebar) {
+        sidebar.style.display = 'none';
+        sidebar.style.width = '0';
+        sidebar.style.position = 'fixed';
+        sidebar.style.left = '-9999px';
+        sidebar.style.visibility = 'hidden';
+    }
+
     // 1. 모바일 전용 버튼들 노출
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const headerPlannerBtn = document.getElementById('headerPlannerBtn');
@@ -625,9 +635,27 @@ function toggleMobileSidebar() {
     const overlay = document.getElementById('sidebarOverlay');
 
     if (sidebar && overlay) {
-        sidebar.classList.toggle('mobile-open');
-        overlay.classList.toggle('active');
-        console.log('🎯 사이드바 상태:', sidebar.classList.contains('mobile-open') ? '열림' : '닫힘');
+        const isOpen = sidebar.classList.contains('mobile-open');
+        if (isOpen) {
+            // 닫기: 인라인 스타일로 강제 숨김
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+            sidebar.style.display = 'none';
+            sidebar.style.width = '0';
+            sidebar.style.position = 'fixed';
+            sidebar.style.left = '-9999px';
+            sidebar.style.visibility = 'hidden';
+        } else {
+            // 열기: 인라인 스타일 초기화 → CSS .mobile-open이 제어
+            sidebar.style.display = '';
+            sidebar.style.width = '';
+            sidebar.style.position = '';
+            sidebar.style.left = '';
+            sidebar.style.visibility = '';
+            sidebar.classList.add('mobile-open');
+            overlay.classList.add('active');
+        }
+        console.log('🎯 사이드바 상태:', !isOpen ? '열림' : '닫힘');
     }
 }
 
@@ -638,7 +666,14 @@ function closeMobileSidebar() {
     const sidebar = document.getElementById('historySidebar');
     const overlay = document.getElementById('sidebarOverlay');
 
-    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (sidebar) {
+        sidebar.classList.remove('mobile-open');
+        sidebar.style.display = 'none';
+        sidebar.style.width = '0';
+        sidebar.style.position = 'fixed';
+        sidebar.style.left = '-9999px';
+        sidebar.style.visibility = 'hidden';
+    }
     if (overlay) overlay.classList.remove('active');
 }
 
