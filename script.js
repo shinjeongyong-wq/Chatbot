@@ -1442,6 +1442,8 @@ async function getBotResponse(userMessage) {
         }
         console.error('Bot Response Error:', error);
         addMessage('죄송합니다. 오류가 발생했습니다.', 'bot');
+    } finally {
+        restoreSendButton();
     }
 }
 
@@ -1774,7 +1776,7 @@ function addFormattedMessage(text, contexts, modelName = null) {
         <div class="feedback-buttons" data-message-id="${messageId}">
             <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
             <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
-            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
+            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="복사하기"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
         </div>
     `;
 
@@ -1910,8 +1912,11 @@ function hideTypingIndicator() {
 
     const el = document.getElementById('typingIndicator');
     if (el) el.remove();
+    // ★ 중지 버튼은 여기서 복원하지 않음 (스트리밍 중에도 중지 가능하도록) ★
+}
 
-    // 중지 버튼 -> 전송 버튼으로 복구
+// ★ 전송 버튼 복원 (답변 생성 완전 완료 후에만 호출) ★
+function restoreSendButton() {
     sendButton.classList.remove('stop-mode');
     sendButton.innerHTML = `
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1919,6 +1924,8 @@ function hideTypingIndicator() {
         </svg>
     `;
     sendButton.title = '전송';
+    // Gemini 스타일 패딩도 함께 복원
+    chatContainer.style.paddingBottom = '24px';
 }
 
 function scrollToBottom() {
@@ -2213,8 +2220,11 @@ async function copyMessageToClipboard(messageId, buttonElement) {
 
         // 시각적 피드백: SVG 체크 아이콘으로 변경
         const originalHTML = buttonElement.innerHTML;
-        buttonElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        buttonElement.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
         buttonElement.classList.add('copied');
+
+        // ★ 토스트 메시지 표시 ★
+        showToast('클립보드에 복사되었습니다.');
 
         setTimeout(() => {
             buttonElement.innerHTML = originalHTML;
@@ -2223,8 +2233,28 @@ async function copyMessageToClipboard(messageId, buttonElement) {
 
     } catch (error) {
         console.error('클립보드 복사 실패:', error);
-        alert('복사에 실패했습니다. 브라우저 권한을 확인해주세요.');
+        showToast('복사에 실패했습니다. 브라우저 권한을 확인해주세요.');
     }
+}
+
+// ★ 토스트 메시지 표시 함수 ★
+function showToast(message) {
+    const existing = document.querySelector('.toast-message');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-message';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
 }
 
 // ========== 피드백 시스템 ==========
@@ -3483,7 +3513,7 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
         <div class="feedback-buttons" data-message-id="${messageId}">
             <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
             <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
-            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
+            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="복사하기"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
         </div>
     `;
 
