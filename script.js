@@ -3154,8 +3154,8 @@ ${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t =>
     let modelName = null;
     let lastTypingTime = 0;   // 마지막 타이핑 시간
 
-    const TYPING_SPEED = 20;  // 밀리초 (한 글자당) - ChatGPT 수준
-    const CHARS_PER_TICK = 1; // 한 번에 추가할 글자 수
+    const TYPING_SPEED = 15;  // 밀리초 (한 글자당)
+    const CHARS_PER_TICK = 2; // 한 번에 추가할 글자 수
 
     // ★ 백그라운드 탭 복귀 시 밀린 텍스트 즉시 렌더링 ★
     const handleVisibilityChange = () => {
@@ -3335,8 +3335,8 @@ function createStreamingMessageContainer() {
  * @returns {Promise<void>}
  */
 async function displayWithTypingEffect(contentDiv, text) {
-    const TYPING_SPEED = 30;  // 밀리초 (한 글자당)
-    const CHARS_PER_TICK = 1; // 한 번에 추가할 글자 수
+    const TYPING_SPEED = 15;  // 밀리초 (한 글자당)
+    const CHARS_PER_TICK = 2; // 한 번에 추가할 글자 수
 
     // ★ 백그라운드 탭 복귀 시 즉시 완료 ★
     let displayedIndex = 0;
