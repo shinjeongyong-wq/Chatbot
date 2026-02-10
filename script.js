@@ -1,3 +1,157 @@
+// ============================================================
+// ★ 비밀 피드백 대시보드 (로고 5회 클릭 이스터에그)
+// ============================================================
+(function () {
+    let _fbClickCount = 0;
+    let _fbClickTimer = null;
+    let _fbAllData = [];
+
+    // 페이지 로드 후 로고에 이벤트 연결
+    document.addEventListener('DOMContentLoaded', function () {
+        const logoText = document.querySelector('.logo-text');
+        if (!logoText) return;
+
+        logoText.style.cursor = 'default'; // 클릭 커서 안 보이게
+        logoText.addEventListener('click', function () {
+            _fbClickCount++;
+            clearTimeout(_fbClickTimer);
+            _fbClickTimer = setTimeout(function () { _fbClickCount = 0; }, 2000);
+
+            if (_fbClickCount >= 5) {
+                _fbClickCount = 0;
+                openFeedbackDashboard();
+            }
+        });
+    });
+
+    // 대시보드 열기
+    window.openFeedbackDashboard = function () {
+        var dash = document.getElementById('feedbackDashboard');
+        var appContainer = document.querySelector('.app-container');
+        if (!dash) return;
+
+        dash.style.display = 'block';
+        if (appContainer) appContainer.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+        loadFeedbackData();
+    };
+
+    // 대시보드 닫기
+    window.closeFeedbackDashboard = function () {
+        var dash = document.getElementById('feedbackDashboard');
+        var appContainer = document.querySelector('.app-container');
+        if (!dash) return;
+
+        dash.style.display = 'none';
+        if (appContainer) appContainer.style.display = '';
+        document.body.style.overflow = '';
+    };
+
+    // Supabase에서 피드백 조회
+    window.loadFeedbackData = async function () {
+        var tbody = document.getElementById('fbTableBody');
+        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">⏳ 불러오는 중...</td></tr>';
+
+        try {
+            // chat-history.js의 supabaseClient 재사용
+            if (typeof supabaseClient === 'undefined') {
+                throw new Error('Supabase 클라이언트 없음');
+            }
+
+            var result = await supabaseClient
+                .from('feedback')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (result.error) throw result.error;
+
+            _fbAllData = result.data || [];
+            renderFeedbackSummary(_fbAllData);
+            renderFeedbackTable(_fbAllData);
+
+        } catch (err) {
+            console.error('피드백 로드 오류:', err);
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#f87171;">❌ 데이터 로드 실패: ' + err.message + '</td></tr>';
+        }
+    };
+
+    // 요약 카드 렌더링
+    function renderFeedbackSummary(data) {
+        var total = data.length;
+        var good = data.filter(function (d) { return d.type === 'Good'; }).length;
+        var bad = data.filter(function (d) { return d.type === 'Bad'; }).length;
+        var rate = total > 0 ? Math.round((good / total) * 100) : 0;
+
+        var el = document.getElementById('fbTotalCount');
+        if (el) el.textContent = total;
+        el = document.getElementById('fbGoodCount');
+        if (el) el.textContent = good;
+        el = document.getElementById('fbBadCount');
+        if (el) el.textContent = bad;
+        el = document.getElementById('fbGoodRate');
+        if (el) el.textContent = rate + '%';
+    }
+
+    // 테이블 렌더링
+    function renderFeedbackTable(data) {
+        var tbody = document.getElementById('fbTableBody');
+        if (!tbody) return;
+
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#94a3b8;">피드백이 없습니다</td></tr>';
+            return;
+        }
+
+        var html = '';
+        data.forEach(function (item) {
+            var date = item.created_at ? new Date(item.created_at).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
+            var typeClass = item.type === 'Good' ? 'fb-type-good' : 'fb-type-bad';
+            var typeIcon = item.type === 'Good' ? '👍' : '👎';
+            var question = escFb(item.question || '-');
+            var answer = escFb(item.answer || '-');
+            var content = escFb(item.content || '-');
+            var userName = escFb(item.user_name || '-');
+            var specialty = escFb(item.specialty || '-');
+
+            html += '<tr>';
+            html += '<td style="white-space:nowrap;">' + date + '</td>';
+            html += '<td>' + userName + '</td>';
+            html += '<td>' + specialty + '</td>';
+            html += '<td><span class="' + typeClass + '">' + typeIcon + ' ' + item.type + '</span></td>';
+            html += '<td class="fb-cell-expandable" onclick="this.classList.toggle(\'expanded\')"><div class="fb-cell-short">' + question + '</div>' + (question.length > 50 ? '<div class="fb-expand-hint">클릭하여 더보기</div>' : '') + '</td>';
+            html += '<td class="fb-cell-expandable" onclick="this.classList.toggle(\'expanded\')"><div class="fb-cell-short">' + answer + '</div>' + (answer.length > 50 ? '<div class="fb-expand-hint">클릭하여 더보기</div>' : '') + '</td>';
+            html += '<td class="fb-cell-expandable" onclick="this.classList.toggle(\'expanded\')"><div class="fb-cell-short">' + content + '</div>' + (content.length > 30 ? '<div class="fb-expand-hint">클릭하여 더보기</div>' : '') + '</td>';
+            html += '</tr>';
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    // HTML 이스케이프
+    function escFb(str) {
+        if (!str) return '';
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
+
+    // 필터
+    window.filterFeedback = function (type) {
+        // 버튼 활성화 토글
+        document.querySelectorAll('.fb-filter-btn').forEach(function (btn) {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-filter') === type) btn.classList.add('active');
+        });
+
+        if (type === 'all') {
+            renderFeedbackTable(_fbAllData);
+        } else {
+            var filtered = _fbAllData.filter(function (d) { return d.type === type; });
+            renderFeedbackTable(filtered);
+        }
+    };
+})();
+
 const CONFIG = {
     USE_MOCK_DATA: false,
 
