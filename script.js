@@ -1365,8 +1365,18 @@ async function getBotResponse(userMessage) {
                 responseText = responseText.replace('[NO_DATA]', '').trim();
             }
 
-            // [1], [2] 등 모든 인용 주석 제거 (v2.3.1)
-            responseText = responseText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').trim();
+            // 모든 인용/참고문서 주석 완전 제거
+            responseText = responseText
+                .replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '')
+                .replace(/참고\s*문서\s*\d+\s*번?/gi, '')
+                .replace(/문서\s*\d+\s*번?/gi, '')
+                .replace(/출처[:\s]*\[?\d+\]?/gi, '')
+                .replace(/근거[:\s]*\[?\d+\]?/gi, '')
+                .replace(/참조[:\s]*\[?\d+\]?/gi, '')
+                .replace(/\[참고\s*\d*\]/gi, '')
+                .replace(/\(참고[:\s]*문서?\s*\d+\)/gi, '')
+                .replace(/`\[\d+\]`/g, '')
+                .trim();
 
             // 대화 히스토리에 저장
             chatMemory.addTurn(userMessage, responseText);
@@ -1409,18 +1419,18 @@ async function getBotResponse(userMessage) {
 
             if (responseText.includes('[OFF_TOPIC]')) {
                 let cleanText = responseText.replace('[OFF_TOPIC]', '').trim();
-                cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
+                cleanText = cleanText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').replace(/참고\s*문서\s*\d+\s*번?/gi, '').replace(/출처[:\s]*\[?\d+\]?/gi, '').trim();
                 addOffTopicMessage(cleanText);
                 responseText = cleanText;
                 messageType = 'off_topic';
             } else if (responseText.includes('[NO_DATA]')) {
                 let cleanText = responseText.replace('[NO_DATA]', '').trim();
-                cleanText = cleanText.replace(/\[\d+\]/g, '').trim();
+                cleanText = cleanText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').replace(/참고\s*문서\s*\d+\s*번?/gi, '').replace(/출처[:\s]*\[?\d+\]?/gi, '').trim();
                 addNoDataMessage(cleanText);
                 responseText = cleanText;
                 messageType = 'no_data';
             } else {
-                responseText = responseText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').trim();
+                responseText = responseText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').replace(/참고\s*문서\s*\d+\s*번?/gi, '').replace(/출처[:\s]*\[?\d+\]?/gi, '').trim();
                 addFormattedMessage(responseText, result.filteredContexts || relatedContexts, result.modelName);
             }
 
@@ -1543,6 +1553,16 @@ ${historyText ? historyText : '(첫 대화)'}
 # 참고문서
 ${contextText ? contextText : '(관련 데이터 없음)'}
 
+# 🚫 인용/참고문서 표시 절대 금지 (최우선 규칙)
+**답변에 아래 형태를 절대 포함하지 마세요. 하나라도 포함되면 답변이 거부됩니다:**
+- [1], [2], [3] 등 숫자 대괄호
+- [ID: 1], [ID:2] 등 ID 참조
+- "참고문서 1번", "참고 문서 3", "문서 2번" 등 한국어 참조
+- "출처:", "근거:", "참조:" 등 출처 표시
+- [참고], (참고: 문서 n), [문서 n] 등 모든 형태의 인용
+- 참고문서의 번호나 출처를 언급하는 모든 표현
+→ 참고문서는 답변 생성의 내부 근거일 뿐, 사용자에게 보여주는 것이 아닙니다.
+
 # 핵심 규칙
 1. **[중복 답변 금지]**: 이미 **# ⛔ 중복 금지** 섹션에 있는 업체나 정보가 **# 참고문서**에 또 나오더라도, 이를 제외하고 **새로운 데이터 위주로** 답변하세요.
 
@@ -1576,7 +1596,6 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **⚠️ 추가 규칙**:
      - **본문에 불렛포인트(*, -, •)로 추천 주제를 나열하지 마세요!** 
      - 관련 주제는 반드시 답변 맨 끝의 [RELATED_TOPICS] 블록에만 작성하세요.
-     - 인용 번호([1], [ID: n] 등)를 **절대 사용하지 마세요.**
      - 상투적인 맺음말("성공적인 개원~")을 절대 사용하지 마세요.
 
 # 가독성 규칙
@@ -1587,18 +1606,19 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 - 자연스러운 맺음말로 답변을 마무리하세요.
 
 
-# 관련 주제 추천 (필수)
-**답변 작성 후, 반드시 아래 규칙대로 관련 주제를 추천하세요.**
+# 관련 주제 추천 (⚠️ 필수 - 누락 시 답변 미완성으로 간주)
+**[RELATED_TOPICS] 블록이 없는 답변은 불완전한 답변입니다. 어떤 상황에서도 반드시 포함하세요.**
 
 [사용 가능한 주제 목록 - 아래 목록에서 **글자 그대로 복사**해서 사용하세요]
 ${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t => `- ${t.question}`).join('\n')}
 
-**⚠️ 중요 규칙:**
+**⚠️ 필수 규칙:**
 1. **반드시 위 목록에 있는 질문을 글자 그대로 복사**하세요. 단어 하나도 바꾸지 마세요.
 2. 목록에 없는 질문은 **절대 추천하지 마세요**. 임의로 만들면 안 됩니다.
 3. 현재 답변과 관련있는 주제 2~3개를 선택하세요.
 4. 방금 답변한 내용과 동일한 질문은 제외하세요.
 5. 추천 문장은 **자연스럽고 다양한 표현**으로 작성하세요. 매번 같은 문장을 사용하지 마세요.
+6. **OFF_TOPIC이나 NO_DATA 응답에서도 반드시 [RELATED_TOPICS]를 포함하세요.**
 
 **형식:**
 \`\`\`
@@ -1708,40 +1728,21 @@ function addFormattedMessage(text, contexts, modelName = null) {
         text = text.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
     }
 
-    // 1. [ID: n] 형식의 주석 파싱 및 재정렬
-    let processedText = text;
-    // [ID: 0], [ID: 1] 혹은 [ID:0] 형식을 모두 잡는 정규식
-    const idCitationRegex = /\[ID:\s*(\d+)\]/g;
-    const foundIds = []; // 실제 사용된 원본 ID들 (등장 순서대로)
-    let match;
+    // 1. 모든 인용/참고문서 주석 완전 제거
+    let processedText = text
+        .replace(/\[ID:\s*\d+\]/gi, '')
+        .replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '')
+        .replace(/참고\s*문서\s*\d+\s*번?/gi, '')
+        .replace(/문서\s*\d+\s*번?/gi, '')
+        .replace(/출처[:\s]*\[?\d+\]?/gi, '')
+        .replace(/근거[:\s]*\[?\d+\]?/gi, '')
+        .replace(/참조[:\s]*\[?\d+\]?/gi, '')
+        .replace(/\[참고\s*\d*\]/gi, '')
+        .replace(/\(참고[:\s]*문서?\s*\d+\)/gi, '')
+        .replace(/`\[\d+\]`/g, '')
+        .trim();
 
-    // 텍스트 전체를 스캔하여 언급된 모든 소스 ID를 등장 순서대로 수집
-    while ((match = idCitationRegex.exec(text)) !== null) {
-        const id = parseInt(match[1]);
-        if (!isNaN(id) && !foundIds.includes(id)) {
-            foundIds.push(id);
-        }
-    }
-
-    // 소스 ID -> 사용자용 새 번호 매핑 (ID: 4 -> [1], ID: 0 -> [2] 등)
-    const idToNewNumMap = {};
-    foundIds.forEach((sourceId, idx) => {
-        idToNewNumMap[sourceId] = idx + 1;
-    });
-
-    // 실제 표시될 컨텍스트 데이터를 ID 기반으로 정확히 추출 (인덱스 에러 방지)
-    const activeContexts = foundIds.map(sourceId => {
-        return contexts[sourceId];
-    }).filter(ctx => ctx);
-
-    // 텍스트 본문의 [ID: n] -> [1] 형태로 변환
-    processedText = text.replace(idCitationRegex, (match, idStr) => {
-        const id = parseInt(idStr);
-        const newNum = idToNewNumMap[id];
-        return newNum ? `[${newNum}]` : ''; // 매핑 실패 시 공백 처리 (할루시네이션 방지)
-    });
-
-    // 2. 마크다운 → HTML 변환 (processedText 기반)
+    // 2. 마크다운 → HTML 변환
     let html = processedText
         .replace(/```[\s\S]*?```/g, '')
         .replace(/^### (.+)$/gm, '<h4 class="response-heading">$1</h4>')
@@ -1756,33 +1757,14 @@ function addFormattedMessage(text, contexts, modelName = null) {
     html = html.replace(/<\/ul><br>?<ul class="response-list">/g, '');
 
     // 3. 관련 주제를 클릭 가능한 링크로 변환
-    // 본문의 **주제**를 찾아서 클릭 가능하게 만듦
     if (relatedTopics.length > 0) {
         relatedTopics.forEach(topic => {
-            // **주제** 형태의 굵은 글씨를 클릭 가능한 링크로 변환
             const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
             const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
             html = html.replace(regex, clickableLink);
         });
     }
-
-    // 4. [1], [2] 주석을 툴팁 HTML로 최종 변환
-    // 번호가 큰 것부터 치환하여 중복 매칭 방지
-    const sortedNewNums = Object.values(idToNewNumMap).sort((a, b) => b - a);
-
-    sortedNewNums.forEach(num => {
-        const ctx = activeContexts[num - 1]; // activeContexts는 foundIds 순서대로 담겨 있음
-        if (!ctx) return;
-
-        const answerPreview = ctx.answer.length > 200 ? ctx.answer.substring(0, 200) + '...' : ctx.answer;
-        const tooltip = `<strong>Q:</strong> ${escapeHtml(ctx.question)}<br><br><strong>A:</strong> ${escapeHtml(answerPreview)}`;
-        const citationHtml = `<span class="cite-ref">[${num}]<span class="cite-tooltip">${tooltip}</span></span>`;
-
-        // [번호] 형식을 찾아서 치환
-        const regex = new RegExp(`\\[${num}\\]`, 'g');
-        html = html.replace(regex, citationHtml);
-    });
 
     // 5. 사용한 모델명 표시
     const modelInfo = modelName ? `<div class="model-info">🤖 ${modelName}</div>` : '';
@@ -1793,7 +1775,7 @@ function addFormattedMessage(text, contexts, modelName = null) {
         <div class="feedback-buttons" data-message-id="${messageId}">
             <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
             <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
-            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
+            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
         </div>
     `;
 
@@ -3038,6 +3020,16 @@ ${historyText ? historyText : '(첫 대화)'}
 # 참고문서
 ${contextText ? contextText : '(관련 데이터 없음)'}
 
+# 🚫 인용/참고문서 표시 절대 금지 (최우선 규칙)
+**답변에 아래 형태를 절대 포함하지 마세요. 하나라도 포함되면 답변이 거부됩니다:**
+- [1], [2], [3] 등 숫자 대괄호
+- [ID: 1], [ID:2] 등 ID 참조
+- "참고문서 1번", "참고 문서 3", "문서 2번" 등 한국어 참조
+- "출처:", "근거:", "참조:" 등 출처 표시
+- [참고], (참고: 문서 n), [문서 n] 등 모든 형태의 인용
+- 참고문서의 번호나 출처를 언급하는 모든 표현
+→ 참고문서는 답변 생성의 내부 근거일 뿐, 사용자에게 보여주는 것이 아닙니다.
+
 # 핵심 규칙
 1. **[중복 답변 금지]**: 이미 **# ⛔ 중복 금지** 섹션에 있는 업체나 정보가 **# 참고문서**에 또 나오더라도, 이를 제외하고 **새로운 데이터 위주로** 답변하세요.
 
@@ -3071,7 +3063,6 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **⚠️ 추가 규칙**:
      - **본문에 불렛포인트(*, -, •)로 추천 주제를 나열하지 마세요!** 
      - 관련 주제는 반드시 답변 맨 끝의 [RELATED_TOPICS] 블록에만 작성하세요.
-     - 인용 번호([1], [ID: n] 등)를 **절대 사용하지 마세요.**
      - 상투적인 맺음말("성공적인 개원~")을 절대 사용하지 마세요.
 
 # 가독성 규칙
@@ -3082,18 +3073,19 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 - 자연스러운 맺음말로 답변을 마무리하세요.
 
 
-# 관련 주제 추천 (필수)
-**답변 작성 후, 반드시 아래 규칙대로 관련 주제를 추천하세요.**
+# 관련 주제 추천 (⚠️ 필수 - 누락 시 답변 미완성으로 간주)
+**[RELATED_TOPICS] 블록이 없는 답변은 불완전한 답변입니다. 어떤 상황에서도 반드시 포함하세요.**
 
 [사용 가능한 주제 목록 - 아래 목록에서 **글자 그대로 복사**해서 사용하세요]
 ${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t => `- ${t.question}`).join('\n')}
 
-**⚠️ 중요 규칙:**
+**⚠️ 필수 규칙:**
 1. **반드시 위 목록에 있는 질문을 글자 그대로 복사**하세요. 단어 하나도 바꾸지 마세요.
 2. 목록에 없는 질문은 **절대 추천하지 마세요**. 임의로 만들면 안 됩니다.
 3. 현재 답변과 관련있는 주제 2~3개를 선택하세요.
 4. 방금 답변한 내용과 동일한 질문은 제외하세요.
 5. 추천 문장은 **자연스럽고 다양한 표현**으로 작성하세요. 매번 같은 문장을 사용하지 마세요.
+6. **OFF_TOPIC이나 NO_DATA 응답에서도 반드시 [RELATED_TOPICS]를 포함하세요.**
 
 **형식:**
 \`\`\`
@@ -3116,34 +3108,51 @@ ${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t =>
     // 타이핑 효과를 위한 변수
     let receivedBuffer = '';  // API에서 받은 전체 텍스트
     let displayedIndex = 0;   // 현재까지 표시된 인덱스
-    let typingInterval = null;
+    let typingRAF = null;     // requestAnimationFrame ID
     let streamComplete = false;
     let firstTextReceived = false; // ★ 첫 텍스트 도착 여부
     let modelName = null;
+    let lastTypingTime = 0;   // 마지막 타이핑 시간
 
-    const TYPING_SPEED = 20;  // 밀리초 (한 글자당) - 1.5배 빠른 속도 (ChatGPT 수준)
+    const TYPING_SPEED = 20;  // 밀리초 (한 글자당) - ChatGPT 수준
     const CHARS_PER_TICK = 1; // 한 번에 추가할 글자 수
 
-    // 타이핑 효과 시작
-    const startTypingEffect = () => {
-        if (typingInterval) return;
+    // ★ 백그라운드 탭 복귀 시 밀린 텍스트 즉시 렌더링 ★
+    const handleVisibilityChange = () => {
+        if (!document.hidden && displayedIndex < receivedBuffer.length) {
+            // 탭 복귀 시: 밀린 텍스트 전부 즉시 렌더링 (fast-forward)
+            displayedIndex = receivedBuffer.length;
+            contentDiv.innerHTML = renderMarkdownSafe(receivedBuffer.substring(0, displayedIndex));
+        }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
-        typingInterval = setInterval(() => {
-            if (displayedIndex < receivedBuffer.length) {
-                // 한 번에 CHARS_PER_TICK 글자씩 추가
-                const endIndex = Math.min(displayedIndex + CHARS_PER_TICK, receivedBuffer.length);
+    // 타이핑 효과 시작 (requestAnimationFrame 기반 - 백그라운드 탭에서도 안정적)
+    const startTypingEffect = () => {
+        if (typingRAF) return;
+
+        const typingLoop = (timestamp) => {
+            if (!lastTypingTime) lastTypingTime = timestamp;
+            const elapsed = timestamp - lastTypingTime;
+
+            if (elapsed >= TYPING_SPEED && displayedIndex < receivedBuffer.length) {
+                // 경과 시간에 비례하여 글자 수 계산 (밀린 만큼 따라잡기)
+                const charsToAdd = Math.max(CHARS_PER_TICK, Math.floor(elapsed / TYPING_SPEED));
+                const endIndex = Math.min(displayedIndex + charsToAdd, receivedBuffer.length);
                 displayedIndex = endIndex;
 
-                const displayedText = receivedBuffer.substring(0, displayedIndex);
-                contentDiv.innerHTML = renderMarkdownSafe(displayedText);
-
-                // 스트리밍 중에는 자동 스크롤 하지 않음 (사용자 자유 스크롤 허용)
-            } else if (streamComplete) {
-                // 스트림 완료 & 모든 글자 표시 완료
-                clearInterval(typingInterval);
-                typingInterval = null;
+                contentDiv.innerHTML = renderMarkdownSafe(receivedBuffer.substring(0, displayedIndex));
+                lastTypingTime = timestamp;
             }
-        }, TYPING_SPEED);
+
+            if (displayedIndex < receivedBuffer.length || !streamComplete) {
+                typingRAF = requestAnimationFrame(typingLoop);
+            } else {
+                // 스트림 완료 & 모든 글자 표시 완료
+                typingRAF = null;
+            }
+        };
+        typingRAF = requestAnimationFrame(typingLoop);
     };
 
     try {
@@ -3220,10 +3229,12 @@ ${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t =>
             const checkComplete = setInterval(() => {
                 if (displayedIndex >= receivedBuffer.length) {
                     clearInterval(checkComplete);
-                    if (typingInterval) {
-                        clearInterval(typingInterval);
-                        typingInterval = null;
+                    if (typingRAF) {
+                        cancelAnimationFrame(typingRAF);
+                        typingRAF = null;
                     }
+                    // visibilitychange 리스너 정리
+                    document.removeEventListener('visibilitychange', handleVisibilityChange);
                     resolve();
                 }
             }, 50);
@@ -3239,9 +3250,11 @@ ${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t =>
 
     } catch (error) {
         // 타이머 정리
-        if (typingInterval) {
-            clearInterval(typingInterval);
+        if (typingRAF) {
+            cancelAnimationFrame(typingRAF);
         }
+        // visibilitychange 리스너 정리
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
 
         if (error.name === 'AbortError') {
             console.log('✨ 스트리밍 중단됨');
@@ -3285,21 +3298,38 @@ async function displayWithTypingEffect(contentDiv, text) {
     const TYPING_SPEED = 30;  // 밀리초 (한 글자당)
     const CHARS_PER_TICK = 1; // 한 번에 추가할 글자 수
 
+    // ★ 백그라운드 탭 복귀 시 즉시 완료 ★
+    let displayedIndex = 0;
+    const handleVisibility = () => {
+        if (!document.hidden && displayedIndex < text.length) {
+            displayedIndex = text.length;
+            contentDiv.innerHTML = renderMarkdownSafe(text);
+        }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return new Promise((resolve) => {
-        let displayedIndex = 0;
+        let lastTime = 0;
 
-        const typingInterval = setInterval(() => {
+        const typingLoop = (timestamp) => {
+            if (!lastTime) lastTime = timestamp;
+            const elapsed = timestamp - lastTime;
+
+            if (elapsed >= TYPING_SPEED && displayedIndex < text.length) {
+                const charsToAdd = Math.max(CHARS_PER_TICK, Math.floor(elapsed / TYPING_SPEED));
+                displayedIndex = Math.min(displayedIndex + charsToAdd, text.length);
+                contentDiv.innerHTML = renderMarkdownSafe(text.substring(0, displayedIndex));
+                lastTime = timestamp;
+            }
+
             if (displayedIndex < text.length) {
-                const endIndex = Math.min(displayedIndex + CHARS_PER_TICK, text.length);
-                displayedIndex = endIndex;
-
-                const displayedText = text.substring(0, displayedIndex);
-                contentDiv.innerHTML = renderMarkdownSafe(displayedText);
+                requestAnimationFrame(typingLoop);
             } else {
-                clearInterval(typingInterval);
+                document.removeEventListener('visibilitychange', handleVisibility);
                 resolve();
             }
-        }, TYPING_SPEED);
+        };
+        requestAnimationFrame(typingLoop);
     });
 }
 
@@ -3310,10 +3340,16 @@ async function displayWithTypingEffect(contentDiv, text) {
  */
 function renderMarkdownSafe(text) {
     return text
-        // ★ 모든 인용 번호 제거 (v2.3.2) ★
-        // [1], [2, 3], [ID: 1], [id:1], [ID:1, 2] 등 모든 형태
+        // ★ 모든 인용/참고문서 주석 완전 제거 ★
         .replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '')
-        .replace(/`\[\d+\]`/g, '')  // 백틱으로 감싼 인용도 제거
+        .replace(/`\[\d+\]`/g, '')
+        .replace(/참고\s*문서\s*\d+\s*번?/gi, '')
+        .replace(/문서\s*\d+\s*번?/gi, '')
+        .replace(/출처[:\s]*\[?\d+\]?/gi, '')
+        .replace(/근거[:\s]*\[?\d+\]?/gi, '')
+        .replace(/참조[:\s]*\[?\d+\]?/gi, '')
+        .replace(/\[참고\s*\d*\]/gi, '')
+        .replace(/\(참고[:\s]*문서?\s*\d+\)/gi, '')
         // [NO_DATA], [OFF_TOPIC] 태그 제거 (스트리밍 중 노출 방지)
         .replace(/\[NO_DATA\]/gi, '')
         .replace(/\[OFF_TOPIC\]/gi, '')
@@ -3390,19 +3426,41 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
         processedText = processedText.replace(/\[TOPIC:\s*[^\]]+\]\n?/, '').trim();
     }
 
-    // [RELATED_TOPICS] 추출
+    // [RELATED_TOPICS] 추출 (파이프 + 줄바꿈 불렛 둘 다 지원)
     let relatedTopics = [];
     const topicsMatch = processedText.match(/\[RELATED_TOPICS\]([\s\S]*?)\[\/RELATED_TOPICS\]/);
     if (topicsMatch) {
         const topicsBlock = topicsMatch[1].trim();
         if (topicsBlock.includes('|')) {
             relatedTopics = topicsBlock.split('|').map(t => t.trim()).filter(t => t.length > 0);
+        } else {
+            relatedTopics = topicsBlock.split('\n').map(line => line.replace(/^[-•*]\s*/, '').trim()).filter(line => line.length > 0);
         }
         processedText = processedText.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
     }
 
-    // 모든 인용 번호 제거
-    processedText = processedText.replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '').trim();
+    // ★ 코드 레벨 보장: AI가 RELATED_TOPICS를 누락해도 자동 삽입 ★
+    if (relatedTopics.length === 0 && typeof findRelatedAnchorTopics === 'function') {
+        const currentQ = window.currentQuestion || '';
+        const autoTopics = findRelatedAnchorTopics(currentQ, 3);
+        if (autoTopics.length > 0) {
+            relatedTopics = autoTopics;
+            console.log('🔄 RT 자동 삽입:', relatedTopics);
+        }
+    }
+
+    // 모든 인용/참고문서 주석 완전 제거
+    processedText = processedText
+        .replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '')
+        .replace(/참고\s*문서\s*\d+\s*번?/gi, '')
+        .replace(/문서\s*\d+\s*번?/gi, '')
+        .replace(/출처[:\s]*\[?\d+\]?/gi, '')
+        .replace(/근거[:\s]*\[?\d+\]?/gi, '')
+        .replace(/참조[:\s]*\[?\d+\]?/gi, '')
+        .replace(/\[참고\s*\d*\]/gi, '')
+        .replace(/\(참고[:\s]*문서?\s*\d+\)/gi, '')
+        .replace(/`\[\d+\]`/g, '')
+        .trim();
 
     // 마크다운 렌더링
     let html = renderMarkdownSafe(processedText);
@@ -3423,7 +3481,7 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
         <div class="feedback-buttons" data-message-id="${messageId}">
             <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
             <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
-            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
+            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
         </div>
     `;
 

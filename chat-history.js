@@ -691,16 +691,24 @@ function addBotMessageToUI(content, question = '', contextPrompt = '', messageTy
         content = content.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
     }
 
-    // 마크다운 → HTML 변환 (script.js의 addFormattedMessage와 동일한 로직)
+    // 마크다운 → HTML 변환 (모든 인용/참고문서 주석 완전 제거)
     let html = content
         .replace(/```[\s\S]*?```/g, '')  // 코드 블록 제거
         .replace(/^### (.+)$/gm, '<h4 class="response-heading">$1</h4>')
         .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/^\* (.+)$/gm, '<li>$1</li>')
-        .replace(/^---+$/gm, '')           // ★ 수정: 구분선 한 줄만 제거 (이후 내용 보존)
-        .replace(/\[ID:\s*\d+\]/g, '')   // 인용 ID 제거 (기록에서는 불필요)
-        .replace(/\[\d+\]/g, '')         // 숫자 인용도 제거
+        .replace(/^---+$/gm, '')
+        .replace(/\[ID:\s*\d+\]/gi, '')
+        .replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '')
+        .replace(/참고\s*문서\s*\d+\s*번?/gi, '')
+        .replace(/문서\s*\d+\s*번?/gi, '')
+        .replace(/출처[:\s]*\[?\d+\]?/gi, '')
+        .replace(/근거[:\s]*\[?\d+\]?/gi, '')
+        .replace(/참조[:\s]*\[?\d+\]?/gi, '')
+        .replace(/\[참고\s*\d*\]/gi, '')
+        .replace(/\(참고[:\s]*문서?\s*\d+\)/gi, '')
+        .replace(/`\[\d+\]`/g, '')
         .replace(/\n/g, '<br>');
 
     // 리스트 정리
@@ -753,7 +761,7 @@ function addBotMessageToUI(content, question = '', contextPrompt = '', messageTy
         <div class="feedback-buttons" data-message-id="${messageId}">
             <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
             <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
-            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사">📋</button>
+            <button class="feedback-btn copy" onclick="copyMessageToClipboard(${messageId}, this)" title="답변 복사"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
         </div>
     `;
 
