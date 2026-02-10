@@ -1691,9 +1691,13 @@ function addMessage(text, sender) {
         const viewportHeight = chatContainer.clientHeight;
         chatContainer.style.paddingBottom = viewportHeight + 'px';
         requestAnimationFrame(() => {
-            // 수동 스크롤: 사용자 메시지 상단에 20px 여유공간 확보
-            const scrollTarget = div.offsetTop - 20;
-            chatContainer.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+            // getBoundingClientRect로 정확한 상대 위치 계산 (offsetParent 문제 회피)
+            const msgRect = div.getBoundingClientRect();
+            const containerRect = chatContainer.getBoundingClientRect();
+            const currentOffset = msgRect.top - containerRect.top;
+            const desiredOffset = 24; // 상단에서 24px 여유공간
+            const newScrollTop = chatContainer.scrollTop + currentOffset - desiredOffset;
+            chatContainer.scrollTo({ top: Math.max(0, newScrollTop), behavior: 'smooth' });
         });
     } else {
         scrollToBottom();
@@ -1833,7 +1837,7 @@ function showTypingIndicator() {
         <span id="typingStatus" style="color:#64748b; font-size:13px; margin-left:8px;">준비 중...</span>
     `;
     chatContainer.appendChild(div);
-    scrollToBottom();
+    // ★ scrollToBottom() 제거 - 사용자 메시지가 상단에 유지되도록 ★
 
     // 전송 버튼 -> 중지 버튼으로 변경
     sendButton.classList.add('stop-mode');
