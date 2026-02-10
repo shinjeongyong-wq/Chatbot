@@ -1532,11 +1532,33 @@ ${alreadyMentioned.slice(0, 15).join(', ')}
 - 토픽 태그 다음 줄부터 실제 답변을 시작하세요.
 ` : '';
 
-    const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변해주세요.
+    const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변하되, **잘 구조화된 보고서 형식**으로 출력하세요.
 
 ${specialtyInfo ? '# 사용자 진료과\n' + specialtyInfo + '\n' : ''}
 ${deduplicationRule}
 ${topicGenerationRule}
+
+# [Visual Formatting Protocol] (답변 포맷 규칙 - 최우선 적용) 🎨
+**내용은 아래 '핵심 규칙'을 따르되, 시각적 형식은 반드시 다음을 준수하세요:**
+
+1.  **두괄식 요약 (Summary First)**
+    * 답변의 첫 문장은 질문에 대한 **핵심 결론**으로 시작하세요.
+    * 예: "**원장님, 문의하신 강남구 내과 개원 비용은 평균 4억 원 선입니다.**"
+
+2.  **구조화된 본문 (Structured Body)**
+    * 3줄 이상의 긴 줄글(Wall of Text)을 절대 쓰지 마세요.
+    * 주제가 바뀔 때마다 **소제목(\`###\`)**을 사용하여 구획을 나누세요.
+    * 소제목 위에는 반드시 **빈 줄을 2번(\`\\n\\n\`)** 넣어 시각적 여백을 확보하세요.
+
+3.  **시각적 강조 (Visual Anchors)**
+    * **핵심 키워드, 비용, 수치**는 **굵게(**bold**)** 처리하세요. (문장 전체 볼드 금지)
+    * 단계별 절차나 나열이 필요한 경우 **번호 매기기(\`1.\`)**나 **글머리 기호(\`-\`)**를 적극 활용하세요.
+
+4.  **표 활용 (Tables)**
+    * 가격 비교, 장단점 분석, 3개 이상의 옵션 제안 시에는 **마크다운 표**를 사용하세요.
+
+---
+
 # 이전 대화
 ${historyText ? historyText : '(첫 대화)'}
 
@@ -1553,7 +1575,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 - 참고문서의 번호나 출처를 언급하는 모든 표현
 → 참고문서는 답변 생성의 내부 근거일 뿐, 사용자에게 보여주는 것이 아닙니다.
 
-# 핵심 규칙
+# 핵심 규칙 (비즈니스 로직)
 1. **[중복 답변 금지]**: 이미 **# ⛔ 중복 금지** 섹션에 있는 업체나 정보가 **# 참고문서**에 또 나오더라도, 이를 제외하고 **새로운 데이터 위주로** 답변하세요.
 
 2. **[정보 선별 및 주의사항 안내]**:
@@ -1584,17 +1606,8 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **고정 안내 문구** (NO_DATA 전용): "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
    
    - **⚠️ 추가 규칙**:
-     - **본문에 불렛포인트(*, -, •)로 추천 주제를 나열하지 마세요!** 
-     - 관련 주제는 반드시 답변 맨 끝의 [RELATED_TOPICS] 블록에만 작성하세요.
+     - **본문에 불렛포인트(*, -, •)로 추천 주제를 나열하지 마세요!** - 관련 주제는 반드시 답변 맨 끝의 [RELATED_TOPICS] 블록에만 작성하세요.
      - 상투적인 맺음말("성공적인 개원~")을 절대 사용하지 마세요.
-
-# 가독성 규칙
-- **가독성 최우선**: 각 리스트 항목(1. 2. 3...) 사이와 주요 섹션 사이에는 반드시 **빈 줄(Double Line Break)**을 추가하여 답변이 빽빽해 보이지 않게 하세요.
-- **볼드체 활용**: 업체명, 평당가, 주요 특징 등 핵심 정보는 **볼드체**를 사용하여 시인성을 높이세요.
-- 줄바꿈을 적절히 사용하여 하나의 텍스트 덩어리가 너무 크지 않게 조절하세요.
-- 정중하고 전문적인 말투 (~요, ~습니다)
-- 자연스러운 맺음말로 답변을 마무리하세요.
-
 
 # 관련 주제 추천 (⚠️ 필수 - 누락 시 답변 미완성으로 간주)
 **[RELATED_TOPICS] 블록이 없는 답변은 불완전한 답변입니다. 어떤 상황에서도 반드시 포함하세요.**
@@ -3052,11 +3065,33 @@ ${alreadyMentioned.slice(0, 15).join(', ')}
 - 토픽 태그 다음 줄부터 실제 답변을 시작하세요.
 ` : '';
 
-    const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변해주세요.
+    const systemPrompt = `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변하되, **잘 구조화된 보고서 형식**으로 출력하세요.
 
 ${specialtyInfo ? '# 사용자 진료과\n' + specialtyInfo + '\n' : ''}
 ${deduplicationRule}
 ${topicGenerationRule}
+
+# [Visual Formatting Protocol] (답변 포맷 규칙 - 최우선 적용) 🎨
+**내용은 아래 '핵심 규칙'을 따르되, 시각적 형식은 반드시 다음을 준수하세요:**
+
+1.  **두괄식 요약 (Summary First)**
+    * 답변의 첫 문장은 질문에 대한 **핵심 결론**으로 시작하세요.
+    * 예: "**원장님, 문의하신 강남구 내과 개원 비용은 평균 4억 원 선입니다.**"
+
+2.  **구조화된 본문 (Structured Body)**
+    * 3줄 이상의 긴 줄글(Wall of Text)을 절대 쓰지 마세요.
+    * 주제가 바뀔 때마다 **소제목(\`###\`)**을 사용하여 구획을 나누세요.
+    * 소제목 위에는 반드시 **빈 줄을 2번(\`\\n\\n\`)** 넣어 시각적 여백을 확보하세요.
+
+3.  **시각적 강조 (Visual Anchors)**
+    * **핵심 키워드, 비용, 수치**는 **굵게(**bold**)** 처리하세요. (문장 전체 볼드 금지)
+    * 단계별 절차나 나열이 필요한 경우 **번호 매기기(\`1.\`)**나 **글머리 기호(\`-\`)**를 적극 활용하세요.
+
+4.  **표 활용 (Tables)**
+    * 가격 비교, 장단점 분석, 3개 이상의 옵션 제안 시에는 **마크다운 표**를 사용하세요.
+
+---
+
 # 이전 대화
 ${historyText ? historyText : '(첫 대화)'}
 
@@ -3073,7 +3108,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 - 참고문서의 번호나 출처를 언급하는 모든 표현
 → 참고문서는 답변 생성의 내부 근거일 뿐, 사용자에게 보여주는 것이 아닙니다.
 
-# 핵심 규칙
+# 핵심 규칙 (비즈니스 로직)
 1. **[중복 답변 금지]**: 이미 **# ⛔ 중복 금지** 섹션에 있는 업체나 정보가 **# 참고문서**에 또 나오더라도, 이를 제외하고 **새로운 데이터 위주로** 답변하세요.
 
 2. **[정보 선별 및 주의사항 안내]**:
@@ -3104,17 +3139,8 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **고정 안내 문구** (NO_DATA 전용): "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
    
    - **⚠️ 추가 규칙**:
-     - **본문에 불렛포인트(*, -, •)로 추천 주제를 나열하지 마세요!** 
-     - 관련 주제는 반드시 답변 맨 끝의 [RELATED_TOPICS] 블록에만 작성하세요.
+     - **본문에 불렛포인트(*, -, •)로 추천 주제를 나열하지 마세요!** - 관련 주제는 반드시 답변 맨 끝의 [RELATED_TOPICS] 블록에만 작성하세요.
      - 상투적인 맺음말("성공적인 개원~")을 절대 사용하지 마세요.
-
-# 가독성 규칙
-- **가독성 최우선**: 각 리스트 항목(1. 2. 3...) 사이와 주요 섹션 사이에는 반드시 **빈 줄(Double Line Break)**을 추가하여 답변이 빽빽해 보이지 않게 하세요.
-- **볼드체 활용**: 업체명, 평당가, 주요 특징 등 핵심 정보는 **볼드체**를 사용하여 시인성을 높이세요.
-- 줄바꿈을 적절히 사용하여 하나의 텍스트 덩어리가 너무 크지 않게 조절하세요.
-- 정중하고 전문적인 말투 (~요, ~습니다)
-- 자연스러운 맺음말로 답변을 마무리하세요.
-
 
 # 관련 주제 추천 (⚠️ 필수 - 누락 시 답변 미완성으로 간주)
 **[RELATED_TOPICS] 블록이 없는 답변은 불완전한 답변입니다. 어떤 상황에서도 반드시 포함하세요.**
@@ -3378,11 +3404,14 @@ async function displayWithTypingEffect(contentDiv, text) {
 
 /**
  * 마크다운을 HTML로 변환 (스트리밍용 - 부분 텍스트에서도 안전하게)
+ * v2: 테이블, 번호 리스트, 불렛 리스트 그룹화 지원
  * @param {string} text - 마크다운 텍스트
  * @returns {string} HTML
  */
 function renderMarkdownSafe(text) {
-    return text
+    if (!text) return '';
+
+    let processed = text
         // ★ 모든 인용/참고문서 주석 완전 제거 ★
         .replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '')
         .replace(/`\[\d+\]`/g, '')
@@ -3400,15 +3429,87 @@ function renderMarkdownSafe(text) {
         .replace(/\[TOPIC:\s*[^\]]*\]\s*/gi, '')
         // [RELATED_TOPICS]...[/RELATED_TOPICS] 블록 및 부분 태그 제거
         .replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/gi, '')
-        .replace(/\[RELATED_TOPICS\][\s\S]*/gi, '')  // 아직 닫히지 않은 경우 (스트리밍 중간)
+        .replace(/\[RELATED_TOPICS\][\s\S]*/gi, '')
         .replace(/\[\/RELATED_TOPICS\]/gi, '')
-        .replace(/```[\s\S]*?```/g, '')  // 코드 블록 제거
+        .replace(/```[\s\S]*?```/g, '');  // 코드 블록 제거
+
+    // ★ 테이블 처리 (태그 제거 후 안전하게 처리) ★
+    processed = processed.replace(/((?:^\|.+\|$\n?)+)/gm, (match) => {
+        const lines = match.trim().split('\n').filter(l => l.trim());
+        // 구분선(|---|---|)이 없으면 테이블이 아님
+        const hasSeparator = lines.some(l => /^\|[\s-:|]+\|$/.test(l.trim()));
+        if (!hasSeparator || lines.length < 3) return match;
+
+        let tableHtml = '<div class="markdown-table-wrapper"><table>';
+        let headerDone = false;
+
+        lines.forEach(line => {
+            // 구분선 라인 건너뛰기
+            if (/^\|[\s-:|]+\|$/.test(line.trim())) {
+                headerDone = true;
+                return;
+            }
+            const cells = line.split('|').slice(1, -1); // 앞뒤 빈 셀 제거
+            if (cells.length === 0) return;
+
+            tableHtml += '<tr>';
+            cells.forEach(cell => {
+                const tag = !headerDone ? 'th' : 'td';
+                // 셀 내부 볼드 처리
+                const cellContent = cell.trim().replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                tableHtml += `<${tag}>${cellContent}</${tag}>`;
+            });
+            tableHtml += '</tr>';
+        });
+
+        tableHtml += '</table></div>';
+        return tableHtml;
+    });
+
+    // ★ 번호 리스트 (1. 2. 3.) 그룹화 ★
+    processed = processed.replace(/((?:^\d+\.\s+.+$\n?)+)/gm, (match) => {
+        const items = match.trim().split('\n').filter(l => l.trim());
+        let listHtml = '<ol class="response-list">';
+        items.forEach(item => {
+            const content = item.replace(/^\d+\.\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            listHtml += `<li>${content}</li>`;
+        });
+        listHtml += '</ol>';
+        return listHtml;
+    });
+
+    // ★ 불렛 리스트 (* - •) 그룹화 ★
+    processed = processed.replace(/((?:^[*\-•]\s+.+$\n?)+)/gm, (match) => {
+        const items = match.trim().split('\n').filter(l => l.trim());
+        let listHtml = '<ul class="response-list">';
+        items.forEach(item => {
+            const content = item.replace(/^[*\-•]\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            listHtml += `<li>${content}</li>`;
+        });
+        listHtml += '</ul>';
+        return listHtml;
+    });
+
+    // ★ 인라인 스타일 처리 ★
+    processed = processed
         .replace(/^### (.+)$/gm, '<h4 class="response-heading">$1</h4>')
         .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^\* (.+)$/gm, '<li>$1</li>')
         .replace(/^---$/gm, '<hr>')
         .replace(/\n/g, '<br>');
+
+    // ★ 불필요한 <br> 정리 (헤딩/리스트/테이블 앞뒤) ★
+    processed = processed
+        .replace(/<br>\s*(<h[34])/g, '$1')
+        .replace(/(<\/h[34]>)\s*<br>/g, '$1')
+        .replace(/<br>\s*(<[ou]l)/g, '$1')
+        .replace(/(<\/[ou]l>)\s*<br>/g, '$1')
+        .replace(/<br>\s*(<div class="markdown-table)/g, '$1')
+        .replace(/(<\/div>)\s*<br>/g, '$1')
+        .replace(/<br>\s*(<hr>)/g, '$1')
+        .replace(/(<hr>)\s*<br>/g, '$1');
+
+    return processed;
 }
 
 

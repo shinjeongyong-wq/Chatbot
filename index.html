@@ -1152,14 +1152,61 @@
         }
 
         .formatted-response ul.response-list {
-            margin: 4px 0;
-            padding-left: 18px;
+            margin: 8px 0;
+            padding-left: 20px;
             list-style-type: disc;
         }
 
         .formatted-response ul.response-list li {
-            margin: 4px 0;
-            line-height: 1.5;
+            margin: 6px 0;
+            line-height: 1.6;
+        }
+
+        /* ★ 번호 리스트 스타일 ★ */
+        .formatted-response ol.response-list {
+            margin: 8px 0;
+            padding-left: 24px;
+            list-style-type: decimal;
+        }
+
+        .formatted-response ol.response-list li {
+            margin: 6px 0;
+            line-height: 1.6;
+        }
+
+        /* ★ 마크다운 테이블 스타일 ★ */
+        .markdown-table-wrapper {
+            overflow-x: auto;
+            margin: 12px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border-color, #e0e0e0);
+        }
+
+        .markdown-table-wrapper table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background-color: var(--surface, #fff);
+        }
+
+        .markdown-table-wrapper th {
+            background-color: var(--surface-secondary, #f7f9fc);
+            font-weight: 600;
+            color: var(--text-primary, #333);
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 2px solid var(--border-color, #e0e0e0);
+            white-space: nowrap;
+        }
+
+        .markdown-table-wrapper td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color, #f0f0f0);
+            color: var(--text-secondary, #444);
+        }
+
+        .markdown-table-wrapper tr:last-child td {
+            border-bottom: none;
         }
 
         .formatted-response hr.response-divider {
