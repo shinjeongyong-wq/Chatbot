@@ -1748,33 +1748,8 @@ function addFormattedMessage(text, contexts, modelName = null) {
         text = text.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
     }
 
-    // 1. 모든 인용/참고문서 주석 완전 제거
-    let processedText = text
-        .replace(/\[ID:\s*\d+\]/gi, '')
-        .replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '')
-        .replace(/참고\s*문서\s*\d+\s*번?/gi, '')
-        .replace(/문서\s*\d+\s*번?/gi, '')
-        .replace(/출처[:\s]*\[?\d+\]?/gi, '')
-        .replace(/근거[:\s]*\[?\d+\]?/gi, '')
-        .replace(/참조[:\s]*\[?\d+\]?/gi, '')
-        .replace(/\[참고\s*\d*\]/gi, '')
-        .replace(/\(참고[:\s]*문서?\s*\d+\)/gi, '')
-        .replace(/`\[\d+\]`/g, '')
-        .trim();
-
-    // 2. 마크다운 → HTML 변환
-    let html = processedText
-        .replace(/```[\s\S]*?```/g, '')
-        .replace(/^### (.+)$/gm, '<h4 class="response-heading">$1</h4>')
-        .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^\* (.+)$/gm, '<li>$1</li>')
-        .replace(/^---$/gm, '<hr>')
-        .replace(/\n/g, '<br>');
-
-    html = html.replace(/(<li>.*?<\/li>)(<br>)?/g, '$1');
-    html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul class="response-list">$1</ul>');
-    html = html.replace(/<\/ul><br>?<ul class="response-list">/g, '');
+    // 1~2. 인용 제거 + 마크다운 → HTML 변환 (renderMarkdownSafe로 통일)
+    let html = renderMarkdownSafe(text);
 
     // 3. 관련 주제를 클릭 가능한 링크로 변환
     if (relatedTopics.length > 0) {
