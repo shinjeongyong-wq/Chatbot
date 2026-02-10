@@ -1210,28 +1210,34 @@ async function getBotResponse(userMessage) {
                             if (!finalAnswer.includes('[NO_DATA]')) {
                                 finalAnswer = '[NO_DATA]' + finalAnswer;
                             }
+                            // ★ OUT_OF_SCOPE에도 RT 추가 (DB 저장 + 리로드 시 복원용) ★
+                            const rtTopics = findRelatedAnchorTopics(userMessage, 3);
+                            if (rtTopics.length > 0) {
+                                finalAnswer += '\n\n[RELATED_TOPICS]' + rtTopics.join('|') + '[/RELATED_TOPICS]';
+                            }
                         } else if (queryPlan.intent === 'AMBIGUOUS') {
                             // 관련 주제 추천 추가
                             const relatedTopics = findRelatedAnchorTopics(userMessage, 5);
                             if (relatedTopics.length > 0) {
-                                finalAnswer += '\n\n[RELATED_TOPICS]\n' + relatedTopics.map(t => `- ${t}`).join('\n') + '\n[/RELATED_TOPICS]';
+                                finalAnswer += '\n\n[RELATED_TOPICS]' + relatedTopics.join('|') + '[/RELATED_TOPICS]';
                             }
                         }
 
                         // ★ 타이핑 효과 적용 ★
                         await displayWithTypingEffect(streamingContent, finalAnswer);
 
-                        // 스트리밍 완료 후 최종 포맷팅 적용
-                        finalizeStreamingMessage(streamingContainer, finalAnswer, [], null);
+                        // 스트리밍 완료 후 최종 포맷팅 적용 (GREETING이면 RT 스킵)
+                        const isGreeting = queryPlan.intent === 'GREETING';
+                        finalizeStreamingMessage(streamingContainer, finalAnswer, [], null, { skipRT: isGreeting });
 
 
 
-                        // ChatMemory에 저장 (맥락 유지용)
-                        await chatMemory.addTurn(userMessage, queryPlan.directAnswer);
+                        // ChatMemory에 저장 (맥락 유지용) - finalAnswer로 저장 (RT 블록 포함)
+                        await chatMemory.addTurn(userMessage, finalAnswer);
 
-                        // Supabase 저장
+                        // Supabase 저장 - finalAnswer로 저장 (RT 블록 포함하여 리로드 시 복원)
                         if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-                            window.chatHistory.saveMessage('assistant', queryPlan.directAnswer, chatMemory.getContextPrompt(), messageType).catch(() => { });
+                            window.chatHistory.saveMessage('assistant', finalAnswer, chatMemory.getContextPrompt(), messageType).catch(() => { });
                         }
 
                         return; // ★ 검색 로직 완전 스킵 ★
@@ -1831,14 +1837,29 @@ function generateRTFallbackHTML(topics) {
     const links = top3.map(topic => {
         return `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
     });
-    let sentence;
-    if (links.length === 1) {
-        sentence = `혹시 ${links[0]}에 대해서도 궁금하시면 물어보세요 😊`;
-    } else if (links.length === 2) {
-        sentence = `혹시 ${links[0]}이나 ${links[1]}에 대해서도 궁금하시면 물어보세요 😊`;
-    } else {
-        sentence = `혹시 ${links[0]}, ${links[1]}, ${links[2]} 등에 대해서도 궁금하시면 물어보세요 😊`;
-    }
+
+    // 다양한 추천 문장 템플릿
+    const templates1 = [
+        (l) => `혹시 ${l[0]}에 대해서도 궁금하시면 물어보세요 😊`,
+        (l) => `${l[0]}에 대해서도 안내해 드릴 수 있어요!`,
+        (l) => `추가로 ${l[0]}도 확인해 보시겠어요?`,
+        (l) => `참고로 ${l[0]}도 많이 물어보시는 주제예요 💡`,
+    ];
+    const templates2 = [
+        (l) => `혹시 ${l[0]}이나 ${l[1]}에 대해서도 궁금하시면 물어보세요 😊`,
+        (l) => `${l[0]}이나 ${l[1]}에 대해서도 안내해 드릴 수 있어요!`,
+        (l) => `추가로 ${l[0]}이나 ${l[1]}도 확인해 보시겠어요?`,
+        (l) => `참고로 ${l[0]}, ${l[1]}도 많이 물어보시는 주제예요 💡`,
+    ];
+    const templates3 = [
+        (l) => `혹시 ${l[0]}, ${l[1]}, ${l[2]} 등에 대해서도 궁금하시면 물어보세요 😊`,
+        (l) => `${l[0]}, ${l[1]}, ${l[2]} 등에 대해서도 안내해 드릴 수 있어요!`,
+        (l) => `추가로 ${l[0]}, ${l[1]}, ${l[2]} 등도 확인해 보시겠어요?`,
+        (l) => `참고로 ${l[0]}, ${l[1]}, ${l[2]} 등도 많이 물어보시는 주제예요 💡`,
+    ];
+
+    const pool = links.length === 1 ? templates1 : links.length === 2 ? templates2 : templates3;
+    const sentence = pool[Math.floor(Math.random() * pool.length)](links);
     return `<br><br><p>${sentence}</p>`;
 }
 
@@ -3563,7 +3584,7 @@ function updateStreamingMessage(contentDiv, fullText) {
  * @param {Array} contexts - 참고 문서
  * @param {string} modelName - 모델명
  */
-function finalizeStreamingMessage(container, finalText, contexts, modelName) {
+function finalizeStreamingMessage(container, finalText, contexts, modelName, options = {}) {
     // streaming 클래스 제거
     container.classList.remove('streaming');
 
@@ -3615,39 +3636,42 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
         processedText = processedText.replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/, '').trim();
     }
 
-    // ★ 코드 레벨 보장: AI가 RELATED_TOPICS를 누락해도 자동 삽입 ★
-    if (relatedTopics.length === 0 && typeof findRelatedAnchorTopics === 'function') {
-        const currentQ = window.currentQuestion || '';
-        const autoTopics = findRelatedAnchorTopics(currentQ, 3);
-        if (autoTopics.length > 0) {
-            relatedTopics = autoTopics;
-            console.log('🔄 RT 자동 삽입:', relatedTopics);
-        }
-    }
-
     // 마크다운 렌더링 (renderMarkdownSafe가 인용 제거도 포함)
     let html = renderMarkdownSafe(processedText);
 
-    // 관련 주제 클릭 가능 링크
-    let rtMatchedCount = 0;
-    if (relatedTopics.length > 0) {
-        relatedTopics.forEach(topic => {
-            const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
-            const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
-            const before = html;
-            html = html.replace(regex, clickableLink);
-            if (html !== before) rtMatchedCount++;
-
-            // ★ 중복 추천 방지: 노출된 주제 기록 ★
-            if (typeof chatMemory !== 'undefined' && chatMemory.addUsedTopic) {
-                chatMemory.addUsedTopic(topic);
+    // ★ RT 처리 (skipRT 옵션이 없을 때만) ★
+    if (!options.skipRT) {
+        // 코드 레벨 보장: AI가 RELATED_TOPICS를 누락해도 자동 삽입
+        if (relatedTopics.length === 0 && typeof findRelatedAnchorTopics === 'function') {
+            const currentQ = window.currentQuestion || '';
+            const autoTopics = findRelatedAnchorTopics(currentQ, 3);
+            if (autoTopics.length > 0) {
+                relatedTopics = autoTopics;
+                console.log('🔄 RT 자동 삽입:', relatedTopics);
             }
-        });
+        }
 
-        // ★ 본문에 주제가 없으면 추천 문장 자동 생성 ★
-        if (rtMatchedCount === 0) {
-            html += generateRTFallbackHTML(relatedTopics);
+        // 관련 주제 클릭 가능 링크
+        let rtMatchedCount = 0;
+        if (relatedTopics.length > 0) {
+            relatedTopics.forEach(topic => {
+                const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
+                const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')"> ${escapeHtml(topic)}</strong>`;
+                const before = html;
+                html = html.replace(regex, clickableLink);
+                if (html !== before) rtMatchedCount++;
+
+                // 중복 추천 방지: 노출된 주제 기록
+                if (typeof chatMemory !== 'undefined' && chatMemory.addUsedTopic) {
+                    chatMemory.addUsedTopic(topic);
+                }
+            });
+
+            // 본문에 주제가 없으면 추천 문장 자동 생성
+            if (rtMatchedCount === 0) {
+                html += generateRTFallbackHTML(relatedTopics);
+            }
         }
     }
 
