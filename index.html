@@ -408,7 +408,11 @@
         }
 
         .header {
-            padding: 12px 24px;
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             border-bottom: 1px solid var(--border-color);
             background: var(--surface);
             backdrop-filter: blur(10px);
@@ -1889,11 +1893,13 @@
 
 
         .sidebar-top-controls {
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
+            padding: 0 16px;
             border-bottom: 1px solid var(--history-border);
+            flex-shrink: 0;
         }
 
         .hamburger-btn {
@@ -2080,7 +2086,7 @@
 
         .history-sidebar-footer {
             padding: 16px;
-            border-top: none;
+            border-top: 1px solid var(--history-border);
         }
 
         .user-info {
