@@ -3490,7 +3490,10 @@ function renderMarkdownSafe(text) {
     // 순서: 번호 리스트를 먼저 처리 → '1. 항목'이 불렛으로 먹히는 것 방지
     processed = processed.replace(/((?:^\d+\.\s+.+$(?:\n\s{2,}[*\-•]\s+.+$)*\n?)+)/gm, (match) => {
         const lines = match.trim().split('\n').filter(l => l.trim());
-        let listHtml = '<ol class="response-list">';
+        // ★ 첫 번째 항목의 실제 번호를 파싱하여 start 속성 설정 ★
+        const firstNumMatch = lines[0].match(/^(\d+)\.\s+/);
+        const startNum = firstNumMatch ? parseInt(firstNumMatch[1], 10) : 1;
+        let listHtml = `<ol class="response-list" start="${startNum}">`;
         let i = 0;
         while (i < lines.length) {
             const line = lines[i];
