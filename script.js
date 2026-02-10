@@ -1750,18 +1750,26 @@ function addFormattedMessage(text, contexts, modelName = null) {
     let html = renderMarkdownSafe(text);
 
     // 3. 관련 주제를 클릭 가능한 링크로 변환
+    let rtMatchedCount = 0;
     if (relatedTopics.length > 0) {
         relatedTopics.forEach(topic => {
             const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
             const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
+            const before = html;
             html = html.replace(regex, clickableLink);
+            if (html !== before) rtMatchedCount++;
 
             // ★ 중복 추천 방지: 노출된 주제 기록 ★
             if (typeof chatMemory !== 'undefined' && chatMemory.addUsedTopic) {
                 chatMemory.addUsedTopic(topic);
             }
         });
+
+        // ★ 본문에 주제가 없으면 추천 문장 자동 생성 ★
+        if (rtMatchedCount === 0) {
+            html += generateRTFallbackHTML(relatedTopics);
+        }
     }
 
     // 5. 사용한 모델명 표시
@@ -1814,6 +1822,24 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// ★ RT 폴백: 본문에 주제가 없을 때 자연스러운 추천 문장 생성 ★
+function generateRTFallbackHTML(topics) {
+    if (!topics || topics.length === 0) return '';
+    const top3 = topics.slice(0, 3);
+    const links = top3.map(topic => {
+        return `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
+    });
+    let sentence;
+    if (links.length === 1) {
+        sentence = `혹시 ${links[0]}에 대해서도 궁금하시면 물어보세요 😊`;
+    } else if (links.length === 2) {
+        sentence = `혹시 ${links[0]}이나 ${links[1]}에 대해서도 궁금하시면 물어보세요 😊`;
+    } else {
+        sentence = `혹시 ${links[0]}, ${links[1]}, ${links[2]} 등에 대해서도 궁금하시면 물어보세요 😊`;
+    }
+    return `<br><br><p>${sentence}</p>`;
 }
 
 function showTypingIndicator() {
@@ -3603,18 +3629,26 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
     let html = renderMarkdownSafe(processedText);
 
     // 관련 주제 클릭 가능 링크
+    let rtMatchedCount = 0;
     if (relatedTopics.length > 0) {
         relatedTopics.forEach(topic => {
             const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
             const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
+            const before = html;
             html = html.replace(regex, clickableLink);
+            if (html !== before) rtMatchedCount++;
 
             // ★ 중복 추천 방지: 노출된 주제 기록 ★
             if (typeof chatMemory !== 'undefined' && chatMemory.addUsedTopic) {
                 chatMemory.addUsedTopic(topic);
             }
         });
+
+        // ★ 본문에 주제가 없으면 추천 문장 자동 생성 ★
+        if (rtMatchedCount === 0) {
+            html += generateRTFallbackHTML(relatedTopics);
+        }
     }
 
     // 피드백 버튼 + 복사 버튼 추가

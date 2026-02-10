@@ -695,14 +695,22 @@ function addBotMessageToUI(content, question = '', contextPrompt = '', messageTy
     let html = renderMarkdownSafe(content);
 
     // 관련 주제를 클릭 가능한 링크로 변환
+    let rtMatchedCount = 0;
     if (relatedTopics.length > 0) {
         relatedTopics.forEach(topic => {
             // **주제** 형태의 굵은 글씨를 클릭 가능한 링크로 변환
             const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
             const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
+            const before = html;
             html = html.replace(regex, clickableLink);
+            if (html !== before) rtMatchedCount++;
         });
+
+        // ★ 본문에 주제가 없으면 추천 문장 자동 생성 ★
+        if (rtMatchedCount === 0 && typeof generateRTFallbackHTML === 'function') {
+            html += generateRTFallbackHTML(relatedTopics);
+        }
     }
 
     // ★ 플래너 버튼 추가 (no_data, out_of_scope 타입인 경우) ★
