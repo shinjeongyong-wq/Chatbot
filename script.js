@@ -1770,6 +1770,11 @@ function addFormattedMessage(text, contexts, modelName = null) {
             const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
             const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
             html = html.replace(regex, clickableLink);
+
+            // ★ 중복 추천 방지: 노출된 주제 기록 ★
+            if (typeof chatMemory !== 'undefined' && chatMemory.addUsedTopic) {
+                chatMemory.addUsedTopic(topic);
+            }
         });
     }
 
@@ -3507,6 +3512,11 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
             const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
             const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
             html = html.replace(regex, clickableLink);
+
+            // ★ 중복 추천 방지: 노출된 주제 기록 ★
+            if (typeof chatMemory !== 'undefined' && chatMemory.addUsedTopic) {
+                chatMemory.addUsedTopic(topic);
+            }
         });
     }
 
