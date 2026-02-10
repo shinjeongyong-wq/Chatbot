@@ -1685,6 +1685,9 @@ function addMessage(text, sender) {
 
     if (sender === 'user') {
         // ★ Gemini/ChatGPT 스타일: 사용자 메시지가 화면 상단으로 즉시 이동 ★
+        // 하단에 viewport 높이만큼 패딩을 추가하여 스크롤 공간 확보
+        const viewportHeight = chatContainer.clientHeight;
+        chatContainer.style.paddingBottom = viewportHeight + 'px';
         requestAnimationFrame(() => {
             div.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
@@ -1924,6 +1927,9 @@ function scrollToBottom() {
 
 // AI 응답 완료 시 직전 사용자 질문부터 보이도록 스크롤
 function scrollToMessageTop(messageElement) {
+    // ★ Gemini 스타일 패딩 복원 ★
+    chatContainer.style.paddingBottom = '24px';
+
     if (messageElement) {
         // AI 응답 바로 이전의 사용자 메시지 찾기
         const prevSibling = messageElement.previousElementSibling;
@@ -3517,5 +3523,8 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
     };
 
     contentDiv.innerHTML = html + plannerButton + feedbackButtons;
+
+    // ★ Gemini 스타일 패딩 복원 (스트리밍 완료 후) ★
+    chatContainer.style.paddingBottom = '24px';
 }
 
