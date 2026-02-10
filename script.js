@@ -1548,7 +1548,7 @@ ${topicGenerationRule}
 2.  **구조화된 본문 (Structured Body)**
     * 3줄 이상의 긴 줄글(Wall of Text)을 절대 쓰지 마세요.
     * 주제가 바뀔 때마다 **소제목(\`###\`)**을 사용하여 구획을 나누세요.
-    * 소제목 위에는 반드시 **빈 줄을 2번(\`\\n\\n\`)** 넣어 시각적 여백을 확보하세요.
+    * 소제목 위에는 반드시 **빈 줄을 2번(Enter 2번)** 넣어 시각적 여백을 확보하세요.
 
 3.  **시각적 강조 (Visual Anchors)**
     * **핵심 키워드, 비용, 수치**는 **굵게(**bold**)** 처리하세요. (문장 전체 볼드 금지)
@@ -3054,7 +3054,7 @@ ${topicGenerationRule}
 2.  **구조화된 본문 (Structured Body)**
     * 3줄 이상의 긴 줄글(Wall of Text)을 절대 쓰지 마세요.
     * 주제가 바뀔 때마다 **소제목(\`###\`)**을 사용하여 구획을 나누세요.
-    * 소제목 위에는 반드시 **빈 줄을 2번(\`\\n\\n\`)** 넣어 시각적 여백을 확보하세요.
+    * 소제목 위에는 반드시 **빈 줄을 2번(Enter 2번)** 넣어 시각적 여백을 확보하세요.
 
 3.  **시각적 강조 (Visual Anchors)**
     * **핵심 키워드, 비용, 수치**는 **굵게(**bold**)** 처리하세요. (문장 전체 볼드 금지)
@@ -3398,6 +3398,8 @@ function renderMarkdownSafe(text) {
         .replace(/\[OFF_TOPIC\]/gi, '')
         // [TOPIC: ...] 태그 제거 (스트리밍 중 노출 방지)
         .replace(/\[TOPIC:\s*[^\]]*\]\s*/gi, '')
+        // ★ 문자열 \n 을 실제 줄바꿈으로 치환 (AI 할루시네이션 방지) ★
+        .replace(/\\n/g, '\n')
         // [RELATED_TOPICS]...[/RELATED_TOPICS] 블록 및 부분 태그 제거
         .replace(/\[RELATED_TOPICS\][\s\S]*?\[\/RELATED_TOPICS\]/gi, '')
         .replace(/\[RELATED_TOPICS\][\s\S]*/gi, '')
