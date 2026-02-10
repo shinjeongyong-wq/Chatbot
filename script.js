@@ -1691,7 +1691,9 @@ function addMessage(text, sender) {
         const viewportHeight = chatContainer.clientHeight;
         chatContainer.style.paddingBottom = viewportHeight + 'px';
         requestAnimationFrame(() => {
-            div.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // 수동 스크롤: 사용자 메시지 상단에 20px 여유공간 확보
+            const scrollTarget = div.offsetTop - 20;
+            chatContainer.scrollTo({ top: scrollTarget, behavior: 'smooth' });
         });
     } else {
         scrollToBottom();
@@ -3410,10 +3412,7 @@ function renderMarkdownSafe(text) {
 function updateStreamingMessage(contentDiv, fullText) {
     // 전체 텍스트를 마크다운 렌더링하여 교체
     contentDiv.innerHTML = renderMarkdownSafe(fullText);
-
-    // 스크롤 유지
-    const messagesContainer = document.getElementById('chatContainer');
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    // ★ 스트리밍 중에는 자동 스크롤 안 함 (사용자 질문이 상단에 유지되도록) ★
 }
 
 /**
