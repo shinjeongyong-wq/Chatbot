@@ -3318,7 +3318,7 @@ function createStreamingMessageContainer() {
 
     const messagesContainer = document.getElementById('chatContainer');
     messagesContainer.appendChild(container);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    // ★ scrollToBottom 제거 - 사용자 메시지가 상단에 유지되도록 ★
 
     return {
         container: container,
