@@ -3498,16 +3498,16 @@ function renderMarkdownSafe(text) {
         .replace(/^---$/gm, '<hr>')
         .replace(/\n/g, '<br>');
 
-    // ★ 불필요한 <br> 정리 (헤딩/리스트/테이블 앞뒤) ★
+    // ★ 불필요한 <br> 정리 (헤딩/리스트/테이블 앞뒤 - 연속 br 모두 제거) ★
     processed = processed
-        .replace(/<br>\s*(<h[34])/g, '$1')
-        .replace(/(<\/h[34]>)\s*<br>/g, '$1')
-        .replace(/<br>\s*(<[ou]l)/g, '$1')
-        .replace(/(<\/[ou]l>)\s*<br>/g, '$1')
-        .replace(/<br>\s*(<div class="markdown-table)/g, '$1')
-        .replace(/(<\/div>)\s*<br>/g, '$1')
-        .replace(/<br>\s*(<hr>)/g, '$1')
-        .replace(/(<hr>)\s*<br>/g, '$1');
+        .replace(/(<br>\s*)+(<h[34])/g, '$2')
+        .replace(/(<\/h[34]>)(\s*<br>)+/g, '$1')
+        .replace(/(<br>\s*)+(<[ou]l)/g, '$2')
+        .replace(/(<\/[ou]l>)(\s*<br>)+/g, '$1')
+        .replace(/(<br>\s*)+(<div class="markdown-table)/g, '$2')
+        .replace(/(<\/div>)(\s*<br>)+/g, '$1')
+        .replace(/(<br>\s*)+(<hr>)/g, '$2')
+        .replace(/(<hr>)(\s*<br>)+/g, '$1');
 
     return processed;
 }
