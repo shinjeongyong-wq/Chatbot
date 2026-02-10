@@ -1224,13 +1224,7 @@ async function getBotResponse(userMessage) {
                         // 스트리밍 완료 후 최종 포맷팅 적용
                         finalizeStreamingMessage(streamingContainer, finalAnswer, [], null);
 
-                        // ★ 답변 완료 후: 사용자 질문이 화면 최상단에 오도록 스크롤 ★
-                        const chatContainerEl = document.getElementById('chatContainer');
-                        const userMessages = chatContainerEl.querySelectorAll('.message.user');
-                        if (userMessages.length > 0) {
-                            const lastUserMessage = userMessages[userMessages.length - 1];
-                            lastUserMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
+
 
                         // ChatMemory에 저장 (맥락 유지용)
                         await chatMemory.addTurn(userMessage, queryPlan.directAnswer);
@@ -1330,13 +1324,7 @@ async function getBotResponse(userMessage) {
                 result.modelName
             );
 
-            // ★ 답변 완료 후: 사용자 질문이 화면 최상단에 오도록 스크롤 ★
-            const chatContainer = document.getElementById('chatContainer');
-            const userMessages = chatContainer.querySelectorAll('.message.user');
-            if (userMessages.length > 0) {
-                const lastUserMessage = userMessages[userMessages.length - 1];
-                lastUserMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+
 
 
             // 최종 응답 텍스트 결정
@@ -1694,7 +1682,15 @@ function addMessage(text, sender) {
     div.className = `message ${sender}`;
     div.innerHTML = `<div class="message-avatar">${sender === 'user' ? '나' : 'AI'}</div><div class="message-content">${text.replace(/\n/g, '<br>')}</div>`;
     chatContainer.appendChild(div);
-    scrollToBottom();
+
+    if (sender === 'user') {
+        // ★ Gemini/ChatGPT 스타일: 사용자 메시지가 화면 상단으로 즉시 이동 ★
+        requestAnimationFrame(() => {
+            div.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    } else {
+        scrollToBottom();
+    }
 }
 
 // 마크다운을 HTML로 변환하여 렌더링
