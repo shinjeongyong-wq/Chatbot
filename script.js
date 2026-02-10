@@ -3466,26 +3466,58 @@ function renderMarkdownSafe(text) {
         return tableHtml;
     });
 
-    // ★ 번호 리스트 (1. 2. 3.) 그룹화 ★
-    processed = processed.replace(/((?:^\d+\.\s+.+$\n?)+)/gm, (match) => {
-        const items = match.trim().split('\n').filter(l => l.trim());
+    // ★ 번호 리스트 (1. 2. 3.) + 들여쓰기 서브 항목 처리 ★
+    // 순서: 번호 리스트를 먼저 처리 → '1. 항목'이 불렛으로 먹히는 것 방지
+    processed = processed.replace(/((?:^\d+\.\s+.+$(?:\n\s{2,}[*\-•]\s+.+$)*\n?)+)/gm, (match) => {
+        const lines = match.trim().split('\n').filter(l => l.trim());
         let listHtml = '<ol class="response-list">';
-        items.forEach(item => {
-            const content = item.replace(/^\d+\.\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            listHtml += `<li>${content}</li>`;
-        });
+        let i = 0;
+        while (i < lines.length) {
+            const line = lines[i];
+            if (/^\d+\.\s+/.test(line)) {
+                const content = line.replace(/^\d+\.\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                listHtml += `<li>${content}`;
+                // 들여쓰기 서브 항목 수집
+                let hasSubItems = false;
+                while (i + 1 < lines.length && /^\s{2,}[*\-•]\s+/.test(lines[i + 1])) {
+                    if (!hasSubItems) { listHtml += '<ul class="response-sublist">'; hasSubItems = true; }
+                    i++;
+                    const subContent = lines[i].trim().replace(/^[*\-•]\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                    listHtml += `<li>${subContent}</li>`;
+                }
+                if (hasSubItems) listHtml += '</ul>';
+                listHtml += '</li>';
+            }
+            i++;
+        }
         listHtml += '</ol>';
         return listHtml;
     });
 
-    // ★ 불렛 리스트 (* - •) 그룹화 ★
-    processed = processed.replace(/((?:^[*\-•]\s+.+$\n?)+)/gm, (match) => {
-        const items = match.trim().split('\n').filter(l => l.trim());
+    // ★ 불렛 리스트 (줄 시작 - * •) + 들여쓰기 서브 항목 처리 ★
+    // 줄 시작(^)에서 바로 시작하는 항목만 최상위로 인식
+    processed = processed.replace(/((?:^[*\-•]\s+.+$(?:\n\s{2,}[*\-•]\s+.+$)*\n?)+)/gm, (match) => {
+        const lines = match.trim().split('\n').filter(l => l.trim());
         let listHtml = '<ul class="response-list">';
-        items.forEach(item => {
-            const content = item.replace(/^[*\-•]\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            listHtml += `<li>${content}</li>`;
-        });
+        let i = 0;
+        while (i < lines.length) {
+            const line = lines[i];
+            if (/^[*\-•]\s+/.test(line) && !/^\s/.test(line)) {
+                const content = line.replace(/^[*\-•]\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                listHtml += `<li>${content}`;
+                // 들여쓰기 서브 항목 수집
+                let hasSubItems = false;
+                while (i + 1 < lines.length && /^\s{2,}[*\-•]\s+/.test(lines[i + 1])) {
+                    if (!hasSubItems) { listHtml += '<ul class="response-sublist">'; hasSubItems = true; }
+                    i++;
+                    const subContent = lines[i].trim().replace(/^[*\-•]\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                    listHtml += `<li>${subContent}</li>`;
+                }
+                if (hasSubItems) listHtml += '</ul>';
+                listHtml += '</li>';
+            }
+            i++;
+        }
         listHtml += '</ul>';
         return listHtml;
     });
