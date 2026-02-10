@@ -150,6 +150,176 @@
             renderFeedbackTable(filtered);
         }
     };
+
+    // ============================================================
+    // ★ 탭 전환
+    // ============================================================
+    var _currentDashTab = 'feedback';
+
+    window.switchDashTab = function (tabName) {
+        _currentDashTab = tabName;
+
+        // 탭 버튼 활성화
+        document.querySelectorAll('.fb-tab-btn').forEach(function (btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+        });
+
+        // 탭 콘텐츠 전환
+        document.getElementById('tabFeedback').style.display = tabName === 'feedback' ? 'block' : 'none';
+        document.getElementById('tabAnalytics').style.display = tabName === 'analytics' ? 'block' : 'none';
+
+        // 사용 통계 탭 최초 진입 시 데이터 로드
+        if (tabName === 'analytics') {
+            loadAnalyticsData();
+        }
+    };
+
+    // 새로고침 버튼
+    window.refreshCurrentTab = function () {
+        if (_currentDashTab === 'feedback') {
+            window.loadFeedbackData();
+        } else {
+            loadAnalyticsData();
+        }
+    };
+
+    // ============================================================
+    // ★ 사용 통계 로드
+    // ============================================================
+    async function loadAnalyticsData() {
+        try {
+            if (typeof supabaseClient === 'undefined') {
+                throw new Error('Supabase 클라이언트 없음');
+            }
+
+            // 1. 기본 통계 (유저, 세션, 메시지)
+            var usersResult = await supabaseClient.from('users').select('id', { count: 'exact', head: true });
+            var sessionsResult = await supabaseClient.from('chat_sessions').select('id', { count: 'exact', head: true });
+            var messagesResult = await supabaseClient.from('messages').select('id', { count: 'exact', head: true });
+
+            var totalUsers = usersResult.count || 0;
+            var totalSessions = sessionsResult.count || 0;
+            var totalMessages = messagesResult.count || 0;
+            var avgPerSession = totalSessions > 0 ? (totalMessages / totalSessions).toFixed(1) : '0';
+
+            var el;
+            el = document.getElementById('statUsers'); if (el) el.textContent = totalUsers;
+            el = document.getElementById('statSessions'); if (el) el.textContent = totalSessions;
+            el = document.getElementById('statMessages'); if (el) el.textContent = totalMessages;
+            el = document.getElementById('statAvgPerSession'); if (el) el.textContent = avgPerSession;
+
+            // 2. daily_analytics에서 최신 분석 결과 가져오기
+            var analyticsResult = await supabaseClient
+                .from('daily_analytics')
+                .select('*')
+                .order('date', { ascending: false })
+                .limit(1);
+
+            if (analyticsResult.data && analyticsResult.data.length > 0) {
+                var latest = analyticsResult.data[0];
+                renderKeywordsChart(latest.popular_keywords || []);
+                renderFaqList(latest.frequent_questions || []);
+
+                var dateEl = document.getElementById('analyticsDate');
+                if (dateEl) dateEl.textContent = '마지막 분석: ' + latest.date;
+            } else {
+                document.getElementById('keywordsChart').innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;">아직 분석 데이터가 없습니다.<br>첫 분석을 실행해주세요.</div>';
+                document.getElementById('faqList').innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;">아직 분석 데이터가 없습니다.</div>';
+            }
+
+            // 3. 최근 유저 질문 (최신 30개)
+            var recentResult = await supabaseClient
+                .from('messages')
+                .select('content, created_at')
+                .eq('role', 'user')
+                .order('created_at', { ascending: false })
+                .limit(30);
+
+            renderRecentQuestions(recentResult.data || []);
+
+        } catch (err) {
+            console.error('사용 통계 로드 오류:', err);
+        }
+    }
+
+    // ============================================================
+    // ★ 인기 키워드 바 차트 렌더링
+    // ============================================================
+    function renderKeywordsChart(keywords) {
+        var container = document.getElementById('keywordsChart');
+        if (!container || !keywords.length) return;
+
+        var maxCount = keywords[0].count || 1;
+        var html = '';
+
+        keywords.forEach(function (item, i) {
+            var pct = Math.round((item.count / maxCount) * 100);
+            var hue = 210 + (i * 12); // 파란 계열 그라데이션
+            html += '<div class="kw-bar-row">';
+            html += '<span class="kw-bar-label">' + escFb(item.keyword) + '</span>';
+            html += '<div class="kw-bar-track">';
+            html += '<div class="kw-bar-fill" style="width:' + pct + '%;background:hsl(' + hue + ',70%,55%);"></div>';
+            html += '</div>';
+            html += '<span class="kw-bar-count">' + item.count + '건</span>';
+            html += '</div>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    // ============================================================
+    // ★ 자주 묻는 질문 리스트 렌더링
+    // ============================================================
+    function renderFaqList(questions) {
+        var container = document.getElementById('faqList');
+        if (!container || !questions.length) return;
+
+        var html = '';
+        questions.forEach(function (item, i) {
+            html += '<div class="faq-item">';
+            html += '<div class="faq-item-header">';
+            html += '<span class="faq-rank">' + (i + 1) + '</span>';
+            html += '<span class="faq-topic">' + escFb(item.topic || item.representative || '') + '</span>';
+            html += '<span class="faq-count">' + (item.count || 0) + '건</span>';
+            html += '</div>';
+            if (item.examples && item.examples.length > 0) {
+                html += '<div class="faq-examples">';
+                item.examples.forEach(function (ex) {
+                    html += '<div class="faq-example">"' + escFb(ex) + '"</div>';
+                });
+                html += '</div>';
+            }
+            html += '</div>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    // ============================================================
+    // ★ 최근 유저 질문 렌더링
+    // ============================================================
+    function renderRecentQuestions(messages) {
+        var tbody = document.getElementById('recentQuestionsBody');
+        if (!tbody) return;
+
+        if (!messages.length) {
+            tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:40px;color:#94a3b8;">질문이 없습니다</td></tr>';
+            return;
+        }
+
+        var html = '';
+        messages.forEach(function (msg) {
+            var date = msg.created_at ? new Date(msg.created_at).toLocaleString('ko-KR', {
+                month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+            }) : '-';
+            html += '<tr>';
+            html += '<td style="white-space:nowrap;width:120px;">' + date + '</td>';
+            html += '<td>' + escFb(msg.content || '-') + '</td>';
+            html += '</tr>';
+        });
+
+        tbody.innerHTML = html;
+    }
 })();
 
 const CONFIG = {
