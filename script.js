@@ -3319,7 +3319,7 @@ function createStreamingMessageContainer() {
     container.className = 'message bot streaming';
     container.innerHTML = `
         <div class="message-avatar">AI</div>
-        <div class="message-content streaming-content"></div>
+        <div class="message-content streaming-content formatted-response"></div>
     `;
 
     const messagesContainer = document.getElementById('chatContainer');
@@ -3544,6 +3544,10 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
     container.classList.remove('streaming');
 
     const contentDiv = container.querySelector('.message-content');
+    // ★ formatted-response 클래스 보장 (CSS 스타일 통일) ★
+    if (contentDiv && !contentDiv.classList.contains('formatted-response')) {
+        contentDiv.classList.add('formatted-response');
+    }
     let processedText = finalText;
 
     // ★ NO_DATA / OFF_TOPIC 감지 ★
@@ -3597,20 +3601,7 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName) {
         }
     }
 
-    // 모든 인용/참고문서 주석 완전 제거
-    processedText = processedText
-        .replace(/\[(?:ID:\s*)?\d+(?:,\s*\d+)*\]/gi, '')
-        .replace(/참고\s*문서\s*\d+\s*번?/gi, '')
-        .replace(/문서\s*\d+\s*번?/gi, '')
-        .replace(/출처[:\s]*\[?\d+\]?/gi, '')
-        .replace(/근거[:\s]*\[?\d+\]?/gi, '')
-        .replace(/참조[:\s]*\[?\d+\]?/gi, '')
-        .replace(/\[참고\s*\d*\]/gi, '')
-        .replace(/\(참고[:\s]*문서?\s*\d+\)/gi, '')
-        .replace(/`\[\d+\]`/g, '')
-        .trim();
-
-    // 마크다운 렌더링
+    // 마크다운 렌더링 (renderMarkdownSafe가 인용 제거도 포함)
     let html = renderMarkdownSafe(processedText);
 
     // 관련 주제 클릭 가능 링크
