@@ -266,6 +266,43 @@ const TEST_CASES = [
             expandedKeywords: ['미용', '피부과', '성형외과', '디자인', '시공', '파트너사'],
             excludeKeywords: ['무아디자인'], searchStrategy: 'semantic'
         }
+    },
+    // ★ 일반 질문 (부스트 영향 없어야 함) ★
+    {
+        question: '개원 절차가 어떻게 되나요?',
+        queryPlan: {
+            intent: 'SPECIFIC', requiresSearch: true,
+            subIntent: ['정보요청'], topic: ['개원준비'],
+            targetCategory: ['hospital-basics'],
+            specialtyRelevant: false,
+            coreKeywords: ['개원', '절차', '과정', '단계'],
+            expandedKeywords: ['병원', '의원', '준비', '일정'],
+            excludeKeywords: [], searchStrategy: 'semantic'
+        }
+    },
+    {
+        question: '의료기기 리스 비용이 궁금합니다',
+        queryPlan: {
+            intent: 'SPECIFIC', requiresSearch: true,
+            subIntent: ['정보요청'], topic: ['의료장비'],
+            targetCategory: ['medical_device', 'hospital-basics'],
+            specialtyRelevant: true,
+            coreKeywords: ['의료기기', '리스', '비용', '렌탈'],
+            expandedKeywords: ['장비', '구매', '할부', '미용', '피부과'],
+            excludeKeywords: [], searchStrategy: 'semantic'
+        }
+    },
+    {
+        question: '세무사 추천해주세요',
+        queryPlan: {
+            intent: 'SPECIFIC', requiresSearch: true,
+            subIntent: ['파트너사목록'], topic: ['세무'],
+            targetCategory: ['partners', 'hospital-basics'],
+            specialtyRelevant: false,
+            coreKeywords: ['세무사', '세무', '추천'],
+            expandedKeywords: ['세금', '회계', '파트너사', '개원'],
+            excludeKeywords: [], searchStrategy: 'semantic'
+        }
     }
 ];
 
