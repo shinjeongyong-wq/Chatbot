@@ -287,6 +287,22 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
             }
         }
 
+        // ★ 고유명사 부스트: 코어 키워드가 문서 제목(question)과 정확 매칭 시 큰 보너스 ★
+        if (coreKeywords && coreKeywords.length > 0) {
+            const questionTrimmed = (item.question || '').trim();
+            const questionNoSpace = questionTrimmed.toLowerCase().replace(/\s/g, '');
+            for (const kw of coreKeywords) {
+                if (!kw || kw.length < 2) continue;
+                const kwNoSpace = kw.toLowerCase().replace(/\s/g, '');
+                // 문서 제목이 키워드와 정확히 일치하거나, 제목에 키워드가 포함
+                if (questionNoSpace === kwNoSpace || questionTrimmed.toLowerCase() === kw.toLowerCase()) {
+                    score += 1.0; // 고유명사 정확 매칭 부스트
+                    item._entityBoosted = true;
+                    break;
+                }
+            }
+        }
+
         return { ...item, score };
     })
         .filter(r => r.score > 0.05)
@@ -307,7 +323,7 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
 
             let finalScore = item.score;
 
-            if (!isSpecialtySensitive || !hasSpecTag || matchesUserSpec) {
+            if (!isSpecialtySensitive || !hasSpecTag || matchesUserSpec || item._entityBoosted) {
                 finalScore = item.score * 1.0;
             } else if (isSpecialtySensitive && hasSpecTag && !matchesUserSpec) {
                 finalScore = item.score * 0.6;

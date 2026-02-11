@@ -1274,26 +1274,8 @@ async function getBotResponse(userMessage) {
             relatedContexts = await sheetsLoader.searchRelatedContext(userMessage, maxResults);
         }
 
-        // ========== Stage 2.5: 고유명사(업체명) 강제 포함 ==========
-        // 질문에 특정 업체명이 언급되면 해당 문서를 강제로 포함
-        const forcedResult = findForcedDocsByCompanyName(userMessage, sheetsLoader.cache || []);
 
-        if (forcedResult.forcedDocs.length > 0) {
-            console.log(`🎯 고유명사 매칭: ${forcedResult.matchedCompanies.join(', ')}`);
-            console.log(`📌 강제 포함 문서: ${forcedResult.forcedDocs.length}개`);
-
-            // 중복 제거 후 병합 (강제 문서를 앞에 배치)
-            const regularQuestions = new Set(relatedContexts.map(d => d.question));
-            const uniqueForcedDocs = forcedResult.forcedDocs.filter(d => !regularQuestions.has(d.question));
-
-            // 강제 문서에 높은 점수 부여 (정렬 유지용)
-            uniqueForcedDocs.forEach(doc => {
-                doc.score = 100; // 강제 포함 문서는 최상위 점수
-                doc._forcedInclude = true; // 강제 포함 마커
-            });
-
-            relatedContexts = [...uniqueForcedDocs, ...relatedContexts];
-        }
+        // (고유명사 강제 포함 로직 제거됨 — 검색 스코어링의 고유명사 부스트로 대체)
 
         // ★ 출처 분석 (Log용) ★
         const sourceCounts = relatedContexts.reduce((acc, doc) => {
