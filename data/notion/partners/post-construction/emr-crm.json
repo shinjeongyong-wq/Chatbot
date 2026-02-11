@@ -25,7 +25,11 @@
           "미용",
           "성형외과"
         ],
-        "website": "https://www.vegas-solution.com/home/main"
+        "website": "https://www.vegas-solution.com/home/main",
+        "winningRate": 50,
+        "totalContracts": 2,
+        "totalIntroductions": 4,
+        "priority": 1
       },
       "embedding": [
         0.03981216,
@@ -819,7 +823,11 @@
           "미용",
           "성형외과"
         ],
-        "website": "https://carecrm.co.kr/index"
+        "website": "https://carecrm.co.kr/index",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 0,
+        "priority": 3
       },
       "embedding": [
         -0.04010764,
@@ -1612,7 +1620,11 @@
           "피부",
           "미용"
         ],
-        "website": "https://kos-solution.com/"
+        "website": "https://kos-solution.com/",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 0,
+        "priority": 3
       },
       "embedding": [
         0.0058353236,
@@ -2406,7 +2418,11 @@
           "미용",
           "성형외과"
         ],
-        "website": "https://smartdoctor.cc/"
+        "website": "https://smartdoctor.cc/",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 0,
+        "priority": 3
       },
       "embedding": [
         0.017358983,

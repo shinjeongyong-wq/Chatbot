@@ -811,7 +811,11 @@
         "specialties": [
           "전체"
         ],
-        "website": "https://gigaeyes.kttelecop.co.kr/#/sfaLogin"
+        "website": "https://gigaeyes.kttelecop.co.kr/#/sfaLogin",
+        "winningRate": 100,
+        "totalContracts": 6,
+        "totalIntroductions": 6,
+        "priority": 1
       },
       "embedding": [
         0.020178331,
@@ -1602,7 +1606,11 @@
         "structuredSubCategory": "pre-construction/pc-network",
         "specialties": [
           "전체"
-        ]
+        ],
+        "winningRate": 70,
+        "totalContracts": 7,
+        "totalIntroductions": 10,
+        "priority": 1
       },
       "embedding": [
         0.023774957,

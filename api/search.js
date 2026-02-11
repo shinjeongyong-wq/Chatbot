@@ -314,6 +314,16 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
             score = score + 0.2;  // 파트너사 보너스 (0.2)
         }
 
+        // ★ Priority 보너스: 파트너사의 실적 기반 우선순위 반영 ★
+        if (itemPath.startsWith('partners') && item.metadata?.priority) {
+            if (item.metadata.priority === 1) {
+                score = score + 0.15;  // P1: 최우선 추천 (WR≥50% & 소개≥3)
+            } else if (item.metadata.priority === 2) {
+                score = score + 0.05;  // P2: 일반 추천 (WR≥30% 또는 소개≥5)
+            }
+            // P3: 보너스 없음
+        }
+
 
         // 진료과 보너스
         if (userSpecialty && userSpecialty.keywords) {

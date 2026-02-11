@@ -19,7 +19,11 @@
         "parentType": "database_id",
         "parentDbName": "상세 조건 보기",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/bank"
+        "structuredSubCategory": "pre-construction/bank",
+        "winningRate": 40,
+        "totalContracts": 2,
+        "totalIntroductions": 5,
+        "priority": 2
       },
       "embedding": [
         -0.024725527,
@@ -807,7 +811,11 @@
         "parentType": "database_id",
         "parentDbName": "상세 조건 보기",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/bank"
+        "structuredSubCategory": "pre-construction/bank",
+        "winningRate": 67,
+        "totalContracts": 6,
+        "totalIntroductions": 9,
+        "priority": 1
       },
       "embedding": [
         0.0130971745,
@@ -1595,7 +1603,11 @@
         "parentType": "database_id",
         "parentDbName": "상세 조건 보기",
         "structuredCategory": "partners",
-        "structuredSubCategory": "pre-construction/bank"
+        "structuredSubCategory": "pre-construction/bank",
+        "winningRate": 17,
+        "totalContracts": 1,
+        "totalIntroductions": 6,
+        "priority": 2
       },
       "embedding": [
         -0.00055998215,

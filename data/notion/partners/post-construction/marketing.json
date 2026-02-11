@@ -28,7 +28,11 @@
           "오프라인마케팅",
           "판촉마케팅"
         ],
-        "website": "https://m.blog.naver.com/plan-t?tab=1"
+        "website": "https://m.blog.naver.com/plan-t?tab=1",
+        "winningRate": 100,
+        "totalContracts": 2,
+        "totalIntroductions": 2,
+        "priority": 2
       },
       "embedding": [
         0.045329142,
