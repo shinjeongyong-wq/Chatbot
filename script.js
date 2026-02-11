@@ -1651,26 +1651,19 @@ function addFormattedMessage(text, contexts, modelName = null) {
     let html = renderMarkdownSafe(text);
 
     // 3. 관련 주제를 클릭 가능한 링크로 변환
-    let rtMatchedCount = 0;
+    // 3. 관련 주제를 클릭 가능한 링크로 변환
     if (relatedTopics.length > 0) {
         relatedTopics.forEach(topic => {
+            // 본문에 **주제** 형태로 있는 것을 찾아 클릭 가능한 링크로 만듭니다.
             const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
             const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
-            const before = html;
             html = html.replace(regex, clickableLink);
-            if (html !== before) rtMatchedCount++;
 
-            // ★ 중복 추천 방지: 노출된 주제 기록 ★
             if (typeof chatMemory !== 'undefined' && chatMemory.addUsedTopic) {
                 chatMemory.addUsedTopic(topic);
             }
         });
-
-        // ★ 본문에 주제가 없으면 추천 문장 자동 생성 ★
-        if (rtMatchedCount === 0) {
-            html += generateRTFallbackHTML(relatedTopics);
-        }
     }
 
     // 5. 사용한 모델명 표시
@@ -1772,12 +1765,11 @@ ${topicGenerationRule}
 **모든 답변은 다음 마크다운 표준을 엄격히 준수하며, 선언된 형식을 벗어나지 마세요.**
 
 1.  **Top-Down Summary**
-    * 답변의 첫 줄은 반드시 질문에 대한 핵심 결론을 **한 문장**으로 작성합니다.
-    * 형식 예시: "**핵심 결론: [질문에 대한 명확한 답변 수치나 결과]**"
+    * 답변의 첫 줄은 반드시 질문에 대한 핵심 결론 또는 명확한 수치나 결과를 **한 문장**으로 작성합니다.
 
 2.  **Standard Markdown Structure**
     * 주제 전환 시 반드시 \`### 소제목\` 을 사용합니다.
-    * 여백 규칙: 소제목 직전에는 반드시 공백 라인을 삽입하여 시각적 가독성을 높입니다.
+    * 여백 규칙: 소제목 직전에는 반드시 공백 라인을 1개만 삽입하여 시각적 가독성을 높입니다.
     * 가독성 규칙: 한 단락은 최대 **3줄**을 넘지 않으며, 초과 시 강제로 줄바꿈을 적용합니다.
 
 3.  **Emphasis & Listing**
@@ -1787,8 +1779,6 @@ ${topicGenerationRule}
 4.  **Termination Protocol (Strict)**
     * 답변 본문은 반드시 **마침표(.)** 하나로 끝맺음합니다.
     * 마침표 이후 특수문자, 공백, 부연설명을 추가하지 마세요. (\`...\`, \`.,\` 등 금지)
-    * 상투적인 맺음말("성공적인 개원을 응원합니다" 등)을 사용하지 마세요.
-    * 본문에 불렛포인트로 추천 주제를 나열하지 마세요.
 
 ---
 
@@ -1823,23 +1813,23 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **고정 안내 문구**: "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
 
 # 관련 주제 추천 (필수)
-답변 맨 끝에 반드시 [RELATED_TOPICS] 블록을 포함하세요.
+답변의 마무리 부분에서 다음 대화를 위한 관련 주제를 자연스럽게 제안하세요.
 
-[사용 가능한 주제 목록 - 아래 목록에서 글자 그대로 복사해서 사용하세요]
+[추천 가능한 주제 목록 - 아래 주제들을 대화에 활용하세요]
 ${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t => '- ' + t.question).join('\n')}
 
 **규칙:**
-1. 위 목록의 질문을 글자 그대로 복사하세요. 임의로 만들지 마세요.
-2. 현재 답변과 관련있는 주제 2~3개를 선택하세요.
-3. 방금 답변한 내용과 동일한 질문은 제외하세요.
-4. OFF_TOPIC이나 NO_DATA 응답에서도 반드시 포함하세요.
+1. 위 목록에서 현재 답변과 가장 관련 깊은 주제 2~3개를 선택하세요.
+2. **[자연스러운 추천]**: "혹시 **[주제]**에 대해서도 궁금하신가요?" 혹은 "추가로 **[주제]** 관련 정보도 안내해 드릴 수 있습니다."와 같이 대화 맥락에 맞춰 자연스럽게 제안하세요. 
+3. 제안하는 핵심 주제 키워드는 반드시 **굵게(bold)** 표시하세요.
+4. 방금 답변한 내용이나 이미 추천했던 주제는 제외하세요.
+5. 답변의 맨 마지막에는 시스템 버튼 생성을 위해 \`[RELATED_TOPICS]질문1|질문2[/RELATED_TOPICS]\` 형식을 반드시 포함하세요. (이때 질문1, 2는 목록의 원본 질문 텍스트를 사용하세요.)
 
-**형식 (블록만 출력, 추천 문장은 작성하지 마세요):**
-\`\`\`
-[RELATED_TOPICS]주제1|주제2|주제3[/RELATED_TOPICS]
-\`\`\`
-블록은 한 줄로 작성하고, 주제는 파이프(|)로 구분하세요.
-블록 외에 추천 문장이나 부연설명을 추가하지 마세요.`;
+**형식 예시:**
+... 답변 본문 마침표로 끝.
+추가로 원장님, **인공신장실 시설 기준**이나 **의료기기 리스 조건**에 대해서도 더 궁금한 점이 있으시면 언제든 말씀해 주세요.
+
+[RELATED_TOPICS]인공신장실 시설 관련 기준은?|의료기기 리스 및 렌탈 비용은?[/RELATED_TOPICS]`;
 }
 
 function showTypingIndicator() {
@@ -3528,27 +3518,19 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName, opt
             }
         }
 
-        // 관련 주제 클릭 가능 링크
-        let rtMatchedCount = 0;
+        // 시스템용 버튼 생성 데이터만 추출 (관련 주제 버튼 클릭 시 사용)
         if (relatedTopics.length > 0) {
             relatedTopics.forEach(topic => {
+                // 본문의 **주제**를 클릭 가능한 버튼으로 변환
                 const escapedTopic = topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 const regex = new RegExp(`<strong>${escapedTopic}</strong>`, 'gi');
                 const clickableLink = `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')"> ${escapeHtml(topic)}</strong>`;
-                const before = html;
                 html = html.replace(regex, clickableLink);
-                if (html !== before) rtMatchedCount++;
 
-                // 중복 추천 방지: 노출된 주제 기록
                 if (typeof chatMemory !== 'undefined' && chatMemory.addUsedTopic) {
                     chatMemory.addUsedTopic(topic);
                 }
             });
-
-            // 본문에 주제가 없으면 추천 문장 자동 생성
-            if (rtMatchedCount === 0) {
-                html += generateRTFallbackHTML(relatedTopics);
-            }
         }
     }
 
