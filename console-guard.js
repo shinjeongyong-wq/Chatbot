@@ -4,7 +4,8 @@
         || window.location.hostname.includes('192.168.');
 
     const isStaging = window.location.hostname.includes('staging')
-        || window.location.hostname.includes('-git-staging-');
+        || window.location.hostname.includes('-git-staging-')
+        || window.location.hostname.includes('-git-feature-');
 
     if (!isLocal && !isStaging) {
         console.log = () => { };
