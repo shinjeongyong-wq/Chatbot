@@ -289,7 +289,7 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
 
         const itemTopic = item.metadata?.topic || item.metadata?.category || '';
         const itemField = (item.metadata?.field || '').toLowerCase();
-        const itemPath = item.metadata?.categoryPath || '';
+        const itemPath = item.metadata?.structuredCategory || item.metadata?.categoryPath || '';
         const itemSubPath = item.metadata?.structuredSubCategory || '';
 
         // 토픽 매칭 보너스 - 배열 지원
@@ -310,12 +310,13 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         // ★ 파트너사 가중치: subIntent에 '파트너사목록'이 포함될 때 적용 ★
         const subIntents = Array.isArray(queryPlan.subIntent) ? queryPlan.subIntent : [queryPlan.subIntent];
         const isPartnerIntent = subIntents.includes('파트너사목록');
-        if (isPartnerIntent && itemPath.startsWith('partners')) {
+        const isPartnerItem = itemPath === 'partners' || itemPath.startsWith('partners');
+        if (isPartnerIntent && isPartnerItem) {
             score = score + 0.2;  // 파트너사 보너스 (0.2)
         }
 
         // ★ Priority 보너스: 파트너사의 실적 기반 우선순위 반영 ★
-        if (itemPath.startsWith('partners') && item.metadata?.priority) {
+        if (isPartnerItem && item.metadata?.priority) {
             if (item.metadata.priority === 1) {
                 score = score + 0.15;  // P1: 최우선 추천 (WR≥50% & 소개≥3)
             } else if (item.metadata.priority === 2) {
