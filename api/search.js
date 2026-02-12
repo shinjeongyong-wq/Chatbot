@@ -256,7 +256,7 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
 
         const itemTopic = item.metadata?.topic || item.metadata?.category || '';
         const itemField = (item.metadata?.field || '').toLowerCase();
-        const itemPath = item.metadata?.categoryPath || '';
+        const itemPath = item.metadata?.structuredCategory || '';
 
         // 토픽 매칭 보너스 - 배열 지원
         if (topic) {
