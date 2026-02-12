@@ -31,7 +31,11 @@
           "맞춤제작",
           "붙박이가구"
         ],
-        "website": "https://bauskitchen.co.kr/"
+        "website": "https://bauskitchen.co.kr/",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 0,
+        "priority": 3
       },
       "embedding": [
         0.038952973,
@@ -826,7 +830,11 @@
         "features": [
           "하이엔드"
         ],
-        "website": "https://aurumncompany.com/"
+        "website": "https://aurumncompany.com/",
+        "winningRate": 50,
+        "totalContracts": 1,
+        "totalIntroductions": 2,
+        "priority": 2
       },
       "embedding": [
         0.028052138,
@@ -1623,7 +1631,11 @@
           "브랜딩",
           "다양한브랜드"
         ],
-        "website": "https://unwind.kr/"
+        "website": "https://unwind.kr/",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 0,
+        "priority": 3
       },
       "embedding": [
         -0.04027421,
@@ -2418,7 +2430,11 @@
         "features": [
           "맞춤쇼파제작전문"
         ],
-        "website": "http://www.dssofa.com/default/index.php"
+        "website": "http://www.dssofa.com/default/index.php",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 1,
+        "priority": 3
       },
       "embedding": [
         -0.005988459,
@@ -3217,7 +3233,11 @@
           "높은업력",
           "병의원포트폴리오다수"
         ],
-        "website": "https://www.instagram.com/lieu_furniture_official?igsh=bTNkODB6MGtoZnNp"
+        "website": "https://www.instagram.com/lieu_furniture_official?igsh=bTNkODB6MGtoZnNp",
+        "winningRate": 75,
+        "totalContracts": 3,
+        "totalIntroductions": 4,
+        "priority": 1
       },
       "embedding": [
         -0.004629721,
@@ -4015,7 +4035,11 @@
           "맞춤쇼파제작전문",
           "조약돌쇼파"
         ],
-        "website": "https://maisonbfurniture.com/"
+        "website": "https://maisonbfurniture.com/",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 2,
+        "priority": 3
       },
       "embedding": [
         -0.0065836096,

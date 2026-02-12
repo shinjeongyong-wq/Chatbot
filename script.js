@@ -1450,16 +1450,29 @@ async function callOpenRouterAPI(userQuery, contexts) {
         console.log(`   📚 최종 문서: ${filteredContexts.length}개 (범위: ${minDocs}~${maxDocs})`);
 
         // ★ 최종 문서 30개 상세 로그 ★
-        console.log('   📋 문서 목록:');
+        console.log('   📋 문서 목록 (점수 내림차순):');
         filteredContexts.forEach((doc, idx) => {
             const src = doc.source || 'etc';
             const q = (doc.question || '').substring(0, 50);
-            console.log(`      [${idx + 1}] (${src}) ${q}${doc.question.length > 50 ? '...' : ''}`);
+            const score = doc.score ? doc.score.toFixed(4) : 'N/A';
+            const priority = doc.metadata?.priority ? `P${doc.metadata.priority}` : '';
+            console.log(`      [${idx + 1}] score=${score} ${priority} (${src}) ${q}${doc.question.length > 50 ? '...' : ''}`);
         });
+        // 점수 분포 통계
+        const scores = filteredContexts.map(d => d.score || 0);
+        const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+        const variance = scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scores.length;
+        const stdDev = Math.sqrt(variance);
+        console.log(`   📊 점수 분포: 평균=${mean.toFixed(4)}, 표준편차=${stdDev.toFixed(4)}, 최고=${scores[0]?.toFixed(4)}, 최저=${scores[scores.length - 1]?.toFixed(4)}`);
 
         // 문서 포맷팅 함수
         const formatDoc = (item, idx) => {
             let prefix = `[${idx + 1}]`;
+
+            // Priority 힌트 태그 (파트너사 우선순위)
+            if (item.metadata?.priority === 1) {
+                prefix += ` ⭐추천`;
+            }
 
             // 진료과 태그 시각화
             if (item.metadata?.specialties && item.metadata.specialties.length > 0) {
@@ -1752,6 +1765,7 @@ ${topicGenerationRule}
 
 2.  **Standard Markdown Structure**
     * 주제 전환 시 반드시 \`### 소제목\` 을 사용합니다.
+    * **####, #####등 4단계 이하 소제목은 절대 사용 금지.** 업체명이나 항목명은 **굵게(bold)** 로 표시합니다.
     * 여백 규칙: 소제목 직전에는 반드시 공백 라인을 1개만 삽입하여 시각적 가독성을 높입니다.
     * 가독성 규칙: 한 단락은 최대 **3줄**을 넘지 않으며, 초과 시 강제로 줄바꿈을 적용합니다.
 
@@ -1759,7 +1773,12 @@ ${topicGenerationRule}
     * 수치, 날짜, 핵심 키워드만 **굵게(bold)** 처리합니다. (문장 전체 볼드 금지)
     * 단계별 절차는 \`1.\`, 단순 나열은 \`-\` 기호를 사용하며, 리스트 간 들여쓰기는 2칸 공백을 유지합니다.
 
-4.  **Termination Protocol (Strict)**
+4.  **파트너사 추천 순서 규칙**
+    * 참고문서에 ⭐추천 태그가 있는 파트너사를 **반드시 먼저** 소개합니다.
+    * ⭐추천 파트너사 소개 후, 나머지 파트너사를 소개합니다.
+    * 추천 태그가 붙은 이유(수치, 비율 등)는 답변에 절대 포함하지 마세요.
+
+5.  **Termination Protocol (Strict)**
     * 답변 본문은 반드시 **마침표(.)** 하나로 끝맺음합니다.
     * 마침표 이후 특수문자, 공백, 부연설명을 추가하지 마세요. (\`...\`, \`.,\` 등 금지)
 
@@ -2995,8 +3014,28 @@ async function callOpenRouterAPIWithStreaming(userQuery, contexts, contentDiv, s
         const maxDocs = Math.min(contexts.length, 30);
         filteredContexts = contexts.slice(0, maxDocs);
 
+        // ★ 스트리밍 문서 목록 점수 로그 ★
+        console.log(`   📚 [스트리밍] 최종 문서: ${filteredContexts.length}개`);
+        console.log('   📋 문서 목록 (점수 내림차순):');
+        filteredContexts.forEach((doc, idx) => {
+            const src = doc.source || 'etc';
+            const q = (doc.question || '').substring(0, 50);
+            const score = doc.score ? doc.score.toFixed(4) : 'N/A';
+            const priority = doc.metadata?.priority ? `P${doc.metadata.priority}` : '';
+            console.log(`      [${idx + 1}] score=${score} ${priority} (${src}) ${q}${doc.question.length > 50 ? '...' : ''}`);
+        });
+        const scores = filteredContexts.map(d => d.score || 0);
+        const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+        const variance = scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scores.length;
+        const stdDev = Math.sqrt(variance);
+        console.log(`   📊 점수 분포: 평균=${mean.toFixed(4)}, 표준편차=${stdDev.toFixed(4)}, 최고=${scores[0]?.toFixed(4)}, 최저=${scores[scores.length - 1]?.toFixed(4)}`);
+
         const formatDoc = (item, idx) => {
             let prefix = `[${idx}]`;
+            // Priority 힌트 태그 (파트너사 우선순위)
+            if (item.metadata?.priority === 1) {
+                prefix += ` ⭐추천`;
+            }
             if (item.specialty && item.specialty !== '공통' && item.specialty !== 'ALL') {
                 prefix += ` (특화: ${item.specialty})`;
             }

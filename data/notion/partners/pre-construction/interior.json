@@ -29,7 +29,11 @@
           "합리적비용",
           "투명한견적"
         ],
-        "website": "https://www.mooadesign.co.kr/"
+        "website": "https://www.mooadesign.co.kr/",
+        "winningRate": 57,
+        "totalContracts": 4,
+        "totalIntroductions": 7,
+        "priority": 1
       },
       "embedding": [
         0.03517216,
@@ -824,7 +828,11 @@
           "치과",
           "내과"
         ],
-        "website": "http://jwcgroup.gamgakdesign.com/sub03/sub01.php"
+        "website": "http://jwcgroup.gamgakdesign.com/sub03/sub01.php",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 2,
+        "priority": 3
       },
       "embedding": [
         -0.007598272,
@@ -1622,7 +1630,11 @@
           "오래된업력",
           "포트폴리오최다"
         ],
-        "website": "http://www.fluxdesign.co.kr/"
+        "website": "http://www.fluxdesign.co.kr/",
+        "winningRate": 10,
+        "totalContracts": 1,
+        "totalIntroductions": 10,
+        "priority": 2
       },
       "embedding": [
         -0.008165111,
@@ -2423,7 +2435,11 @@
           "병의원인테리어 최다진행",
           "포트폴리오최다"
         ],
-        "website": "http://www.plananc.com/"
+        "website": "http://www.plananc.com/",
+        "winningRate": 30,
+        "totalContracts": 3,
+        "totalIntroductions": 10,
+        "priority": 2
       },
       "embedding": [
         0.025365664,
@@ -3223,7 +3239,11 @@
           "오래된업력",
           "도면구성좋음"
         ],
-        "website": "http://nestdesign.co.kr/"
+        "website": "http://nestdesign.co.kr/",
+        "winningRate": 33,
+        "totalContracts": 2,
+        "totalIntroductions": 6,
+        "priority": 2
       },
       "embedding": [
         0.023946118,
@@ -4020,7 +4040,11 @@
           "트렌디한디자인",
           "철저한A/S"
         ],
-        "website": "https://www.toneandtones.co.kr/index.php"
+        "website": "https://www.toneandtones.co.kr/index.php",
+        "winningRate": 33,
+        "totalContracts": 3,
+        "totalIntroductions": 9,
+        "priority": 2
       },
       "embedding": [
         0.032865915,
@@ -4818,7 +4842,11 @@
           "좋은후기",
           "트렌디한디자인"
         ],
-        "website": "http://www.intoex.co.kr/"
+        "website": "http://www.intoex.co.kr/",
+        "winningRate": 50,
+        "totalContracts": 2,
+        "totalIntroductions": 4,
+        "priority": 1
       },
       "embedding": [
         0.031579033,
@@ -5615,7 +5643,11 @@
           "탄탄한재무",
           "국보디자인"
         ],
-        "website": "www.nayac2y.com"
+        "website": "www.nayac2y.com",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 0,
+        "priority": 3
       },
       "embedding": [
         0.008624563,
@@ -6409,7 +6441,11 @@
           "내과",
           "전체진료과"
         ],
-        "website": "https://www.3rd-s.com/"
+        "website": "https://www.3rd-s.com/",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 0,
+        "priority": 3
       },
       "embedding": [
         0.041541234,
@@ -7203,7 +7239,11 @@
           "내과",
           "정형외과"
         ],
-        "website": "http://made-by.co.kr/"
+        "website": "http://made-by.co.kr/",
+        "winningRate": 50,
+        "totalContracts": 1,
+        "totalIntroductions": 2,
+        "priority": 2
       },
       "embedding": [
         0.027054815,
@@ -8005,7 +8045,11 @@
           "화이트모던인테리어",
           "미니멀인테리어"
         ],
-        "website": "https://theconamedispace.co.kr/"
+        "website": "https://theconamedispace.co.kr/",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 1,
+        "priority": 3
       },
       "embedding": [
         0.02595955,

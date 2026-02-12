@@ -22,7 +22,11 @@
         "structuredSubCategory": "pre-construction/signage",
         "specialties": [
           "치과"
-        ]
+        ],
+        "winningRate": 78,
+        "totalContracts": 7,
+        "totalIntroductions": 9,
+        "priority": 1
       },
       "embedding": [
         0.031511836,
@@ -819,7 +823,11 @@
           "합리적가격",
           "강력한A/S지원"
         ],
-        "website": "https://www.jait.co.kr/"
+        "website": "https://www.jait.co.kr/",
+        "winningRate": 42,
+        "totalContracts": 5,
+        "totalIntroductions": 12,
+        "priority": 2
       },
       "embedding": [
         0.033499017,
@@ -1617,7 +1625,11 @@
           "병원에 최적화된 시스템 제공",
           "가심비"
         ],
-        "website": "https://lsdesign.biz/"
+        "website": "https://lsdesign.biz/",
+        "winningRate": 45,
+        "totalContracts": 5,
+        "totalIntroductions": 11,
+        "priority": 2
       },
       "embedding": [
         -0.020086717,
@@ -2413,7 +2425,11 @@
           "외부 간판",
           "내부 사인물"
         ],
-        "website": "blog.naver.com/fineledprime"
+        "website": "blog.naver.com/fineledprime",
+        "winningRate": 38,
+        "totalContracts": 3,
+        "totalIntroductions": 8,
+        "priority": 2
       },
       "embedding": [
         0.028726792,
@@ -3211,7 +3227,11 @@
           "인쇄물",
           "LED전광판"
         ],
-        "website": "https://donasign.co.kr/main/"
+        "website": "https://donasign.co.kr/main/",
+        "winningRate": 25,
+        "totalContracts": 1,
+        "totalIntroductions": 4,
+        "priority": 3
       },
       "embedding": [
         0.012114158,
@@ -4010,7 +4030,11 @@
           "병원에 최적화된 시스템 제공",
           "하이엔드"
         ],
-        "website": "http://www.feelthesign.com"
+        "website": "http://www.feelthesign.com",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 1,
+        "priority": 3
       },
       "embedding": [
         -0.00037637172,
@@ -4807,7 +4831,11 @@
           "경쟁사대비동일조건하저렴함",
           "트랜디한디자인",
           "높은내구성"
-        ]
+        ],
+        "winningRate": 43,
+        "totalContracts": 3,
+        "totalIntroductions": 7,
+        "priority": 2
       },
       "embedding": [
         -0.007988895,

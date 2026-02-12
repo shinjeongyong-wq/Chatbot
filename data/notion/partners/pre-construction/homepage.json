@@ -26,7 +26,11 @@
           "성형외과",
           "검진센터"
         ],
-        "website": "https://www.pdbud.com/"
+        "website": "https://www.pdbud.com/",
+        "winningRate": 75,
+        "totalContracts": 3,
+        "totalIntroductions": 4,
+        "priority": 1
       },
       "embedding": [
         -0.007821978,
@@ -820,7 +824,11 @@
           "통증",
           "정형외과"
         ],
-        "website": "http://oneframe.co.kr"
+        "website": "http://oneframe.co.kr",
+        "winningRate": 83,
+        "totalContracts": 5,
+        "totalIntroductions": 6,
+        "priority": 1
       },
       "embedding": [
         -0.013496291,
@@ -1614,7 +1622,11 @@
           "치과",
           "성형외과"
         ],
-        "website": "https://www.fineappleptl.com/"
+        "website": "https://www.fineappleptl.com/",
+        "winningRate": 60,
+        "totalContracts": 3,
+        "totalIntroductions": 5,
+        "priority": 1
       },
       "embedding": [
         -0.018005572,
@@ -2406,7 +2418,11 @@
         "specialties": [
           "전체진료과"
         ],
-        "website": "https://www.urdv.net/"
+        "website": "https://www.urdv.net/",
+        "winningRate": 78,
+        "totalContracts": 7,
+        "totalIntroductions": 9,
+        "priority": 1
       },
       "embedding": [
         0.0103559,
