@@ -1,7 +1,76 @@
 {
   "category": "partners",
   "subCategory": "pre-construction/bank",
-  "itemCount": 0,
-  "lastUpdated": "2026-02-06T07:59:42.466Z",
-  "items": []
+  "itemCount": 3,
+  "lastUpdated": "2026-02-12T04:06:16.610Z",
+  "items": [
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8151-bd28-c8363927664a",
+      "question": "부산은행",
+      "answer": "[이미지]",
+      "metadata": {
+        "field": "파트너사",
+        "topic": "은행",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:11:00.000Z",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "pre-construction/bank",
+        "originalQuestion": "부산은행",
+        "originalId": "notion-2ed62aded336",
+        "paragraphTitle": "부산은행",
+        "keywords": [
+          "부산은행"
+        ]
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-816c-8626-ff5226555620",
+      "question": "[하나은행] 닥터플래티늄",
+      "answer": "[이미지]\n\n## 의과/치과\n🏦 신용점수 NICE/KCB 909점 이상일 경우 최대 금액 시도 가능합니다.",
+      "metadata": {
+        "field": "파트너사",
+        "topic": "은행",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:11:00.000Z",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "pre-construction/bank",
+        "originalQuestion": "[하나은행] 닥터플래티늄",
+        "originalId": "notion-2ed62aded336",
+        "paragraphTitle": "[하나은행] 닥터플래티늄",
+        "keywords": [
+          "하나은행",
+          "닥터플래티늄"
+        ]
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-81dd-b3d9-e2dbdd7cd198",
+      "question": "[경남은행] 메디칼론",
+      "answer": "[이미지]\n\n## 의과/치과\n\n📊 전문의/일반의",
+      "metadata": {
+        "field": "파트너사",
+        "topic": "은행",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:11:00.000Z",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "pre-construction/bank",
+        "originalQuestion": "[경남은행] 메디칼론",
+        "originalId": "notion-2ed62aded336",
+        "paragraphTitle": "[경남은행] 메디칼론",
+        "keywords": [
+          "경남은행",
+          "메디칼론"
+        ]
+      }
+    }
+  ]
 }

@@ -1,7 +1,52 @@
 {
   "category": "hospital-basics",
   "subCategory": "post-opening/pharmacy",
-  "itemCount": 0,
-  "lastUpdated": "2026-02-06T07:59:42.418Z",
-  "items": []
+  "itemCount": 2,
+  "lastUpdated": "2026-02-12T04:06:16.582Z",
+  "items": [
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8123-a34b-e13a3e2fcbde",
+      "question": "💊 네이처파마",
+      "answer": "[이미지]\n\n📊 📁오픈닥터 고객 사례",
+      "metadata": {
+        "field": "병의원 기본",
+        "topic": "약국",
+        "category": "DB 레코드",
+        "icon": "💊",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "structuredCategory": "hospital-basics",
+        "structuredSubCategory": "post-opening/pharmacy",
+        "originalQuestion": "💊 네이처파마",
+        "originalId": "notion-2ed62aded336",
+        "paragraphTitle": "💊 네이처파마",
+        "keywords": [
+          "네이처파마"
+        ]
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-814c-bf57-c41caacc7c70",
+      "question": "💊 유원팜",
+      "answer": "[이미지]\n룬피부과\n국내 비뇨기과 점유율 높음 ",
+      "metadata": {
+        "field": "병의원 기본",
+        "topic": "약국",
+        "category": "DB 레코드",
+        "icon": "💊",
+        "lastUpdated": "2026-01-19T05:12:00.000Z",
+        "structuredCategory": "hospital-basics",
+        "structuredSubCategory": "post-opening/pharmacy",
+        "originalQuestion": "💊 유원팜",
+        "originalId": "notion-2ed62aded336",
+        "paragraphTitle": "💊 유원팜",
+        "keywords": [
+          "유원팜"
+        ]
+      }
+    }
+  ]
 }
