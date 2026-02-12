@@ -1469,9 +1469,9 @@ async function callOpenRouterAPI(userQuery, contexts) {
         const formatDoc = (item, idx) => {
             let prefix = `[${idx + 1}]`;
 
-            // Priority 힌트 태그 (파트너사 우선순위)
-            if (item.metadata?.priority === 1) {
-                prefix += ` ⭐추천`;
+            // tier 태그
+            if (item.metadata?.tier) {
+                prefix += ` [tier:${item.metadata.tier}]`;
             }
 
             // 진료과 태그 시각화
@@ -1802,6 +1802,7 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
 3. **[정보 선별]**:
    - 질문 의도가 '업체 추천'이 아닌 '방법/정보 요청'이면 **절차와 가이드 위주로** 답변하세요.
    - 업체 정보 제공 시, 특화 진료과가 사용자와 다르면: "해당 정보는 주로 **[참고문서의 진료과]**에 특화되어 있어, 원장님의 **[사용자 진료과]**에는 확인이 필요할 수 있습니다."
+   - **[파트너사 tier 규칙]**: 참고문서에 [tier:1], [tier:2], [tier:3] 태그가 있으면 파트너사입니다. 첫 추천은 **tier:1만** 추천하세요. "더 없어?", "다른 업체도" 등 후속 질문 시 tier:2를, 그래도 더 요구하면 tier:3을 추천하세요.
 
 4. **[주제 일관성]**: 현재 대화의 주제를 중심으로 답변하세요. 새로운 정보가 없다면 정직하게 전달하세요.
 
@@ -3032,9 +3033,9 @@ async function callOpenRouterAPIWithStreaming(userQuery, contexts, contentDiv, s
 
         const formatDoc = (item, idx) => {
             let prefix = `[${idx}]`;
-            // Priority 힌트 태그 (파트너사 우선순위)
-            if (item.metadata?.priority === 1) {
-                prefix += ` ⭐추천`;
+            // tier 태그
+            if (item.metadata?.tier) {
+                prefix += ` [tier:${item.metadata.tier}]`;
             }
             if (item.specialty && item.specialty !== '공통' && item.specialty !== 'ALL') {
                 prefix += ` (특화: ${item.specialty})`;
