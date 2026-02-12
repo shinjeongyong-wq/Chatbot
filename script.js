@@ -3441,6 +3441,7 @@ function renderMarkdownSafe(text) {
 
     // ★ 인라인 스타일 처리 ★
     processed = processed
+        .replace(/^#{4,5} (.+)$/gm, '<h4 class="response-heading">$1</h4>')
         .replace(/^### (.+)$/gm, '<h4 class="response-heading">$1</h4>')
         .replace(/^## (.+)$/gm, '<h3 class="response-heading">$1</h3>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
