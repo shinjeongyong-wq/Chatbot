@@ -30,7 +30,6 @@
         "winningRate": 75,
         "totalContracts": 3,
         "totalIntroductions": 4,
-        "priority": 1,
         "tier": 1
       },
       "embedding": [
@@ -829,7 +828,6 @@
         "winningRate": 83,
         "totalContracts": 5,
         "totalIntroductions": 6,
-        "priority": 1,
         "tier": 1
       },
       "embedding": [
@@ -1628,7 +1626,6 @@
         "winningRate": 60,
         "totalContracts": 3,
         "totalIntroductions": 5,
-        "priority": 1,
         "tier": 2
       },
       "embedding": [
@@ -2425,7 +2422,6 @@
         "winningRate": 78,
         "totalContracts": 7,
         "totalIntroductions": 9,
-        "priority": 1,
         "tier": 1
       },
       "embedding": [

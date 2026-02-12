@@ -1,0 +1,29 @@
+파일: checklist/general.json
+인덱스: 21
+질문: 의료기관 개설 신고 가능 여부
+길이: 945자
+============================================================
+
+1. 정의
+        의원, 치과의원, 한의원 및 조산원을 개설하려는 자는 의료법 제33조(개설 등) 및 의료법 시행규칙 제25조(의료기관 개설신고)에 따라 모든 의료기관은 시/군/구청장(지자체 기준)에게 신고해야한다.
+        cf.) 병원급은 의료기관 개설허가 대상임
+        1. 관계법령 근거
+        의료법 제33조(개설 등)
+        https://www.law.go.kr/lsSc.do?section=&menuId=1&subMenuId=15&tabMenuId=81&eventGubun=060101&query=의료법#undefined
+        의료법 시행규칙 제25조(의료기관 개설신고)
+        https://www.law.go.kr/lsSc.do?section=&menuId=1&subMenuId=15&tabMenuId=81&eventGubun=060101&query=의료법#J25:0
+        1. 의료기관 개설신고서
+        [파일]
+        1. 의료기관 시설기준
+        [파일]
+        [파일]
+        1. 오픈닥터에서 개설신고와 관련하여 체크해야 할 가장 중요한 사항
+          장애인 편의시설의 종류 및 기준(500㎡ 를 넘느냐 안넘느냐..그것이 문제)
+        [파일]
+        [파일]
+        [이미지]
+          서울시 주차장 설치 및 관리 조례 제25조(10대 미만 면제, 10대 이상 3%)
+          https://www.law.go.kr/LSW/ordinSideInfoP.do?ordinSeq= 1892099&chrClsCd=010202&gubun=&joNo=0021&joBrNo=02&docCls=jo&urlMode=ordinScJoRltInfoR
+          건축물대장 용도 표시
+        [이미지]
+        [이미지]

@@ -33,7 +33,6 @@
         "winningRate": 57,
         "totalContracts": 4,
         "totalIntroductions": 7,
-        "priority": 1,
         "tier": 1
       },
       "embedding": [
@@ -833,7 +832,6 @@
         "winningRate": 0,
         "totalContracts": 0,
         "totalIntroductions": 2,
-        "priority": 3,
         "tier": 3
       },
       "embedding": [
@@ -1636,7 +1634,6 @@
         "winningRate": 10,
         "totalContracts": 1,
         "totalIntroductions": 10,
-        "priority": 2,
         "tier": 3
       },
       "embedding": [
@@ -2442,7 +2439,6 @@
         "winningRate": 30,
         "totalContracts": 3,
         "totalIntroductions": 10,
-        "priority": 2,
         "tier": 3
       },
       "embedding": [
@@ -3247,7 +3243,6 @@
         "winningRate": 33,
         "totalContracts": 2,
         "totalIntroductions": 6,
-        "priority": 2,
         "tier": 2
       },
       "embedding": [
@@ -4049,7 +4044,6 @@
         "winningRate": 33,
         "totalContracts": 3,
         "totalIntroductions": 9,
-        "priority": 2,
         "tier": 2
       },
       "embedding": [
@@ -4852,7 +4846,6 @@
         "winningRate": 50,
         "totalContracts": 2,
         "totalIntroductions": 4,
-        "priority": 1,
         "tier": 1
       },
       "embedding": [
@@ -5654,7 +5647,6 @@
         "winningRate": 0,
         "totalContracts": 0,
         "totalIntroductions": 0,
-        "priority": 3,
         "tier": 3
       },
       "embedding": [
@@ -6453,7 +6445,6 @@
         "winningRate": 0,
         "totalContracts": 0,
         "totalIntroductions": 0,
-        "priority": 3,
         "tier": 3
       },
       "embedding": [
@@ -7252,7 +7243,6 @@
         "winningRate": 50,
         "totalContracts": 1,
         "totalIntroductions": 2,
-        "priority": 2,
         "tier": 1
       },
       "embedding": [
@@ -8059,7 +8049,6 @@
         "winningRate": 0,
         "totalContracts": 0,
         "totalIntroductions": 1,
-        "priority": 3,
         "tier": 3
       },
       "embedding": [

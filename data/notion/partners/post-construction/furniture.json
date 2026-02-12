@@ -35,7 +35,6 @@
         "winningRate": 0,
         "totalContracts": 0,
         "totalIntroductions": 0,
-        "priority": 3,
         "tier": 2
       },
       "embedding": [
@@ -835,7 +834,6 @@
         "winningRate": 50,
         "totalContracts": 1,
         "totalIntroductions": 2,
-        "priority": 2,
         "tier": 1
       },
       "embedding": [
@@ -1637,7 +1635,6 @@
         "winningRate": 0,
         "totalContracts": 0,
         "totalIntroductions": 0,
-        "priority": 3,
         "tier": 2
       },
       "embedding": [
@@ -2437,7 +2434,6 @@
         "winningRate": 0,
         "totalContracts": 0,
         "totalIntroductions": 1,
-        "priority": 3,
         "tier": 3
       },
       "embedding": [
@@ -3241,7 +3237,6 @@
         "winningRate": 75,
         "totalContracts": 3,
         "totalIntroductions": 4,
-        "priority": 1,
         "tier": 1
       },
       "embedding": [
@@ -4044,7 +4039,6 @@
         "winningRate": 0,
         "totalContracts": 0,
         "totalIntroductions": 2,
-        "priority": 3,
         "tier": 3
       },
       "embedding": [

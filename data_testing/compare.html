@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion 문단 분할 비교 뷰어</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #232733;
+            --border: #2d3244;
+            --text: #e4e7f1;
+            --text-dim: #8b90a5;
+            --accent: #6c5ce7;
+            --accent2: #a29bfe;
+            --green: #00b894;
+            --green-bg: rgba(0, 184, 148, 0.10);
+            --orange: #fdcb6e;
+            --orange-bg: rgba(253, 203, 110, 0.10);
+            --red: #e17055;
+            --blue: #74b9ff;
+            --blue-bg: rgba(116, 185, 255, 0.10);
+            --split-line: #e17055;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ─── Header ─── */
+        .header {
+            background: linear-gradient(180deg, #1e2030 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 24px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent2), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .subtitle {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* ─── Stats Bar ─── */
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 12px 20px;
+            min-width: 140px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .stat-card .value.accent {
+            color: var(--accent2);
+        }
+
+        .stat-card .value.green {
+            color: var(--green);
+        }
+
+        .stat-card .value.orange {
+            color: var(--orange);
+        }
+
+        /* ─── Filter Bar ─── */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text-dim);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+        }
+
+        /* ─── Main Content ─── */
+        .main {
+            padding: 24px 32px;
+        }
+
+        /* ─── Document Card ─── */
+        .doc-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .doc-card:hover {
+            border-color: var(--accent);
+        }
+
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            cursor: pointer;
+            background: var(--surface2);
+            gap: 12px;
+        }
+
+        .doc-header:hover {
+            background: rgba(108, 92, 231, 0.08);
+        }
+
+        .doc-title {
+            font-size: 15px;
+            font-weight: 600;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .doc-meta {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-dim);
+            flex-shrink: 0;
+        }
+
+        .tag {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .tag.split {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .tag.unchanged {
+            background: rgba(139, 144, 165, 0.15);
+            color: var(--text-dim);
+        }
+
+        .tag.file {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+
+        .arrow {
+            transition: transform 0.3s;
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-left: 8px;
+        }
+
+        .arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .doc-body {
+            display: none;
+        }
+
+        .doc-body.open {
+            display: block;
+        }
+
+        /* ─── Full-Expand View (핵심) ─── */
+        .full-content {
+            padding: 24px;
+            font-size: 14px;
+            line-height: 2;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* 문단 구분선 */
+        .split-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .split-divider::before,
+        .split-divider::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: var(--split-line);
+            opacity: 0.6;
+        }
+
+        .split-divider .divider-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px;
+            background: rgba(225, 112, 85, 0.15);
+            border: 1px solid rgba(225, 112, 85, 0.4);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--split-line);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .split-divider .divider-label .idx {
+            background: var(--split-line);
+            color: #fff;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* 문단 블록 - 미묘한 배경색 */
+        .paragraph-block {
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .paragraph-block:hover {
+            background: rgba(108, 92, 231, 0.05);
+        }
+
+        .paragraph-block.even {
+            background: rgba(255, 255, 255, 0.015);
+        }
+
+        .paragraph-block.even:hover {
+            background: rgba(108, 92, 231, 0.07);
+        }
+
+        /* 변경 없는 문서의 단순한 컨텐츠 표시 */
+        .unchanged-content {
+            padding: 20px 24px;
+            font-size: 13px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border);
+        }
+
+        /* 범례 */
+        .legend {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 24px;
+            background: var(--surface2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-line {
+            width: 24px;
+            height: 2px;
+            background: var(--split-line);
+            opacity: 0.6;
+        }
+
+        .legend-block {
+            width: 16px;
+            height: 12px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid var(--border);
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+
+            .header,
+            .stats-bar,
+            .filter-bar,
+            .main {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .full-content {
+                padding: 16px;
+                font-size: 13px;
+            }
+        }
+
+        /* ─── Scroll to top ─── */
+        .scroll-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
+            transition: opacity 0.3s;
+            z-index: 50;
+        }
+
+        .scroll-top.visible {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>📑 Notion 문단 분할 비교 뷰어</h1>
+        <div class="subtitle">원본 문서를 펼쳐서 보여주고, 문단 나눈 지점에 구분선을 표시합니다</div>
+    </div>
+
+    <div class="stats-bar" id="statsBar"></div>
+
+    <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">전체</button>
+        <button class="filter-btn" data-filter="split">분할됨 ✂️</button>
+        <button class="filter-btn" data-filter="unchanged">변경없음</button>
+        <input type="text" class="search-input" id="searchInput" placeholder="🔍 질문이나 내용으로 검색...">
+    </div>
+
+    <div class="legend">
+        <span style="font-weight:600;">범례:</span>
+        <div class="legend-item">
+            <div class="legend-line"></div>
+            <span>문단 구분선 (분할 지점)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-block"></div>
+            <span>교대 배경 (단락 구분)</span>
+        </div>
+    </div>
+
+    <div class="main" id="mainContent"></div>
+
+    <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+    <script>
+        let DATA = null;
+        let currentFilter = 'all';
+
+        fetch('compare-data.json')
+            .then(r => r.json())
+            .then(d => { DATA = d; renderAll(); })
+            .catch(e => {
+                document.getElementById('mainContent').innerHTML =
+                    '<p style="color:var(--red);padding:20px;">❌ compare-data.json을 불러올 수 없습니다. node build-compare.js를 먼저 실행하세요.</p>';
+            });
+
+        function renderAll() {
+            renderStats();
+            renderItems();
+        }
+
+        function renderStats() {
+            const s = DATA.stats;
+            document.getElementById('statsBar').innerHTML = `
+        <div class="stat-card"><div class="label">원본 문서</div><div class="value">${s.totalOriginalDocs}</div></div>
+        <div class="stat-card"><div class="label">분할 후 총 단락</div><div class="value accent">${s.totalParagraphs}</div></div>
+        <div class="stat-card"><div class="label">분할된 문서</div><div class="value green">${s.splitDocs}</div></div>
+        <div class="stat-card"><div class="label">변경 없음</div><div class="value">${s.unchangedDocs}</div></div>
+        <div class="stat-card"><div class="label">평균 분할 수</div><div class="value orange">${s.avgParagraphsPerSplit}</div></div>
+      `;
+        }
+
+        function renderItems() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const container = document.getElementById('mainContent');
+
+            let items = DATA.items;
+
+            if (currentFilter === 'split') items = items.filter(i => i.wasSplit);
+            else if (currentFilter === 'unchanged') items = items.filter(i => !i.wasSplit);
+
+            if (searchTerm) {
+                items = items.filter(i =>
+                    i.originalQuestion.toLowerCase().includes(searchTerm) ||
+                    i.originalAnswer.toLowerCase().includes(searchTerm) ||
+                    i.file.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // 분할된 것 먼저, 그 다음 길이 순
+            items.sort((a, b) => {
+                if (a.wasSplit && !b.wasSplit) return -1;
+                if (!a.wasSplit && b.wasSplit) return 1;
+                return b.originalLength - a.originalLength;
+            });
+
+            container.innerHTML = items.map((item, idx) => {
+                const bodyContent = item.wasSplit
+                    ? buildSplitView(item)
+                    : `<div class="unchanged-content">${escHtml(item.originalAnswer)}</div>`;
+
+                return `
+          <div class="doc-card">
+            <div class="doc-header" onclick="toggleDoc(${idx})">
+              <div class="doc-title">${escHtml(item.originalQuestion)}</div>
+              <div class="doc-meta">
+                <span class="tag file">${item.file}</span>
+                ${item.wasSplit
+                        ? `<span class="tag split">✂️ ${item.paragraphs.length}개 단락</span>`
+                        : `<span class="tag unchanged">원본 유지</span>`}
+                <span>${formatLen(item.originalLength)}</span>
+                <span class="arrow" id="arrow-${idx}">▼</span>
+              </div>
+            </div>
+            <div class="doc-body" id="body-${idx}">
+              ${bodyContent}
+            </div>
+          </div>`;
+            }).join('');
+        }
+
+        /**
+         * 핵심: 원본 텍스트를 펼치고 분할 지점에 구분선 삽입
+         */
+        function buildSplitView(item) {
+            const original = item.originalAnswer;
+            const paragraphs = item.paragraphs;
+
+            if (!paragraphs || paragraphs.length <= 1) {
+                return `<div class="full-content">${escHtml(original)}</div>`;
+            }
+
+            // 각 단락의 시작 위치를 원본에서 찾기
+            const splitPoints = findSplitPoints(original, paragraphs);
+
+            // 원본 텍스트를 분할 지점에서 나눠서 렌더링
+            let html = '<div class="full-content">';
+            let lastEnd = 0;
+
+            for (let i = 0; i < splitPoints.length; i++) {
+                const sp = splitPoints[i];
+
+                // 구분선 삽입 (첫 번째 앞에도 표시)
+                html += `<div class="split-divider">
+          <div class="divider-label">
+            <span class="idx">${i + 1}</span>
+            ${escHtml(sp.title)}
+            <span style="opacity:0.6;font-weight:400;">(${sp.length.toLocaleString()}자)</span>
+          </div>
+        </div>`;
+
+                // 해당 단락의 텍스트 블록
+                const blockEnd = (i + 1 < splitPoints.length) ? splitPoints[i + 1].start : original.length;
+                const blockText = original.substring(sp.start, blockEnd).trim();
+                const evenClass = i % 2 === 1 ? ' even' : '';
+
+                html += `<div class="paragraph-block${evenClass}">${escHtml(blockText)}</div>`;
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        /**
+         * 각 단락의 원본 내 시작 위치 찾기
+         * 
+         * 전략: 각 단락의 answer에서 첫 줄(또는 처음 40자)을 추출하고
+         * 원본에서 순차적으로 해당 위치를 찾음
+         */
+        function findSplitPoints(original, paragraphs) {
+            const points = [];
+            let searchFrom = 0;
+
+            for (let i = 0; i < paragraphs.length; i++) {
+                const para = paragraphs[i];
+                const paraText = para.answer || '';
+
+                // 단락의 첫 줄에서 검색 키를 추출
+                const searchKey = getSearchKey(paraText);
+
+                if (!searchKey) {
+                    // 검색키가 없으면 이전 지점 이후로 추정
+                    points.push({
+                        start: searchFrom,
+                        title: para.paragraphTitle || para.question || `단락 ${i + 1}`,
+                        length: paraText.length
+                    });
+                    continue;
+                }
+
+                // 원본에서 위치 찾기 (searchFrom 이후)
+                let pos = original.indexOf(searchKey, searchFrom);
+
+                if (pos === -1) {
+                    // 못 찾으면 더 짧은 키로 재시도
+                    const shortKey = searchKey.substring(0, Math.min(20, searchKey.length));
+                    pos = original.indexOf(shortKey, searchFrom);
+                }
+
+                if (pos === -1) {
+                    // 그래도 못 찾으면 현재 위치 사용
+                    pos = searchFrom;
+                }
+
+                points.push({
+                    start: pos,
+                    title: para.paragraphTitle || para.question || `단락 ${i + 1}`,
+                    length: paraText.length
+                });
+
+                searchFrom = pos + 1;
+            }
+
+            return points;
+        }
+
+        /**
+         * 단락 텍스트에서 원본 매칭용 검색 키 추출
+         * 마크다운 헤더(##, ###) 첫 줄을 그대로 사용
+         */
+        function getSearchKey(text) {
+            if (!text) return '';
+            const lines = text.split('\n');
+            // 비어있지 않은 첫 줄 찾기
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed.length >= 5) {
+                    // 너무 길면 자르기
+                    return trimmed.substring(0, Math.min(60, trimmed.length));
+                }
+            }
+            return text.substring(0, 40).trim();
+        }
+
+        function toggleDoc(idx) {
+            const body = document.getElementById(`body-${idx}`);
+            const arrow = document.getElementById(`arrow-${idx}`);
+            body.classList.toggle('open');
+            arrow.classList.toggle('open');
+        }
+
+        function escHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function formatLen(n) {
+            if (n >= 10000) return (n / 1000).toFixed(1) + 'k자';
+            return n.toLocaleString() + '자';
+        }
+
+        // 필터 버튼
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderItems();
+            });
+        });
+
+        // 검색
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(renderItems, 300);
+        });
+
+        // 스크롤 버튼
+        window.addEventListener('scroll', () => {
+            document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 300);
+        });
+    </script>
+</body>
+
+</html>

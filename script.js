@@ -1455,8 +1455,8 @@ async function callOpenRouterAPI(userQuery, contexts) {
             const src = doc.source || 'etc';
             const q = (doc.question || '').substring(0, 50);
             const score = doc.score ? doc.score.toFixed(4) : 'N/A';
-            const priority = doc.metadata?.priority ? `P${doc.metadata.priority}` : '';
-            console.log(`      [${idx + 1}] score=${score} ${priority} (${src}) ${q}${doc.question.length > 50 ? '...' : ''}`);
+            const tier = doc.metadata?.tier ? `T${doc.metadata.tier}` : '';
+            console.log(`      [${idx + 1}] score=${score} ${tier} (${src}) ${q}${doc.question.length > 50 ? '...' : ''}`);
         });
         // 점수 분포 통계
         const scores = filteredContexts.map(d => d.score || 0);
@@ -3024,8 +3024,8 @@ async function callOpenRouterAPIWithStreaming(userQuery, contexts, contentDiv, s
             const src = doc.source || 'etc';
             const q = (doc.question || '').substring(0, 50);
             const score = doc.score ? doc.score.toFixed(4) : 'N/A';
-            const priority = doc.metadata?.priority ? `P${doc.metadata.priority}` : '';
-            console.log(`      [${idx + 1}] score=${score} ${priority} (${src}) ${q}${doc.question.length > 50 ? '...' : ''}`);
+            const tier = doc.metadata?.tier ? `T${doc.metadata.tier}` : '';
+            console.log(`      [${idx + 1}] score=${score} ${tier} (${src}) ${q}${doc.question.length > 50 ? '...' : ''}`);
         });
         const scores = filteredContexts.map(d => d.score || 0);
         const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
