@@ -11,7 +11,7 @@
       "question": "베가스 CRM",
       "answer": "[이미지]\n\n### 🩺주요 진료과\n피부과, 성형외과\n\n### 💵이용료\n• 초기 설치비 - 165만 원 (최대 10인)\n• 월 이용료 - \n\n### 📝특이사항\n• 미용과 EMR 사용률 1위\n  • 1,500개 이상 병원에서 사용\n• 10년 이상의 업력\n\n### ✨주요 기능\n• CRM(고객관리) 기능\n• 진료 예약 기능\n• 청구 사전 심사\n• 사진 입력\n• PACS 연동\n• 비급여 정보 입력\n• 전자서명\n• 카드 결제 연동\n\n### 👍부가 기능\n\n### ⭐의사 리뷰\n• 선택 이유\n• (이용 이후) 장점\n  • 타 EMR에 비해 CRM 잘 되어 있음\n  • 직관적 인터페이스\n  • 비보험 진료 위주인 경우 편함\n• (이용 이후) 단점\n  • 클라우드 방식으로 서버 다운 간혹 발생 + 영향 심각",
       "metadata": {
-        "field": "플래너 AI",
+        "field": "EMR/CRM",
         "topic": "베가스 CRM",
         "category": "DB 레코드",
         "icon": "",
@@ -25,7 +25,8 @@
           "미용",
           "성형외과"
         ],
-        "website": "https://www.vegas-solution.com/home/main"
+        "website": "https://www.vegas-solution.com/home/main",
+        "tier": 2
       },
       "embedding": [
         0.03981216,
@@ -805,7 +806,7 @@
       "question": "스마트/우노 CRM",
       "answer": "[이미지]\n\n### 🩺주요 진료과\n피부과, 성형외과\n\n### 💵이용료\n• 초기 설치비 - 확인 필요\n• 월 이용료 - 확인 필요\n\n### 📝특이사항\n• UNO CRM - 클라우드 형태\n\n### ✨주요 기능\n• SMART CRM\n  • 원클릭 예약판\n  • 전화연동 기능\n  • 통계 분석\n  • 펜차트 기능\n• UNO CRM\n  • 태블릿 간편접수\n  • 펜차트 기능\n  • 타임테이블 기반 예약 및 접수 관리\n  • 통합 차트 관리\n  • 각종 연동 기능\n  • 통계 분석\n\n### 👍부가 기능\n\n### ⭐의사 리뷰\n• 선택 이유 이유\n• (이용 이후) 장점\n• (이용 이후) 단점",
       "metadata": {
-        "field": "플래너 AI",
+        "field": "EMR/CRM",
         "topic": "스마트/우노 CRM",
         "category": "DB 레코드",
         "icon": "",
@@ -819,7 +820,8 @@
           "미용",
           "성형외과"
         ],
-        "website": "https://carecrm.co.kr/index"
+        "website": "https://carecrm.co.kr/index",
+        "tier": 2
       },
       "embedding": [
         -0.04010764,
@@ -1599,7 +1601,7 @@
       "question": "KOS CRM",
       "answer": "[이미지]\n[이미지]\n\n### 🩺주요 진료과\n피부과, 성형외과\n\n### 💵이용료\n• 월 이용료 - 30만 원\n\n### 📝특이사항\n• 강남언니에서 만든 비급여 미용의료를 위한 신규 CRM\n• 서비스 소개서 ⏬\n[파일]\n[이미지]\n  • KOS CRM 설명서 \nhttps://healingpaper.notion.site/KOS-688f42f6ed164026a25f419b102eac9c\n  • KOS 홈페이지\nhttps://kos-solution.com/\n• 비급여 미용의료 중심으로, 보험청구 및 DUR 연동 기능은 없습니다 🥲\n\n### ✨주요 기능\n• 신규 및 재방문 고객 관리\n  • PC 및 태블릿 전용 웹기반 고객 차트\n• 리소스 최적화 \n  • 상품 및 이벤트 데이터 관리 기능\n  • 시술 현황 관리\n• 통계 기반 인센티브 설계\n  • 결제/구매/시술/예약내원 통계\n• 홈페이지와 강남언니 등 외부채널 예약 연동\n\n### 👍부가 기능\n• 결제 단말기 연동\n• 택스리펀 서비스 연동\n• 문자메시지 발송 서비스\n• 080 무료수신거부 서비스\n\n### 🎁 오픈닥터 혜택\n• 초기 3개월 이용료 : 무료\n\n### ⭐의사 리뷰\n• 선택 이유\n• (이용 이후) 장점\n• (이용 이후) 단점",
       "metadata": {
-        "field": "플래너 AI",
+        "field": "EMR/CRM",
         "topic": "KOS CRM",
         "category": "DB 레코드",
         "icon": "",
@@ -1612,7 +1614,8 @@
           "피부",
           "미용"
         ],
-        "website": "https://kos-solution.com/"
+        "website": "https://kos-solution.com/",
+        "tier": 3
       },
       "embedding": [
         0.0058353236,
@@ -2392,7 +2395,7 @@
       "question": "스마트닥터CRM",
       "answer": "[이미지]\n\n### 🩺주요 진료과\n피부과, 성형외과\n\n### 💵이용료\n• 초기 설치비 - 확인 필요\n• 월 이용료 - 확인 필요\n\n### 📝특이사항\n• 차트-EMR-CRM 제품 간 연동성\n• 전국 3,500개 이상 이용\n\n### ✨주요 기능\n1. 스마트차트\n  • 펜차트 기능\n  • 스마트NC / 타 EMR 모두 연동\n  • 촬영 이미지 차트 연동\n  • 모바일 이용 가능\n1. 스마트NC (EMR)\n  • 접수 및 수납 처리 기능\n  • 화면 구성 커스터마이징 가능\n  • 청구 실시간 사전점검 기능\n  • 전자서명, 진료실 안내 등\n1. 스마트닥터CRM\n  • 예진/문진 관리\n  • 통계 관리\n  • 차트 및 EMR과의 연동 편리성\n\n### 👍부가 기능\n• 기존 종이차트 스캔해 삽입 가능\n• 타 EMR에서 마이그레이션 가능\n\n### ⭐의사 리뷰\n• 선택 이유 이유\n• (이용 이후) 장점\n• (이용 이후) 단점",
       "metadata": {
-        "field": "플래너 AI",
+        "field": "EMR/CRM",
         "topic": "스마트닥터CRM",
         "category": "DB 레코드",
         "icon": "",
@@ -2406,7 +2409,8 @@
           "미용",
           "성형외과"
         ],
-        "website": "https://smartdoctor.cc/"
+        "website": "https://smartdoctor.cc/",
+        "tier": 3
       },
       "embedding": [
         0.017358983,

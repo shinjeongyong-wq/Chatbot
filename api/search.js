@@ -308,32 +308,7 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         .filter(r => r.score > 0.05)
         .sort((a, b) => b.score - a.score);
 
-    // 진료과 민감 카테고리 페널티 - 배열 지원
-    const specialtySensitiveCategories = ['partners', 'medical_device'];
-    const targetCategories = Array.isArray(targetCategory) ? targetCategory : [targetCategory];
-    const isSpecialtySensitive = targetCategories.some(cat => specialtySensitiveCategories.includes(cat));
-
-    if (userSpecialty && userSpecialty.code) {
-        const userSpecCode = userSpecialty.code.toLowerCase();
-
-        results = results.map(item => {
-            const itemSpecs = item.metadata?.specialties || [];
-            const hasSpecTag = itemSpecs.length > 0;
-            const matchesUserSpec = itemSpecs.some(s => s.toLowerCase() === userSpecCode);
-
-            let finalScore = item.score;
-
-            if (!isSpecialtySensitive || !hasSpecTag || matchesUserSpec || item._entityBoosted) {
-                finalScore = item.score * 1.0;
-            } else if (isSpecialtySensitive && hasSpecTag && !matchesUserSpec) {
-                finalScore = item.score * 0.6;
-            }
-
-            return { ...item, score: finalScore };
-        });
-
-        results.sort((a, b) => b.score - a.score);
-    }
+    // 진료과 민감 카테고리 페널티 제거됨 (파트너사 추천 방해 방지)
 
     // ★ 동적 커트라인 R24: min(top×0.75, mean+2σ) + cap10 ★
     const filterInfo = { originalCount: data.length, scoredCount: results.length };
