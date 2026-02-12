@@ -1186,6 +1186,7 @@ async function getBotResponse(userMessage) {
                 const planResult = await planResponse.json();
                 if (planResult.success && planResult.plan) {
                     queryPlan = planResult.plan;
+                    window._lastQueryPlan = queryPlan;  // 피드백용 저장
                     console.log('✅ Query Plan 수신:', queryPlan);
                     console.log('   Intent:', queryPlan.intent);
                     console.log('   RequiresSearch:', queryPlan.requiresSearch);
@@ -1757,7 +1758,7 @@ ${deduplicationRule}
 ${topicGenerationRule}
 
 # [Visual Formatting Protocol] (답변 포맷 규칙 - 최우선 적용) 🎨
-**모든 답변은 다음 마크다운 표준을 엄격히 준수하며, 선언된 형식을 벗어나지 마세요.**
+**모든 답변은 다음 마크다운 표준을 엄격히 준수하며, 선언된 형식을 절대 벗어나지 마세요.**
 
 1.  **Top-Down Summary**
     * 답변의 첫 줄은 반드시 질문에 대한 핵심 결론 또는 명확한 수치나 결과를 **한 문장**으로 작성합니다.
@@ -1770,7 +1771,7 @@ ${topicGenerationRule}
     * 가독성 규칙: 한 단락은 최대 **3줄**을 넘지 않으며, 초과 시 강제로 줄바꿈을 적용합니다.
 
 3.  **Emphasis & Listing**
-    * 수치, 날짜, 핵심 키워드만 **굵게(bold)** 처리합니다. (문장 전체 볼드 금지)
+    * 핵심 키워드만 **굵게(bold)** 처리합니다. (문장 전체 볼드 금지)
     * 단계별 절차는 \`1.\`, 단순 나열은 \`-\` 기호를 사용하며, 리스트 간 들여쓰기는 2칸 공백을 유지합니다.
 
 4.  **Termination Protocol (Strict)**
@@ -1817,9 +1818,9 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **(A)** 참고문서에 정확한 정보가 없는 경우
    - **(B)** 유사 정보로 대체 답변하는 경우
    - **(C)** 사용자가 파트너사 미팅, 의료기기 구매, 플래너 연결 등 **AI가 직접 수행할 수 없는 행동을 요청**하는 경우
-   - [NO_DATA] 태그가 없으면 플래너 연결 버튼이 표시되지 않습니다.
+   - [NO_DATA] 태그있으면 고정 안내 문구 다음에 플래너 연락 버튼을 표시합니다.
    - 일반 답변에서는 "플래너에게 연락" 문구를 사용하지 마세요.
-   - **형식**: [NO_DATA] → 감사/사과 → 관련 내용 → 고정 안내 문구 → [RELATED_TOPICS]
+   - **형식**: [NO_DATA] → 감사/사과 → 관련 내용 → 고정 안내 문구 → 플래너 연락 버튼 → [RELATED_TOPICS]
    - **고정 안내 문구**: "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
 
 # 관련 주제 추천 (필수)
@@ -2325,7 +2326,8 @@ async function submitFeedback() {
         content: content || '(내용 없음)',
         context_prompt: messageData.contextPrompt || '',
         user_name: window.currentUserName || '',
-        specialty: currentUserSpecialty || ''
+        specialty: currentUserSpecialty || '',
+        search_log: messageData.searchLog || null
     };
 
     console.log('📤 피드백 Supabase 저장 시도:', feedback);
@@ -3601,13 +3603,28 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName, opt
 
 
 
-    // 질문/답변 + 맥락 저장 (피드백용)
+    // 질문/답변 + 맥락 + 검색로그 저장 (피드백용)
     window.lastMessages = window.lastMessages || {};
+    const searchLog = {
+        queryPlan: window._lastQueryPlan ? {
+            intent: window._lastQueryPlan.intent,
+            topic: window._lastQueryPlan.topic,
+            subIntent: window._lastQueryPlan.subIntent,
+            coreKeywords: window._lastQueryPlan.coreKeywords
+        } : null,
+        docs: (contexts || []).map((doc, idx) => ({
+            rank: idx + 1,
+            name: (doc.question || '').substring(0, 80),
+            score: doc.score ? parseFloat(doc.score.toFixed(4)) : 0,
+            tier: doc.metadata?.tier || null
+        }))
+    };
     window.lastMessages[messageId] = {
         question: window.currentQuestion || '',
         answer: finalText,
         contexts: contexts,
-        messageType: messageType
+        messageType: messageType,
+        searchLog: searchLog
     };
 
     contentDiv.innerHTML = html + plannerButton + feedbackButtons;
