@@ -612,29 +612,34 @@
         }
 
 
-        .suggested-questions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            text-align: left;
+        .welcome-starter-topics {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            margin-top: 40px;
+            padding: 0 20px;
         }
 
-        .suggestion-chip {
-            padding: 16px;
-            background: transparent;
+        .starter-topic-btn {
+            padding: 12px 20px;
+            background: var(--surface-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 20px;
             font-size: 14px;
             font-weight: 500;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.2s ease;
+            max-width: 80%;
+            text-align: right;
         }
 
-        .suggestion-chip:hover {
-            border-color: var(--text-tertiary);
-            background: var(--surface-secondary);
-            color: var(--text-primary);
+        .starter-topic-btn:hover {
+            border-color: var(--accent-color);
+            background: var(--accent-bg, rgba(83, 109, 177, 0.08));
+            color: var(--accent-color);
+            transform: translateY(-1px);
         }
 
 
@@ -2817,8 +2822,16 @@
                     <h2>무엇을 도와드릴까요?</h2>
                     <p>AI 컨설턴트가 병원 개원의 모든 것을 답변해 드립니다.<br>우측 상단에서 자주 묻는 질문을 확인하거나, 직접 물어보세요.</p>
 
-                    <div class="suggested-questions" style="display: none;">
-
+                    <div class="welcome-starter-topics">
+                        <button class="starter-topic-btn" onclick="sendRelatedTopic('개원 준비, 어디서부터 시작하면 되나요?')">
+                            개원 준비, 어디서부터 시작하면 되나요?
+                        </button>
+                        <button class="starter-topic-btn" onclick="sendRelatedTopic('인테리어 업체 추천해주세요')">
+                            인테리어 업체 추천해주세요
+                        </button>
+                        <button class="starter-topic-btn" onclick="sendRelatedTopic('개원 비용은 얼마나 준비해야 하나요?')">
+                            개원 비용은 얼마나 준비해야 하나요?
+                        </button>
                     </div>
                 </div>
             </div>

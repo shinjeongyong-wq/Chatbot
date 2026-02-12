@@ -329,31 +329,8 @@ const CONFIG = {
     CHAT_ENDPOINT: '/api/chat'
 };
 
-// ★ 앵커 주제 (topics_shortened.json에서 로드) ★
-let anchorTopics = [];
-
-// topics_shortened.json 로드 (축약된 주제 사용)
-async function loadAnchorTopics() {
-    try {
-        const response = await fetch('/data/topics_shortened.json');
-        if (response.ok) {
-            const data = await response.json();
-            // shortened 필드를 question으로 매핑하여 기존 코드 호환성 유지
-            anchorTopics = data.map(item => ({
-                id: item.id,
-                question: item.shortened || '',  // 축약된 주제 사용
-                category: '',     // 호환성용 빈 값
-                subCategory: ''   // 호환성용 빈 값
-            }));
-            console.log(`✅ 앵커 주제 ${anchorTopics.length}개 로드 완료 (축약됨)`);
-        }
-    } catch (error) {
-        console.error('앵커 주제 로드 실패:', error);
-    }
-}
-
-// 페이지 로드 시 앵커 주제 로드
-loadAnchorTopics();
+// ★ 토킹포인트: AI가 참고문서 기반으로 자체 생성 (v3) ★
+// 기존 anchorTopics / topics_shortened.json 시스템 제거됨
 
 
 // ★ Phase 4: 진료과별 키워드 확장 ★
@@ -678,56 +655,7 @@ function extractMentionedKeywords() {
 
 // ★ 사용자 질문과 관련된 앵커 주제 찾기 ★
 // includeUsed: true면 이미 질문한 주제도 포함 (기록용), false면 제외 (추천용)
-function findRelatedAnchorTopics(userMessage, count = 3, includeUsed = false) {
-    if (!anchorTopics || anchorTopics.length === 0) {
-        return [];
-    }
-
-    const message = userMessage.toLowerCase();
-
-    // 이미 사용자가 질문한 주제 가져오기
-    const usedTopics = chatMemory.usedTopics || [];
-
-    // 각 주제별 관련도 점수 계산
-    const scored = anchorTopics
-        .filter(topic => includeUsed || !usedTopics.includes(topic.question))  // ★ 옵션에 따라 필터링 ★
-        .map(topic => {
-            let score = 0;
-            const question = topic.question.toLowerCase();
-            const category = topic.category.toLowerCase();
-            const subCategory = (topic.subCategory || '').toLowerCase();
-
-            // 카테고리 매칭
-            if (message.includes(category)) score += 3;
-            if (message.includes(subCategory)) score += 2;
-
-            // 질문 키워드 매칭
-            const questionWords = question.split(/[\s/]+/).filter(w => w.length > 1);
-            questionWords.forEach(word => {
-                if (message.includes(word)) score += 1;
-            });
-
-            // 메시지 키워드가 질문에 있는지
-            const messageWords = message.split(/[\s/]+/).filter(w => w.length > 1);
-            messageWords.forEach(word => {
-                if (question.includes(word)) score += 1;
-            });
-
-            return { question: topic.question, score };
-        });
-
-    // 점수순 정렬 후 상위 N개 선택
-    const result = scored
-        .filter(t => t.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, count)
-        .map(t => t.question);
-
-    if (!includeUsed) {
-        console.log(`🎯 [RT] 추천 후보: ${result.length}개 (제외된 주제: ${usedTopics.length}개)`);
-    }
-    return result;
-}
+// findRelatedAnchorTopics 제거됨 - AI가 프롬프트 규칙에 따라 토킹포인트 자체 생성
 
 // ★★★ 고유명사(업체명/엔티티) 강제 포함 함수 ★★★
 // 질문에 특정 고유명사가 언급되면 해당 문서를 강제로 포함시킴
@@ -1125,12 +1053,7 @@ async function getBotResponse(userMessage) {
     // 피드백용으로 현재 질문 저장
     window.currentQuestion = userMessage;
 
-    // ★ 사용자 질문과 매칭되는 RT 주제 기록 (중복 추천 방지) ★
-    // 기록할 때는 이미 사용된 주제라도 다시 매칭하여 정확히 기록함 (includeUsed = true)
-    const matchedTopics = findRelatedAnchorTopics(userMessage, 1, true);
-    if (matchedTopics.length > 0) {
-        chatMemory.addUsedTopic(matchedTopics[0]);
-    }
+    // (토킹포인트 v3: AI 자체 생성 방식으로 변경됨)
 
     // 사용자 질문을 Google Sheets에 수집 (비동기, 에러 무시)
     try {
@@ -1211,17 +1134,9 @@ async function getBotResponse(userMessage) {
                             if (!finalAnswer.includes('[NO_DATA]')) {
                                 finalAnswer = '[NO_DATA]' + finalAnswer;
                             }
-                            // ★ OUT_OF_SCOPE에도 RT 추가 (DB 저장 + 리로드 시 복원용) ★
-                            const rtTopics = findRelatedAnchorTopics(userMessage, 3);
-                            if (rtTopics.length > 0) {
-                                finalAnswer += '\n\n[RELATED_TOPICS]' + rtTopics.join('|') + '[/RELATED_TOPICS]';
-                            }
+                            // OUT_OF_SCOPE: 토킹포인트 없음 (GREETING/OUT_OF_SCOPE는 스킵)
                         } else if (queryPlan.intent === 'AMBIGUOUS') {
-                            // 관련 주제 추천 추가
-                            const relatedTopics = findRelatedAnchorTopics(userMessage, 5);
-                            if (relatedTopics.length > 0) {
-                                finalAnswer += '\n\n[RELATED_TOPICS]' + relatedTopics.join('|') + '[/RELATED_TOPICS]';
-                            }
+                            // AMBIGUOUS: AI의 directAnswer에 이미 토킹포인트 포함
                         }
 
                         // ★ 타이핑 효과 적용 ★
@@ -1694,12 +1609,10 @@ function addFormattedMessage(text, contexts, modelName = null) {
     // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
 }
 
-// 관련 주제 버튼 클릭 시 해당 질문 자동 전송
+// 관련 주제(토킹포인트) 버튼 클릭 시 해당 질문 자동 전송
 function sendRelatedTopic(topic) {
-    // topics.json에 있는 질문인지 확인
-    const isValidTopic = anchorTopics.some(t => t.question === topic);
-    if (!isValidTopic) {
-        console.warn('유효하지 않은 앵커 주제:', topic);
+    if (!topic || topic.trim().length === 0) {
+        console.warn('빈 토킹포인트:', topic);
         return;
     }
 
@@ -1824,24 +1737,21 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **형식**: [NO_DATA] → 감사/사과 → 관련 내용 → 고정 안내 문구 → 플래너 연락 버튼 → [RELATED_TOPICS]
    - **고정 안내 문구**: "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
 
-# 관련 주제 추천 (필수)
-답변의 마무리 부분에서 다음 대화를 위한 관련 주제를 자연스럽게 제안하세요.
-
-[추천 가능한 주제 목록 - 아래 주제들을 대화에 활용하세요]
-${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t => '- ' + t.question).join('\n')}
+# 토킹 포인트 (후속 질문 추천) — GREETING, OUT_OF_SCOPE일 때는 생략
+답변 후, 사용자가 이 답변을 읽은 뒤 자연스럽게 궁금해할 후속 질문 2~3개를 생성하세요.
 
 **규칙:**
-1. 위 목록에서 현재 답변과 가장 관련 깊은 주제 2~3개를 선택하세요.
-2. **[자연스러운 추천]**: "혹시 **[주제]**에 대해서도 궁금하신가요?" 혹은 "추가로 **[주제]** 관련 정보도 안내해 드릴 수 있습니다."와 같이 대화 맥락에 맞춰 자연스럽게 제안하세요. 
-3. 제안하는 핵심 주제 키워드는 반드시 **굵게(bold)** 표시하세요.
-4. 방금 답변한 내용이나 이미 추천했던 주제는 제외하세요.
-5. 답변의 맨 마지막에는 시스템 버튼 생성을 위해 \`[RELATED_TOPICS]질문1|질문2[/RELATED_TOPICS]\` 형식을 반드시 포함하세요. (이때 질문1, 2는 목록의 원본 질문 텍스트를 사용하세요.)
+1. 반드시 참고문서 범위 내에서 생성하세요. 답변할 수 없는 질문은 절대 추천 금지.
+2. 현재 답변에서 이미 다룬 내용은 제외하세요.
+3. 사용자가 이 답변을 읽은 뒤 자연스럽게 궁금해할 후속 질문이어야 합니다.
+4. 참고문서가 1개인 경우: 해당 문서 내 다루지 않은 다른 측면, 또는 같은 분야의 일반적 후속 질문도 허용합니다.
+5. "혹시 ~에 대해서도 궁금하신가요?" 같은 정형 문구 금지. 대화 흐름에 맞게 자연스럽게 작성.
+6. 답변의 맨 마지막에 시스템 버튼 생성을 위해 \`[RELATED_TOPICS]질문1|질문2|질문3[/RELATED_TOPICS]\` 형식을 반드시 포함하세요.
 
-**형식 예시:**
+**예시:**
 ... 답변 본문 마침표로 끝.
-추가로 원장님, **인공신장실 시설 기준**이나 **의료기기 리스 조건**에 대해서도 더 궁금한 점이 있으시면 언제든 말씀해 주세요.
 
-[RELATED_TOPICS]인공신장실 시설 관련 기준은?|의료기기 리스 및 렌탈 비용은?[/RELATED_TOPICS]`;
+[RELATED_TOPICS]인테리어 공사 기간은 보통 얼마나 걸리나요?|다른 인테리어 업체도 비교해볼 수 있나요?[/RELATED_TOPICS]`;
 }
 
 function showTypingIndicator() {
@@ -3542,15 +3452,6 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName, opt
 
     // ★ RT 처리 (skipRT 옵션이 없을 때만) ★
     if (!options.skipRT) {
-        // 코드 레벨 보장: AI가 RELATED_TOPICS를 누락해도 자동 삽입
-        if (relatedTopics.length === 0 && typeof findRelatedAnchorTopics === 'function') {
-            const currentQ = window.currentQuestion || '';
-            const autoTopics = findRelatedAnchorTopics(currentQ, 3);
-            if (autoTopics.length > 0) {
-                relatedTopics = autoTopics;
-                console.log('🔄 RT 자동 삽입:', relatedTopics);
-            }
-        }
 
         // 시스템용 버튼 생성 데이터만 추출 (관련 주제 버튼 클릭 시 사용)
         if (relatedTopics.length > 0) {
