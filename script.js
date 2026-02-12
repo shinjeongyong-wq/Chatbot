@@ -1461,11 +1461,6 @@ async function callOpenRouterAPI(userQuery, contexts) {
         const formatDoc = (item, idx) => {
             let prefix = `[${idx + 1}]`;
 
-            // tier 태그 시각화
-            if (item.metadata?.tier) {
-                prefix += ` [tier:${item.metadata.tier}]`;
-            }
-
             // 진료과 태그 시각화
             if (item.metadata?.specialties && item.metadata.specialties.length > 0) {
                 const tags = item.metadata.specialties.map(s => {
@@ -1789,20 +1784,13 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - 질문 의도가 '업체 추천'이 아닌 '방법/정보 요청'이면 **절차와 가이드 위주로** 답변하세요.
    - 업체 정보 제공 시, 특화 진료과가 사용자와 다르면: "해당 정보는 주로 **[참고문서의 진료과]**에 특화되어 있어, 원장님의 **[사용자 진료과]**에는 확인이 필요할 수 있습니다."
 
-4. **[파트너사 추천 규칙 - tier 우선순위]**:
-   - 참고문서에 `[tier: 1]`, `[tier: 2]`, `[tier: 3]` 태그가 있는 문서는 **파트너사**입니다.
-   - 파트너사 추천 시 **tier:1(최우선) → tier:2 → tier:3** 순서로 우선 추천하세요.
-   - 첫 번째 추천은 반드시 **tier:1** 파트너사를 추천하세요. tier:1이 없으면 tier:2를 추천하세요.
-   - 업체명, 예상 견적, 건설업등록증 보유 여부, 주요 특징을 포함하여 답변하세요.
-   - "더 없어?", "다른 업체도" 등 후속 질문 시 다음 tier의 파트너사를 추천하세요.
+4. **[주제 일관성]**: 현재 대화의 주제를 중심으로 답변하세요. 새로운 정보가 없다면 정직하게 전달하세요.
 
-5. **[주제 일관성]**: 현재 대화의 주제를 중심으로 답변하세요. 새로운 정보가 없다면 정직하게 전달하세요.
+5. 참고문서에 없는 내용을 지어내지 마세요 (할루시네이션 금지). 단, 참고문서에 있다고 모두 사용하지 말고, 질문의 핵심 대상과 직접 관련된 내용만 선별하세요.
 
-6. 참고문서에 없는 내용을 지어내지 마세요 (할루시네이션 금지). 단, 참고문서에 있다고 모두 사용하지 말고, 질문의 핵심 대상과 직접 관련된 내용만 선별하세요.
+6. 병원 개원과 무관한 질문 → "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
 
-7. 병원 개원과 무관한 질문 → "[OFF_TOPIC]죄송합니다. 해당 질문에 대해서는 답변을 드리기 어렵습니다."
-
-8. **[NO_DATA] 태그 규칙**:
+7. **[NO_DATA] 태그 규칙**:
    아래 경우에 [NO_DATA] 태그를 사용하세요:
    - **(A)** 참고문서에 정확한 정보가 없는 경우
    - **(B)** 유사 정보로 대체 답변하는 경우
@@ -3009,9 +2997,6 @@ async function callOpenRouterAPIWithStreaming(userQuery, contexts, contentDiv, s
 
         const formatDoc = (item, idx) => {
             let prefix = `[${idx}]`;
-            if (item.metadata?.tier) {
-                prefix += ` [tier:${item.metadata.tier}]`;
-            }
             if (item.specialty && item.specialty !== '공통' && item.specialty !== 'ALL') {
                 prefix += ` (특화: ${item.specialty})`;
             }
