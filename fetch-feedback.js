@@ -1,6 +1,7 @@
 /**
- * 피드백 데이터 수집 스크립트 (Supabase 버전)
- * Supabase에서 미처리 피드백을 가져와서 분석용으로 출력
+ * 피드백 데이터 수집 스크립트 (v3 - Supabase)
+ * - Supabase에서 미처리 피드백을 가져와서 콘솔 출력 + JSON 파일 저장
+ * - _feedback_data.json으로 프로그래밍적 파싱 지원
  */
 
 const fs = require('fs');
@@ -50,6 +51,9 @@ async function fetchFeedbackData() {
 
         if (!feedbacks || feedbacks.length === 0) {
             console.log('ℹ️ 처리할 피드백이 없습니다.');
+            // 빈 배열로 파일 저장
+            fs.writeFileSync('_feedback_data.json', JSON.stringify([], null, 2), 'utf8');
+            console.log('📁 _feedback_data.json 저장 (빈 배열)');
             process.exit(0);
         }
 
@@ -65,6 +69,7 @@ async function fetchFeedbackData() {
             console.log(`  📝 상세: ${fb.content || '(없음)'}`);
             console.log(`  🧠 맥락: ${(fb.context_prompt || '').substring(0, 50)}...`);
             console.log(`  👤 사용자: ${fb.user_name || '(없음)'} / ${fb.specialty || '(없음)'}`);
+            console.log(`  🔍 search_log: ${fb.search_log ? '있음' : '없음'}`);
             console.log(`  ⏰ 시간: ${fb.created_at}`);
         });
 
@@ -73,13 +78,15 @@ async function fetchFeedbackData() {
 
         const goodCount = feedbacks.filter(fb => fb.type === 'Good').length;
         const badCount = feedbacks.filter(fb => fb.type === 'Bad').length;
+        const withLog = feedbacks.filter(fb => fb.search_log).length;
 
         console.log(`  👍 Good: ${goodCount}개`);
         console.log(`  👎 Bad: ${badCount}개`);
+        console.log(`  🔍 search_log 포함: ${withLog}개`);
 
-        // JSON 형태로도 출력 (분석용)
-        console.log('\n\n📦 JSON 데이터:');
-        console.log(JSON.stringify(feedbacks, null, 2));
+        // JSON 파일로 저장
+        fs.writeFileSync('_feedback_data.json', JSON.stringify(feedbacks, null, 2), 'utf8');
+        console.log(`\n📁 _feedback_data.json 저장 완료 (${feedbacks.length}개)`);
 
         return feedbacks;
 
