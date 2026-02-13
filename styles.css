@@ -702,18 +702,14 @@ body {
             max-width: 88% !important;
             border-radius: 18px 18px 18px 4px !important;
         }
-    }
 
-    /* --- 2. Mobile Header Buttons --- */
-    @media (max-width: 768px) {
-
+        /* --- 2. Mobile Header Buttons --- */
         .mobile-menu-btn,
         .header-planner-btn {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             color: #536db1 !important;
-            /* 파란색 */
             padding: 8px !important;
         }
 
@@ -737,10 +733,8 @@ body {
         .sidebar-top-controls {
             padding: 8px 12px !important;
         }
-    }
 
-    /* --- 3. Mobile Sidebar Overlay --- */
-    @media (max-width: 768px) {
+        /* --- 3. Mobile Sidebar Overlay --- */
         .history-sidebar {
             position: fixed !important;
             left: -100% !important;
@@ -771,10 +765,8 @@ body {
         .sidebar-overlay.active {
             display: block !important;
         }
-    }
 
-    /* --- 4. Mobile Bottom Input Safe Area Fix --- */
-    @media (max-width: 768px) {
+        /* --- 4. Mobile Bottom Input Safe Area Fix --- */
         .input-container {
             padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
         }
