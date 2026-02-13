@@ -13,25 +13,25 @@
     --border-color: #e5e7eb;
     --success: #10b981;
     --warning: #f59e0b;
-    
+
     /* Spacing */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
     --spacing-md: 16px;
     --spacing-lg: 24px;
     --spacing-xl: 32px;
-    
+
     /* Border Radius */
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 16px;
     --radius-full: 9999px;
-    
+
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    
+
     /* Typography */
     --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
@@ -401,6 +401,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -408,19 +409,26 @@ body {
 }
 
 @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0);
     }
+
     50% {
         transform: translateY(-10px);
     }
 }
 
 @keyframes typing {
-    0%, 60%, 100% {
+
+    0%,
+    60%,
+    100% {
         opacity: 0.3;
         transform: scale(0.8);
     }
+
     30% {
         opacity: 1;
         transform: scale(1);
@@ -432,31 +440,32 @@ body {
     .container {
         max-width: 100%;
     }
-    
+
     .header {
         padding: var(--spacing-md) var(--spacing-lg);
     }
-    
+
     .chat-container {
         padding: var(--spacing-lg);
     }
-    
+
     .welcome-message {
         margin: var(--spacing-xl) auto;
     }
-    
+
     .welcome-message h2 {
         font-size: 24px;
     }
-    
+
     .message-content {
         max-width: 85%;
     }
-    
+
     .input-container {
         padding: var(--spacing-md) var(--spacing-lg);
     }
 }
+
 /* ========================================
    ?�릭 가?�한 주제 링크 ?��???
    ======================================== */
@@ -490,9 +499,17 @@ body {
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 
@@ -513,7 +530,9 @@ body {
 }
 
 @keyframes blink {
-    50% { opacity: 0; }
+    50% {
+        opacity: 0;
+    }
 }
 
 /* ��Ʈ���� �Ϸ� �� Ŀ�� ���� */
@@ -525,7 +544,7 @@ body {
 .model-info {
     margin-top: 12px;
     padding-top: 8px;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
     font-size: 12px;
     color: var(--text-secondary);
     opacity: 0.7;
@@ -537,6 +556,7 @@ body {
 
 /* 터치 최적화 기본 설정 */
 @media (hover: none) and (pointer: coarse) {
+
     /* 터치 디바이스에서 호버 효과 제거 */
     .suggestion-chip:hover,
     .send-button:hover,
@@ -544,7 +564,7 @@ body {
         transform: none;
         box-shadow: none;
     }
-    
+
     /* 터치 하이라이트 색상 */
     * {
         -webkit-tap-highlight-color: rgba(83, 109, 177, 0.2);
@@ -553,50 +573,52 @@ body {
 
 /* 768px 이하 - 태블릿/모바일 */
 @media (max-width: 768px) {
+
     /* 입력창 터치 최적화 */
     .send-button {
         width: 44px;
         height: 44px;
     }
-    
+
     .chat-input {
-        font-size: 16px; /* iOS 확대 방지 */
+        font-size: 16px;
+        /* iOS 확대 방지 */
     }
-    
+
     /* 메시지 영역 */
     .message-avatar {
         width: 32px;
         height: 32px;
         font-size: 12px;
     }
-    
+
     .message-content {
         font-size: 14px;
         padding: var(--spacing-sm) var(--spacing-md);
     }
-    
+
     /* 피드백 버튼 터치 영역 확대 */
     .feedback-btn {
         min-height: 44px;
         padding: 10px 16px;
     }
-    
+
     /* 플래너 버튼 터치 영역 확대 */
     .contact-planner-btn {
         min-height: 48px;
         width: 100%;
         justify-content: center;
     }
-    
+
     /* 웰컴 메시지 */
     .welcome-message {
         padding: 0 var(--spacing-md);
     }
-    
+
     .welcome-message p {
         font-size: 14px;
     }
-    
+
     /* 제안 칩 터치 영역 */
     .suggestion-chip {
         min-height: 48px;
@@ -606,152 +628,156 @@ body {
 
 /* 480px 이하 - 소형 모바일 */
 @media (max-width: 480px) {
+
     /* 헤더 축소 */
     .header {
         padding: var(--spacing-sm) var(--spacing-md);
     }
-    
+
     .logo-text {
         font-size: 16px;
     }
-    
+
     .header-subtitle {
         display: none;
     }
-    
+
     /* 채팅 영역 */
     .chat-container {
         padding: var(--spacing-md);
     }
-    
+
     .message {
         gap: var(--spacing-sm);
     }
-    
+
     .message-avatar {
         width: 28px;
         height: 28px;
         font-size: 11px;
     }
-    
+
     .message-content {
         max-width: 88%;
         font-size: 14px;
         padding: 10px 12px;
     }
-    
+
     /* 입력 영역 */
     .input-container {
         padding: var(--spacing-sm) var(--spacing-md);
     }
-    
+
     .input-wrapper {
         padding: 6px;
     }
 
-/* ==========================================================================
+    /* ==========================================================================
    MOBILE UI FINAL FIX (v6.0.0)
    ========================================================================== */
 
-/* --- 1. Mobile Avatar Hidden (Gemini Style) --- */
-@media (max-width: 768px) {
-    .message-avatar {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
+    /* --- 1. Mobile Avatar Hidden (Gemini Style) --- */
+    @media (max-width: 768px) {
+        .message-avatar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .message {
+            gap: 0 !important;
+            margin-bottom: 12px !important;
+        }
+
+        .message.user .message-content {
+            margin-right: 8px !important;
+            max-width: 82% !important;
+            border-radius: 18px 18px 4px 18px !important;
+        }
+
+        .message.bot .message-content {
+            margin-left: 8px !important;
+            max-width: 88% !important;
+            border-radius: 18px 18px 18px 4px !important;
+        }
     }
 
-    .message {
-        gap: 0 !important;
-        margin-bottom: 12px !important;
+    /* --- 2. Mobile Header Buttons --- */
+    @media (max-width: 768px) {
+
+        .mobile-menu-btn,
+        .header-planner-btn {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #536db1 !important;
+            /* 파란색 */
+        }
+
+        .header-faq-btn,
+        #hamburgerBtn,
+        .desktop-only {
+            display: none !important;
+        }
+
+        .header {
+            padding: 8px 12px !important;
+            padding-top: max(8px, env(safe-area-inset-top)) !important;
+        }
     }
 
-    .message.user .message-content {
-        margin-right: 8px !important;
-        max-width: 82% !important;
-        border-radius: 18px 18px 4px 18px !important;
+    /* --- 3. Mobile Sidebar Overlay --- */
+    @media (max-width: 768px) {
+        .history-sidebar {
+            position: fixed !important;
+            left: -100% !important;
+            top: 0 !important;
+            height: 100vh !important;
+            width: 80% !important;
+            max-width: 300px !important;
+            z-index: 10001 !important;
+            transition: left 0.3s ease-out !important;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .history-sidebar.mobile-open {
+            left: 0 !important;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+        }
+
+        .sidebar-overlay.active {
+            display: block !important;
+        }
     }
 
-    .message.bot .message-content {
-        margin-left: 8px !important;
-        max-width: 88% !important;
-        border-radius: 18px 18px 18px 4px !important;
-    }
-}
-
-/* --- 2. Mobile Header Buttons --- */
-@media (max-width: 768px) {
-    .mobile-menu-btn,
-    .header-planner-btn {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+    /* --- 4. Mobile Bottom Input Safe Area Fix --- */
+    @media (max-width: 768px) {
+        .input-container {
+            padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
+        }
     }
 
-    .header-faq-btn,
-    #hamburgerBtn,
-    .desktop-only {
-        display: none !important;
-    }
+    /* --- 5. PC Avatar Visible (Default) --- */
+    @media (min-width: 769px) {
+        .message-avatar {
+            display: flex !important;
+        }
 
-    .header {
-        padding: 8px 12px !important;
-        padding-top: max(8px, env(safe-area-inset-top)) !important;
+        .mobile-menu-btn,
+        .header-planner-btn,
+        .mobile-only {
+            display: none !important;
+        }
     }
-}
-
-/* --- 3. Mobile Sidebar Overlay --- */
-@media (max-width: 768px) {
-    .history-sidebar {
-        position: fixed !important;
-        left: -100% !important;
-        top: 0 !important;
-        height: 100vh !important;
-        width: 80% !important;
-        max-width: 300px !important;
-        z-index: 10001 !important;
-        transition: left 0.3s ease-out !important;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.2) !important;
-    }
-
-    .history-sidebar.mobile-open {
-        left: 0 !important;
-    }
-
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 10000;
-    }
-
-    .sidebar-overlay.active {
-        display: block !important;
-    }
-}
-
-/* --- 4. Mobile Bottom Input Safe Area Fix --- */
-@media (max-width: 768px) {
-    .input-container {
-        padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
-    }
-}
-
-/* --- 5. PC Avatar Visible (Default) --- */
-@media (min-width: 769px) {
-    .message-avatar {
-        display: flex !important;
-    }
-
-    .mobile-menu-btn,
-    .header-planner-btn,
-    .mobile-only {
-        display: none !important;
-    }
-}
