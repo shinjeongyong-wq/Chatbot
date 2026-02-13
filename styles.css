@@ -731,8 +731,8 @@ body {
     }
 
     .sidebar-top-controls {
-        padding: 8px 12px !important;
-        padding-top: max(8px, env(safe-area-inset-top)) !important;
+        padding: 8px !important;
+        padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
     }
 
     /* --- 3. Mobile Sidebar Overlay --- */
