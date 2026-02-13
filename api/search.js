@@ -1,5 +1,5 @@
 // Vercel Serverless Function - 검색 API (보안 로직)
-// 프론트엔드에서 노출되던 검색 알고리즘을 서버로 이동
+// v17: v14기반 + EMR 동의어 강화
 
 const fs = require('fs');
 const path = require('path');
@@ -8,6 +8,97 @@ const path = require('path');
 let cachedData = null;
 let dataLoadedTime = null;
 const CACHE_DURATION = 5 * 60 * 1000; // 5분
+
+// ========== TF-IDF 엔진 ==========
+let idfCache = null; // { term: idf_value }
+let docVectorCache = null; // Map<docIndex, { terms: Map<term, tfidf>, norm: number }>
+
+// 한국어 토크나이저 (2글자 이상 단어 추출)
+function tokenize(text) {
+    if (!text) return [];
+    return text.toLowerCase()
+        .replace(/[^가-힣a-z0-9\s]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length >= 2);
+}
+
+// IDF 계산 (전체 문서 기반, 데이터 로드 시 1회 실행)
+function buildIDF(documents) {
+    const docCount = documents.length;
+    const df = {}; // document frequency
+
+    documents.forEach(doc => {
+        const text = ((doc.question || '') + ' ' + (doc.answer || '')).toLowerCase();
+        const terms = new Set(tokenize(text));
+        terms.forEach(term => {
+            df[term] = (df[term] || 0) + 1;
+        });
+    });
+
+    const idf = {};
+    Object.keys(df).forEach(term => {
+        idf[term] = Math.log((docCount + 1) / (df[term] + 1)) + 1; // smoothed IDF
+    });
+
+    return idf;
+}
+
+// 문서의 TF-IDF 벡터 생성
+function buildDocVector(doc, idf) {
+    const text = ((doc.question || '') + ' ' + (doc.answer || '')).toLowerCase();
+    const tokens = tokenize(text);
+    if (tokens.length === 0) return { terms: new Map(), norm: 0 };
+
+    // TF 계산
+    const tf = {};
+    tokens.forEach(t => { tf[t] = (tf[t] || 0) + 1; });
+
+    // TF-IDF 벡터
+    const terms = new Map();
+    let normSq = 0;
+    Object.keys(tf).forEach(term => {
+        const tfidf = (tf[term] / tokens.length) * (idf[term] || 1);
+        terms.set(term, tfidf);
+        normSq += tfidf * tfidf;
+    });
+
+    return { terms, norm: Math.sqrt(normSq) };
+}
+
+// 쿼리 벡터 생성
+function buildQueryVector(queryTerms, idf) {
+    if (queryTerms.length === 0) return { terms: new Map(), norm: 0 };
+
+    const tf = {};
+    queryTerms.forEach(t => { tf[t] = (tf[t] || 0) + 1; });
+
+    const terms = new Map();
+    let normSq = 0;
+    Object.keys(tf).forEach(term => {
+        const tfidf = (tf[term] / queryTerms.length) * (idf[term] || 1);
+        terms.set(term, tfidf);
+        normSq += tfidf * tfidf;
+    });
+
+    return { terms, norm: Math.sqrt(normSq) };
+}
+
+// 코사인 유사도
+function cosineSimilarity(vecA, vecB) {
+    if (vecA.norm === 0 || vecB.norm === 0) return 0;
+
+    let dotProduct = 0;
+    // 작은 쪽을 순회하여 성능 최적화
+    const [smaller, larger] = vecA.terms.size <= vecB.terms.size
+        ? [vecA, vecB] : [vecB, vecA];
+
+    for (const [term, val] of smaller.terms) {
+        const otherVal = larger.terms.get(term);
+        if (otherVal) dotProduct += val * otherVal;
+    }
+
+    return dotProduct / (vecA.norm * vecB.norm);
+}
 
 // ========== 재귀적 JSON 파일 로드 ==========
 function loadJsonFilesRecursively(dirPath, allData = []) {
@@ -100,6 +191,9 @@ const synonyms = {
     '간판': ['사인', '싸인', '현판'],
     '환자': ['고객', '내원객'],
     '진료': ['치료', '시술'],
+    'EMR': ['전자차트', 'CRM', '차트', '진료기록'],
+    '전자차트': ['EMR', 'CRM', '차트', '진료기록'],
+    'CRM': ['EMR', '전자차트', '고객관리'],
 };
 
 // ========== 한국어 조사 제거 ==========
@@ -129,7 +223,7 @@ function expandQueryWithSynonyms(query) {
     return [...new Set(expandedWords)].filter(w => w.length >= 2);
 }
 
-// ========== Smart Score 계산 (단순화 v2.3.1) ==========
+// ========== Smart Score 계산 (v16) ==========
 function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strategy) {
     const question = (item.question || '').toLowerCase();
     const answer = (item.answer || '').toLowerCase();
@@ -140,6 +234,7 @@ function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strate
     const textNoSpace = text.replace(/\s/g, '');
 
     let score = 0;
+    let coreHitCount = 0;
 
     // 1. 핵심 키워드 매칭 (최대 +0.6)
     if (coreKeywords && coreKeywords.length > 0) {
@@ -151,6 +246,7 @@ function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strate
 
             if (text.includes(kw) || textNoSpace.includes(kwNoSpace)) {
                 coreHits++;
+                coreHitCount++;
                 if (question.includes(kw) || question.replace(/\s/g, '').includes(kwNoSpace)) {
                     coreHits += 0.5;
                 }
@@ -182,7 +278,7 @@ function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strate
                 const searchTopic = t.toLowerCase();
                 if (field.includes(searchTopic) || question.includes(searchTopic)) {
                     score += 0.1;
-                    break; // 하나만 매칭되면 OK
+                    break;
                 }
             }
         }
@@ -250,14 +346,30 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         return true;
     });
 
-    // 2. 스코어링
-    let results = candidates.map(item => {
+    // 2. 코사인 유사도 쿼리 벡터 준비
+    const allQueryTerms = [
+        ...(coreKeywords || []).flatMap(kw => tokenize(kw || '')),
+        ...(expandedKeywords || []).flatMap(kw => tokenize(kw || '')),
+    ];
+    const queryVector = idfCache ? buildQueryVector(allQueryTerms, idfCache) : null;
+
+    // 3. 스코어링
+    let results = candidates.map((item, idx) => {
         let score = calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
+
+        // ★ TF-IDF 코사인 유사도 (0~1) → 가중치 0.15 ★
+        let cosine = 0;
+        if (queryVector && idfCache) {
+            const docVec = buildDocVector(item, idfCache);
+            cosine = cosineSimilarity(queryVector, docVec);
+            score += cosine * 0.15;
+        }
 
         const itemTopic = item.metadata?.topic || item.metadata?.category || '';
         const itemField = (item.metadata?.field || '').toLowerCase();
         const itemPath = item.metadata?.structuredCategory || '';
 
+        let hasTopicBonus = false;
         // 토픽 매칭 보너스 - 배열 지원
         if (topic) {
             const topics = Array.isArray(topic) ? topic : [topic];
@@ -266,6 +378,7 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
                     const searchTopic = t.toLowerCase();
                     if (itemTopic.toLowerCase().includes(searchTopic) || itemField.includes(searchTopic)) {
                         score = score + 0.5;
+                        hasTopicBonus = true;
                         break;
                     }
                 }
@@ -294,16 +407,15 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
             for (const kw of coreKeywords) {
                 if (!kw || kw.length < 2) continue;
                 const kwNoSpace = kw.toLowerCase().replace(/\s/g, '');
-                // 문서 제목이 키워드와 정확히 일치하거나, 제목에 키워드가 포함
                 if (questionNoSpace === kwNoSpace || questionTrimmed.toLowerCase() === kw.toLowerCase()) {
-                    score += 1.0; // 고유명사 정확 매칭 부스트
+                    score += 1.0;
                     item._entityBoosted = true;
                     break;
                 }
             }
         }
 
-        return { ...item, score };
+        return { ...item, score, _cosine: cosine };
     })
         .filter(r => r.score > 0.05)
         .sort((a, b) => b.score - a.score);
@@ -319,7 +431,7 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         const stdDev = Math.sqrt(scores.reduce((s, v) => s + (v - mean) ** 2, 0) / scores.length);
 
         const baseCutoff = Math.min(topScore * 0.75, mean + 2.0 * stdDev);
-        const maxDocs = 10;
+        const maxDocs = 15;
         const cutoffThreshold = scores.length > maxDocs
             ? Math.max(baseCutoff, scores[maxDocs - 1])
             : baseCutoff;
@@ -372,6 +484,13 @@ module.exports = async (req, res) => {
 
             if (!serverData || serverData.length === 0) {
                 return res.status(500).json({ error: 'Failed to load server data' });
+            }
+
+            // TF-IDF 캐시 구축 (최초 1회)
+            if (!idfCache) {
+                console.log('[TF-IDF] IDF 캐시 구축 중...');
+                idfCache = buildIDF(serverData);
+                console.log(`[TF-IDF] IDF 구축 완료: ${Object.keys(idfCache).length}개 용어`);
             }
 
             const results = smartSearch(serverData, queryPlan, maxResults || 30, userSpecialty);
