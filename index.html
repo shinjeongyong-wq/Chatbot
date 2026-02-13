@@ -1901,21 +1901,22 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
+            padding: 8px 12px;
             border-bottom: 1px solid var(--history-border);
             flex-shrink: 0;
         }
 
         .hamburger-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             border: none;
             background: transparent;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 6px;
             color: var(--text-primary);
             transition: background 0.2s;
         }
@@ -3514,7 +3515,7 @@
                 if (hamburgerBtn) {
                     hamburgerBtn.removeAttribute('onclick'); // toggleSidebar() 제거
                     hamburgerBtn.style.color = '#536db1';
-                    hamburgerBtn.style.padding = '8px';
+                    hamburgerBtn.style.padding = '6px';
                     hamburgerBtn.addEventListener('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();

@@ -717,7 +717,7 @@ body {
     .hamburger-btn {
         display: flex !important;
         color: #536db1 !important;
-        padding: 8px !important;
+        padding: 6px !important;
     }
 
     .header-faq-btn,
