@@ -714,10 +714,17 @@ body {
             justify-content: center !important;
             color: #536db1 !important;
             /* 파란색 */
+            padding: 8px !important;
+        }
+
+        /* 사이드바 내부 햄버거 버튼도 파란색으로 표시 */
+        .hamburger-btn {
+            display: flex !important;
+            color: #536db1 !important;
+            padding: 8px !important;
         }
 
         .header-faq-btn,
-        #hamburgerBtn,
         .desktop-only {
             display: none !important;
         }
@@ -725,6 +732,10 @@ body {
         .header {
             padding: 8px 12px !important;
             padding-top: max(8px, env(safe-area-inset-top)) !important;
+        }
+
+        .sidebar-top-controls {
+            padding: 8px 12px !important;
         }
     }
 
