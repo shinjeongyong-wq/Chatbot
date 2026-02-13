@@ -671,116 +671,117 @@ body {
     .input-wrapper {
         padding: 6px;
     }
+}
 
-    /* ==========================================================================
+/* ==========================================================================
    MOBILE UI FINAL FIX (v6.0.0)
    ========================================================================== */
 
-    /* --- 1. Mobile Avatar Hidden (Gemini Style) --- */
-    @media (max-width: 768px) {
-        .message-avatar {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        .message {
-            gap: 0 !important;
-            margin-bottom: 12px !important;
-        }
-
-        .message.user .message-content {
-            margin-right: 8px !important;
-            max-width: 82% !important;
-            border-radius: 18px 18px 4px 18px !important;
-        }
-
-        .message.bot .message-content {
-            margin-left: 8px !important;
-            max-width: 88% !important;
-            border-radius: 18px 18px 18px 4px !important;
-        }
-
-        /* --- 2. Mobile Header Buttons --- */
-        .mobile-menu-btn,
-        .header-planner-btn {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            color: #536db1 !important;
-            padding: 8px !important;
-        }
-
-        /* 사이드바 내부 햄버거 버튼도 파란색으로 표시 */
-        .hamburger-btn {
-            display: flex !important;
-            color: #536db1 !important;
-            padding: 8px !important;
-        }
-
-        .header-faq-btn,
-        .desktop-only {
-            display: none !important;
-        }
-
-        .header {
-            padding: 8px 12px !important;
-            padding-top: max(8px, env(safe-area-inset-top)) !important;
-        }
-
-        .sidebar-top-controls {
-            padding: 8px 12px !important;
-        }
-
-        /* --- 3. Mobile Sidebar Overlay --- */
-        .history-sidebar {
-            position: fixed !important;
-            left: -100% !important;
-            top: 0 !important;
-            height: 100vh !important;
-            width: 80% !important;
-            max-width: 300px !important;
-            z-index: 10001 !important;
-            transition: left 0.3s ease-out !important;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2) !important;
-        }
-
-        .history-sidebar.mobile-open {
-            left: 0 !important;
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 10000;
-        }
-
-        .sidebar-overlay.active {
-            display: block !important;
-        }
-
-        /* --- 4. Mobile Bottom Input Safe Area Fix --- */
-        .input-container {
-            padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
-        }
+/* --- 1. Mobile Avatar Hidden (Gemini Style) --- */
+@media (max-width: 768px) {
+    .message-avatar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
-    /* --- 5. PC Avatar Visible (Default) --- */
-    @media (min-width: 769px) {
-        .message-avatar {
-            display: flex !important;
-        }
-
-        .mobile-menu-btn,
-        .header-planner-btn,
-        .mobile-only {
-            display: none !important;
-        }
+    .message {
+        gap: 0 !important;
+        margin-bottom: 12px !important;
     }
+
+    .message.user .message-content {
+        margin-right: 8px !important;
+        max-width: 82% !important;
+        border-radius: 18px 18px 4px 18px !important;
+    }
+
+    .message.bot .message-content {
+        margin-left: 8px !important;
+        max-width: 88% !important;
+        border-radius: 18px 18px 18px 4px !important;
+    }
+
+    /* --- 2. Mobile Header Buttons --- */
+    .mobile-menu-btn,
+    .header-planner-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #536db1 !important;
+        padding: 8px !important;
+    }
+
+    .hamburger-btn {
+        display: flex !important;
+        color: #536db1 !important;
+        padding: 8px !important;
+    }
+
+    .header-faq-btn,
+    .desktop-only {
+        display: none !important;
+    }
+
+    .header {
+        padding: 8px 12px !important;
+        padding-top: max(8px, env(safe-area-inset-top)) !important;
+    }
+
+    .sidebar-top-controls {
+        padding: 8px 12px !important;
+        padding-top: max(8px, env(safe-area-inset-top)) !important;
+    }
+
+    /* --- 3. Mobile Sidebar Overlay --- */
+    .history-sidebar {
+        position: fixed !important;
+        left: -100% !important;
+        top: 0 !important;
+        height: 100vh !important;
+        width: 80% !important;
+        max-width: 300px !important;
+        z-index: 10001 !important;
+        transition: left 0.3s ease-out !important;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .history-sidebar.mobile-open {
+        left: 0 !important;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+    }
+
+    .sidebar-overlay.active {
+        display: block !important;
+    }
+
+    /* --- 4. Mobile Bottom Input Safe Area Fix --- */
+    .input-container {
+        padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
+    }
+}
+
+/* --- 5. PC Avatar Visible (Default) --- */
+@media (min-width: 769px) {
+    .message-avatar {
+        display: flex !important;
+    }
+
+    .mobile-menu-btn,
+    .header-planner-btn,
+    .mobile-only {
+        display: none !important;
+    }
+}

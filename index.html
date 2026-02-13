@@ -3481,6 +3481,7 @@
                 menuBtn.style.border = 'none';
                 menuBtn.style.cursor = 'pointer';
                 menuBtn.style.padding = '8px';
+                menuBtn.style.color = '#536db1';
                 menuBtn.removeAttribute('onclick');
 
                 // 오버레이 생성
@@ -3512,6 +3513,8 @@
                 var hamburgerBtn = document.getElementById('hamburgerBtn');
                 if (hamburgerBtn) {
                     hamburgerBtn.removeAttribute('onclick'); // toggleSidebar() 제거
+                    hamburgerBtn.style.color = '#536db1';
+                    hamburgerBtn.style.padding = '8px';
                     hamburgerBtn.addEventListener('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
