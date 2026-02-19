@@ -1,0 +1,74 @@
+{
+  "category": "partners",
+  "subCategory": "pre-construction/bank",
+  "itemCount": 3,
+  "lastUpdated": "2026-01-22T01:19:07.562Z",
+  "items": [
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-8151-bd28-c8363927664a",
+      "question": "부산은행",
+      "answer": "[이미지]",
+      "metadata": {
+        "field": "세무·대출",
+        "topic": "부산은행",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:11:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "상세 조건 보기",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "pre-construction/bank",
+        "winningRate": 40,
+        "totalContracts": 2,
+        "totalIntroductions": 5,
+        "tier": 2
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-816c-8626-ff5226555620",
+      "question": "[하나은행] 닥터플래티늄",
+      "answer": "[이미지]\n\n## 의과/치과\n🏦 신용점수 NICE/KCB 909점 이상일 경우 최대 금액 시도 가능합니다.",
+      "metadata": {
+        "field": "세무·대출",
+        "topic": "[하나은행] 닥터플래티늄",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:11:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "상세 조건 보기",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "pre-construction/bank",
+        "winningRate": 67,
+        "totalContracts": 6,
+        "totalIntroductions": 9,
+        "tier": 1
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "2ed62ade-d336-81dd-b3d9-e2dbdd7cd198",
+      "question": "[경남은행] 메디칼론",
+      "answer": "[이미지]\n\n## 의과/치과\n\n📊 전문의/일반의",
+      "metadata": {
+        "field": "세무·대출",
+        "topic": "[경남은행] 메디칼론",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-01-19T05:11:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "상세 조건 보기",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "pre-construction/bank",
+        "winningRate": 17,
+        "totalContracts": 1,
+        "totalIntroductions": 6,
+        "tier": 3
+      }
+    }
+  ]
+}
