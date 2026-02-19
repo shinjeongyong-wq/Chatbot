@@ -8,8 +8,15 @@
 const BASE_URL = 'http://localhost:3003';
 const fs = require('fs');
 
-// 버전 번호는 CLI arg로 전달: node _scoring_test_runner.js 1
-const VERSION = process.argv[2] || '1';
+// CLI arg 파싱: node _scoring_test_runner.js --version vR7 --set validation
+const args = process.argv.slice(2);
+let VERSION = '1';
+let TEST_SET = 'main'; // 'main' | 'validation'
+for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--version' && args[i + 1]) VERSION = args[i + 1];
+    else if (args[i] === '--set' && args[i + 1]) TEST_SET = args[i + 1];
+    else if (!args[i].startsWith('--')) VERSION = args[i]; // 하위호환: 인자 하나만 넘기면 VERSION
+}
 
 const USER_SPECIALTY = {
     code: '미용',
@@ -55,6 +62,36 @@ const FIXED_QUESTIONS = [
 
 // Edge case 인덱스 (0-based): 16,17,18,19,20 → Q17~Q21
 const EDGE_CASE_START = 16;  // 0-based index where edge cases begin
+
+// ========== 검증셋 8개 질문 + Edge Case 2개 ==========
+const VALIDATION_QUESTIONS = [
+    '개원할 때 의료기기 리스 vs 구매 어떤 게 유리한가요?',
+    '병원 로고 디자인은 어떻게 하나요?',
+    '개원 초기 마케팅 전략은 어떻게 세우나요?',
+    '의료기기 설치 시 전기 용량은 어떻게 확인하나요?',
+    '직원 4대보험 가입 절차가 어떻게 되나요?',
+    '병원 인테리어 공사 기간은 보통 얼마나 걸리나요?',
+    '개원 전 건강보험심사평가원 등록은 어떻게 하나요?',
+    '환자 예약 시스템 추천해주세요',
+    // ── Edge Case: 데이터 없는 질문 (NO_DATA가 정답) ──
+    '의사 전용 주차구역 법적 기준이 궁금합니다',               // VE01
+    '병원 내 카페테리아 운영 방법이 궁금합니다',                // VE02
+];
+const VALIDATION_EDGE_START = 8; // 검증셋 Edge Case 시작 인덱스 (0-based)
+
+// 검증셋 GROUND_TRUTH
+const VALIDATION_GROUND_TRUTH = {
+    1: { expect: 'OK', type: 'info', keywords: ['리스', '구매', '의료기기', '렌탈', '할부'] },
+    2: { expect: 'OK', type: 'info', keywords: ['로고', '디자인', '브랜드', 'CI', 'BI', '간판'] },
+    3: { expect: 'OK', type: 'info', keywords: ['마케팅', '홍보', '광고', 'SNS', '블로그', '온라인'] },
+    4: { expect: 'OK', type: 'info', keywords: ['전기', '용량', 'kW', '설치', '의료기기', '콘센트'] },
+    5: { expect: 'OK', type: 'info', keywords: ['4대보험', '보험', '가입', '직원', '건강보험', '고용'] },
+    6: { expect: 'OK', type: 'info', keywords: ['인테리어', '공사', '기간', '주', '개월', '일'] },
+    7: { expect: 'OK', type: 'info', keywords: ['심평원', '건강보험', '등록', '심사평가원', '개설'] },
+    8: { expect: 'OK', type: 'info', keywords: ['예약', '시스템', 'CRM', 'EMR', '환자'] },
+    9: { expect: 'NO_DATA', type: 'edge', keywords: [] },
+    10: { expect: 'NO_DATA', type: 'edge', keywords: [] },
+};
 
 // queryPlan의 배열 필드를 첫 번째 값으로 변환
 function normalizeQueryPlan(plan) {
@@ -131,7 +168,7 @@ async function smartSearch(queryPlan) {
     });
     if (!res.ok) throw new Error(`Search 실패: ${res.status}`);
     const data = await res.json();
-    return { results: data.results || [], filterInfo: data.filterInfo || null };
+    return { results: data.results || [], rtResults: data.rtResults || [], filterInfo: data.filterInfo || null };
 }
 
 function formatDoc(item, idx) {
@@ -211,11 +248,22 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **(A)** 참고문서에 질문에 대한 직접적인 정보가 없는 경우
    - **(B)** 유사 정보로 대체 답변하는 경우
    - **(C)** 사용자가 파트너사 미팅, 의료기기 구매, 플래너 연결 등 **AI가 직접 수행할 수 없는 행동을 요청**하는 경우
-   - ⚠️ 단, 참고문서에 질문과 **직접 관련된** 업체·제품·서비스 정보가 있으면 그 정보를 활용하여 답변하세요. 이 경우 [NO_DATA]를 사용하지 마세요.
-   - [NO_DATA] 태그있으면 고정 안내 문구 다음에 플래너 연락 버튼을 표시합니다.
+   
+   ⚠️ **[NO_DATA] 사용 전 반드시 확인하세요**:
+   - 참고문서에 **사용자가 질문한 정확한 주제**에 대한 업체명·제품명·장비명·서비스·비용·절차가 포함되어 있으면 → **[NO_DATA] 금지**, 해당 정보를 활용하여 답변
+   - ✅ "보톡스 필러 장비" 질문 → 참고문서에 보톡스·필러·주사 관련 장비 정보가 있으면 → 답변
+   - ✅ "EMR 추천" 질문 → 참고문서에 EMR·전자차트·CRM 업체 정보가 있으면 → 답변
+   - ✅ "간호사 연봉" 질문 → 참고문서에 인건비·급여·채용 관련 정보가 있으면 → 답변
+   - ❌ 참고문서에 **다른 주제의 정보만** 있고, 질문한 주제의 구체적 정보가 없으면 → **[NO_DATA] 사용**
+   - ❌ "주차장 설계" 질문 → 참고문서에 인테리어·의료기기 정보만 있고 주차장 관련 없으면 → [NO_DATA]
+   - ❌ "배상책임보험" 질문 → 참고문서에 세무·장비 정보만 있고 보험 관련 없으면 → [NO_DATA]
+   - ❌ "의료폐기물 처리" 질문 → 참고문서에 소모품·유니폼 정보만 있고 폐기물 관련 없으면 → [NO_DATA]
+    
+    - [NO_DATA] 태그있으면 고정 안내 문구 다음에 플래너 연락 버튼을 표시합니다.
    - 일반 답변에서는 "플래너에게 연락" 문구를 사용하지 마세요.
    - **형식**: [NO_DATA] → 감사/사과 → 관련 내용 → 고정 안내 문구 → 플래너 연락 버튼
    - **고정 안내 문구**: "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
+
 
 # 토킹 포인트 (후속 질문 추천) — GREETING, OUT_OF_SCOPE일 때는 생략
 답변 본문이 끝난 후, 참고문서 내용을 바탕으로 사용자가 자연스럽게 이어서 궁금해할 만한 주제를 1~2줄로 안내하세요.
@@ -311,7 +359,7 @@ async function runOneTurn(userQuery, history) {
     }
 
     // Stage 2: Search
-    const { results: searchResults, filterInfo } = await smartSearch(queryPlan);
+    const { results: searchResults, rtResults, filterInfo } = await smartSearch(queryPlan);
     const contextText = searchResults.slice(0, 30).map((item, idx) => formatDoc(item, idx)).join('\n\n---\n\n');
 
     // Stage 3: Build prompt + Chat
@@ -348,34 +396,41 @@ async function runOneTurn(userQuery, history) {
         question: userQuery,
         answer: cleanAnswer.replace(/\[NO_DATA\]/g, '').replace(/\[OFF_TOPIC\]/g, '').trim(),
         intent: queryPlan.intent, model: result.model,
-        searchResults, filterInfo, queryPlan,
+        searchResults, rtResults, filterInfo, queryPlan,
         skipped: false, isNoData, isOffTopic
     };
 }
 
 // ========== 메인 ==========
 async function main() {
+    // 질문 셋 선택
+    const isValidation = TEST_SET === 'validation';
+    const activeQuestions = isValidation ? VALIDATION_QUESTIONS : FIXED_QUESTIONS;
+    const activeEdgeStart = isValidation ? VALIDATION_EDGE_START : EDGE_CASE_START;
+    const activeGroundTruth = isValidation ? VALIDATION_GROUND_TRUTH : null; // null이면 아래 기존 GROUND_TRUTH 사용
+    const setLabel = isValidation ? '검증셋' : '고정 질문';
+
     const history = new ConversationHistory();
     let output = '';
 
     output += '='.repeat(100) + '\n';
     output += `  스코어링 테스트 v${VERSION} — ${new Date().toLocaleString('ko-KR')}\n`;
-    output += `  진료과: ${USER_SPECIALTY.label} | 질문: ${FIXED_QUESTIONS.length}개 | 고정 질문\n`;
+    output += `  진료과: ${USER_SPECIALTY.label} | 질문: ${activeQuestions.length}개 | ${setLabel}\n`;
     output += `  환경: localhost:3003, search.js v${VERSION} 적용\n`;
     output += '='.repeat(100) + '\n\n';
 
     const summaryRows = [];
 
-    for (let i = 0; i < FIXED_QUESTIONS.length; i++) {
-        const question = FIXED_QUESTIONS[i];
+    for (let i = 0; i < activeQuestions.length; i++) {
+        const question = activeQuestions[i];
         const turnNum = i + 1;
 
         output += '━'.repeat(100) + '\n';
-        output += `Q${String(turnNum).padStart(2, '0')} / ${FIXED_QUESTIONS.length}\n`;
+        output += `Q${String(turnNum).padStart(2, '0')} / ${activeQuestions.length}\n`;
         output += '━'.repeat(100) + '\n\n';
 
         console.log(`\n${'━'.repeat(60)}`);
-        console.log(`Q${turnNum}/${FIXED_QUESTIONS.length}: "${question}"`);
+        console.log(`Q${turnNum}/${activeQuestions.length}: "${question}"`);
 
         try {
             const result = await runOneTurn(question, history);
@@ -393,14 +448,29 @@ async function main() {
 
             // ── 커트라인 정보 ──
             if (result.filterInfo) {
-                output += `\n  [커트라인] top=${result.filterInfo.topScore}, cutoff=${result.filterInfo.cutoff}, mean=${result.filterInfo.mean}, σ=${result.filterInfo.stdDev}\n`;
-                output += `  [통과] ${result.filterInfo.passedCount}개 / [제외] ${(result.filterInfo.scoredCount || 0) - (result.filterInfo.passedCount || 0)}개\n`;
+                output += `\n  [Primary  커트라인] ${result.filterInfo.primaryCutoff || result.filterInfo.cutoff} ← ${result.filterInfo.primaryFormula || ''}\n`;
+                output += `  [Secondary 커트라인] ${result.filterInfo.secondaryCutoff || 'N/A'} ← ${result.filterInfo.secondaryFormula || ''}\n`;
+                output += `  [통계] top=${result.filterInfo.topScore}, mean=${result.filterInfo.mean}, σ=${result.filterInfo.stdDev}\n`;
+                output += `  [답변용] ${result.filterInfo.passedCount}개 / [RT용] ${result.filterInfo.rtCount || 0}개 / [제외] ${(result.filterInfo.scoredCount || 0) - (result.filterInfo.passedCount || 0) - (result.filterInfo.rtCount || 0)}개\n`;
             }
 
-            // ── 동적 커트라인 통과한 문서 전체 ──
+            // ── Primary Zone (답변 생성 문서) ──
             if (result.searchResults && result.searchResults.length > 0) {
-                output += `\n  ──── 통과 문서 (${result.searchResults.length}개) ────\n`;
+                output += `\n  ──── 답변 문서 (Primary Zone, ${result.searchResults.length}개) ────\n`;
                 result.searchResults.forEach((doc, idx) => {
+                    const score = doc.score?.toFixed(4) || '?';
+                    const field = doc.metadata?.field || '';
+                    const specialty = doc.specialty || '';
+                    const tier = doc.metadata?.tier ? `[tier:${doc.metadata.tier}]` : '';
+                    const qText = (doc.question || '').substring(0, 80);
+                    output += `  [${idx + 1}] ${score} | ${field} | ${specialty} ${tier} | ${qText}\n`;
+                });
+                output += `  ──── 끝 ────\n`;
+            }
+            // ── Secondary Zone (RT 후보 문서) ──
+            if (result.rtResults && result.rtResults.length > 0) {
+                output += `\n  ──── RT 문서 (Secondary Zone, ${result.rtResults.length}개) ────\n`;
+                result.rtResults.forEach((doc, idx) => {
                     const score = doc.score?.toFixed(4) || '?';
                     const field = doc.metadata?.field || '';
                     const specialty = doc.specialty || '';
@@ -545,9 +615,10 @@ async function main() {
     }
 
     // ── 채점 실행 ──
+    const currentGroundTruth = activeGroundTruth || GROUND_TRUTH;
     const grades = [];
     summaryRows.forEach(row => {
-        const truth = GROUND_TRUTH[row.qNum];
+        const truth = currentGroundTruth[row.qNum];
         if (!truth) return;
         const grade = gradeQuestion(row, truth);
         grades.push({ ...row, ...grade, truth });
@@ -567,12 +638,12 @@ async function main() {
 
     // ── 요약 출력 ──
     output += '\n' + '='.repeat(100) + '\n';
-    output += `  📊 스코어링 v${VERSION} 결과 요약 (${FIXED_QUESTIONS.length}개 질문)\n`;
+    output += `  📊 스코어링 v${VERSION} 결과 요약 (${activeQuestions.length}개 ${setLabel})\n`;
     output += '='.repeat(100) + '\n\n';
 
-    // 기본 16개 질문 요약
-    output += `  ── 기본 질문 (Q01~Q16) ──\n`;
-    grades.filter(g => g.qNum <= 16).forEach(g => {
+    // 기본 질문 요약
+    output += `  ── 기본 질문 (Q01~Q${String(activeEdgeStart).padStart(2, '0')}) ──\n`;
+    grades.filter(g => g.qNum <= activeEdgeStart).forEach(g => {
         const icon = g.grade === 'PASS' ? '✅' : g.grade === 'PARTIAL' ? '⚠️' : '❌';
         output += `  Q${String(g.qNum).padStart(2, '0')} ${icon} [${g.grade}] ${g.points}점 | ${g.status} | 문서 ${g.docsCount}개 | top=${g.topScore}\n`;
         output += `    질문: ${g.question}\n`;
@@ -583,9 +654,9 @@ async function main() {
     });
 
     // Edge Case 요약
-    const edgeCases = grades.filter(g => g.qNum > 16);
+    const edgeCases = grades.filter(g => g.qNum > activeEdgeStart);
     if (edgeCases.length > 0) {
-        output += `  ── Edge Case (Q17~Q21: 기대=NO_DATA) ──\n`;
+        output += `  ── Edge Case (Q${activeEdgeStart + 1}~Q${activeQuestions.length}: 기대=NO_DATA) ──\n`;
         edgeCases.forEach(g => {
             const icon = g.grade === 'PASS' ? '✅' : g.grade === 'PARTIAL' ? '⚠️' : '❌';
             output += `  Q${String(g.qNum).padStart(2, '0')} ${icon} [${g.grade}] ${g.points}점 | ${g.status} | 문서 ${g.docsCount}개 | top=${g.topScore}\n`;

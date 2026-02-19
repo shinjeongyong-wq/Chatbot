@@ -1,7 +1,7 @@
 {
   "version": "5.2",
   "generatedAt": "2026-02-03T13:21:00.000Z",
-  "totalItems": 198,
+  "totalItems": 199,
   "categories": {
     "advanced/interior": {
       "itemCount": 1,
@@ -116,7 +116,7 @@
       "file": "homepage.json"
     },
     "partners/pre-construction/interior": {
-      "itemCount": 12,
+      "itemCount": 13,
       "file": "interior.json"
     },
     "partners/pre-construction/pc-network": {

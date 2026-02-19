@@ -386,6 +386,18 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
     ];
     const queryVector = idfCache ? buildQueryVector(allQueryTerms, idfCache) : null;
 
+    // ★ 총 non-stopword 코어키워드 수 (스코어링용 — DOMAIN_STOPWORDS만)
+    const totalNonStopCoreKws = (coreKeywords || []).filter(k => k && !DOMAIN_STOPWORDS.has(k.toLowerCase())).length;
+
+    // ★ 동적 stopword (필터링 전용): 진료과 키워드 추가
+    const dynamicStopwords = new Set(DOMAIN_STOPWORDS);
+    if (userSpecialty && userSpecialty.keywords) {
+        for (const kw of userSpecialty.keywords) {
+            if (kw) dynamicStopwords.add(kw.toLowerCase());
+        }
+    }
+    const totalDynNonStopCoreKws = (coreKeywords || []).filter(k => k && !dynamicStopwords.has(k.toLowerCase())).length;
+
     // 3. 스코어링
     let results = candidates.map((item, idx) => {
         const smartResult = calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
@@ -491,54 +503,94 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
             }
         }
 
-        return { ...item, score, _cosine: cosine, _coreHitCount: coreHitCount, _hasTopicBonus: hasTopicBonus, _hasPartnerBonus: hasPartnerBonus, _hasSpecialtyBonus: hasSpecialtyBonus };
+        // ★ 동적 stopword 기준 코어 히트 수 (필터링 전용, 스코어에 영향 없음)
+        let dynCoreHitCount = 0;
+        if (coreKeywords && coreKeywords.length > 0) {
+            const question_lc = (item.question || '').toLowerCase();
+            const answer_lc = (item.answer || '').toLowerCase();
+            const text_all = question_lc + ' ' + answer_lc;
+            for (const keyword of coreKeywords) {
+                if (!keyword) continue;
+                const kw = keyword.toLowerCase();
+                if (dynamicStopwords.has(kw)) continue; // 진료과 키워드 스킵
+                if (text_all.includes(kw) || text_all.replace(/\s/g, '').includes(kw.replace(/\s/g, ''))) {
+                    dynCoreHitCount++;
+                }
+            }
+        }
+
+        return { ...item, score, _cosine: cosine, _coreHitCount: coreHitCount, _dynCoreHitCount: dynCoreHitCount, _totalNonStopCoreKws: totalNonStopCoreKws, _hasTopicBonus: hasTopicBonus, _hasPartnerBonus: hasPartnerBonus, _hasSpecialtyBonus: hasSpecialtyBonus };
     })
         .filter(r => r.score > 0.05)
         .sort((a, b) => b.score - a.score);
 
     // 진료과 민감 카테고리 페널티 제거됨 (파트너사 추천 방해 방지)
 
-    // ★ 동적 커트라인 R24: min(top×0.75, mean+2σ) + cap10 ★
+    // ★ 듀얼 커트라인: Primary(답변용) + Secondary(RT용) ★
     const filterInfo = { originalCount: data.length, scoredCount: results.length };
+    let rtResults = []; // Related Topics 후보 문서
     if (results.length > 0) {
         const scores = results.map(r => r.score);
         const topScore = scores[0];
         const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
         const stdDev = Math.sqrt(scores.reduce((s, v) => s + (v - mean) ** 2, 0) / scores.length);
 
-        const baseCutoff = Math.min(topScore * 0.65, mean + 2.0 * stdDev);
+        // Primary Cutoff: 답변 생성용 (α=0.65 — Final 1.0 베이스라인)
+        const primaryBase = Math.min(topScore * 0.65, mean + 2.0 * stdDev);
         const maxDocs = 15;
-        const cutoffThreshold = scores.length > maxDocs
-            ? Math.max(baseCutoff, scores[maxDocs - 1])
-            : baseCutoff;
+        const primaryCutoff = scores.length > maxDocs
+            ? Math.max(primaryBase, scores[maxDocs - 1])
+            : primaryBase;
 
-        filterInfo.cutoff = cutoffThreshold.toFixed(4);
+        // Secondary Cutoff: RT용 (β=0.45, maxDocs 클램핑 없음)
+        const secondaryBase = Math.min(topScore * 0.45, mean + 1.5 * stdDev);
+        const secondaryCutoff = secondaryBase; // RT용은 클램핑 없음 — Primary와 겹치면 안 됨
+        const rtMaxDocs = 10; // RT 후보 상한
+
+        filterInfo.primaryCutoff = primaryCutoff.toFixed(4);
+        filterInfo.secondaryCutoff = secondaryCutoff.toFixed(4);
+        filterInfo.cutoff = primaryCutoff.toFixed(4); // 호환성
         filterInfo.topScore = topScore.toFixed(4);
         filterInfo.mean = mean.toFixed(4);
         filterInfo.stdDev = stdDev.toFixed(4);
+        // 수식 분해 정보
+        filterInfo.primaryFormula = `min(top×0.65=${(topScore * 0.65).toFixed(4)}, μ+2σ=${(mean + 2.0 * stdDev).toFixed(4)})`;
+        filterInfo.secondaryFormula = `min(top×0.45=${(topScore * 0.45).toFixed(4)}, μ+1.5σ=${(mean + 1.5 * stdDev).toFixed(4)})`;
 
-        results = results.filter(r => r.score >= cutoffThreshold);
+        // Primary Zone: 답변에 사용
+        const primaryResults = results.filter(r => r.score >= primaryCutoff);
+        // Secondary Zone: Primary 아래 ~ Secondary 이상 (RT용, 최대 rtMaxDocs개)
+        rtResults = results.filter(r => r.score < primaryCutoff && r.score >= secondaryCutoff).slice(0, rtMaxDocs);
+
+        results = primaryResults;
     }
 
-    // ★ v21: 코어키워드 0히트 + 보너스 없는 문서 추가 필터 ★
-    // 코사인 유사도만으로 통과한 무관 문서 제거
-    const beforeCoreFilter = results.length;
-    results = results.filter(r => {
-        // 코어 키워드가 1개라도 매칭되면 유지
-        if (r._coreHitCount > 0) return true;
-        // 코어 키워드 0히트지만 토픽 보너스가 있으면 유지
+    // ★ v21+: 코어키워드 히트율 기반 필터 (FALSE_POSITIVE 방지 강화) ★
+    const coreFilter = (r) => {
+        // 토픽 보너스나 고유명사 부스트는 항상 유지
         if (r._hasTopicBonus) return true;
-        // 고유명사 부스트 문서 유지
         if (r._entityBoosted) return true;
-        // 그 외: 코어 키워드 0히트 + 보너스 없음 → 제외
-        return false;
-    });
+        // 코어키워드 0히트 → 제외
+        if (r._coreHitCount === 0) return false;
+        // ★ 히트율 체크: non-stopword 코어키워드가 2개 이상인데 히트가 1개뿐이면 제외
+        if (r._totalNonStopCoreKws >= 2 && r._coreHitCount <= 1) {
+            console.log(`[Search] 히트율 필터 제외: coreHit=${r._coreHitCount}/${r._totalNonStopCoreKws} | ${(r.question || '').substring(0, 60)}`);
+            return false;
+        }
+        return true;
+    };
+    const beforeCoreFilter = results.length;
+    results = results.filter(coreFilter);
+    // RT 문서에도 코어 필터 적용
+    rtResults = rtResults.filter(coreFilter);
     if (beforeCoreFilter !== results.length) {
         console.log(`[Search] 코어키워드 0히트 필터: ${beforeCoreFilter}개 → ${results.length}개 (${beforeCoreFilter - results.length}개 제외)`);
     }
 
     filterInfo.passedCount = results.length;
-    console.log(`[Search] 커트라인: ${filterInfo.cutoff} (top=${filterInfo.topScore}, mean=${filterInfo.mean}, σ=${filterInfo.stdDev}) → ${filterInfo.passedCount}개 통과 / ${filterInfo.scoredCount - filterInfo.passedCount}개 제외`);
+    filterInfo.rtCount = rtResults.length;
+    console.log(`[Search] 커트라인: Primary=${filterInfo.primaryCutoff || filterInfo.cutoff}, Secondary=${filterInfo.secondaryCutoff || 'N/A'} (top=${filterInfo.topScore}, mean=${filterInfo.mean}, σ=${filterInfo.stdDev})`);
+    console.log(`[Search] → 답변용 ${filterInfo.passedCount}개 / RT용 ${filterInfo.rtCount}개 / 제외 ${filterInfo.scoredCount - filterInfo.passedCount - filterInfo.rtCount}개`);
     console.log(`[Search] 통과 문서:`);
     results.forEach((doc, i) => {
         console.log(`  [${i + 1}] ${doc.score.toFixed(4)} | ${(doc.question || '').substring(0, 60)}`);
@@ -546,6 +598,7 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
 
     const finalResults = results.slice(0, finalMaxResults);
     finalResults._filterInfo = filterInfo;
+    finalResults._rtResults = rtResults;
     return finalResults;
 }
 
@@ -591,6 +644,7 @@ module.exports = async (req, res) => {
             return res.status(200).json({
                 success: true,
                 results: results,
+                rtResults: results._rtResults || [],  // RT용 문서
                 count: results.length,
                 dataSource: 'server',
                 filterInfo: results._filterInfo || null  // T+C+K 필터링 정보
