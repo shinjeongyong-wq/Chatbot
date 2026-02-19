@@ -37,7 +37,7 @@ export default async function handler(req, res) {
 }
 
 // Gemini API 호출 함수 (finishReason 체크 + 자동 재시도)
-async function callGeminiAPI(prompt, systemPrompt = '', model = 'gemini-1.5-flash', maxRetries = 2) {
+async function callGeminiAPI(prompt, systemPrompt = '', model = 'gemini-2.5-flash', maxRetries = 2) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -185,8 +185,9 @@ ${userSpecialtyContext}${conversationContext}
 - **requiresSearch: false** → directAnswer로 상담 범위 안내
 
 ## 4️⃣ OUT_OF_SCOPE (전문가 영역)
-- 개원과 **관련은 있으나** 우리 데이터/역량 밖 (세무 절세, 노무/인사, 의료소송, 보험청구 심사 등)
-- 예: "절세 방법", "근로계약서 양식", "의료소송 대응"
+- 개원과 관련 있으나 **법률적 자문이나 세부 세금 계산** 등 전문가만 답할 수 있는 질문
+- 예: "양도소득세 절세 방법", "근로계약서 법적 검토", "의료소송 법률 대응", "보험 청구 심사 기준"
+- ⚠️ **주의**: 단순 비용/연봉/절차 안내(예: "간호사 연봉", "폐업 절차")는 OUT_OF_SCOPE가 아니라 **SPECIFIC**입니다.
 - **requiresSearch: true** → 관련 데이터 검색 후 답변 생성 (데이터 없으면 플래너 연결 안내)
 
 ## 5️⃣ AMBIGUOUS (모호한 질문)
@@ -196,7 +197,7 @@ ${userSpecialtyContext}${conversationContext}
 
 ## 6️⃣ SPECIFIC (명확한 전문 상담)
 - 개원 관련 + 구체적인 조건/의도가 담긴 질문
-- 예: "송도 내과 입지 알려줘", "C-arm 리스 업체 추천", "30평 인테리어 비용"
+- 예: "송도 내과 입지 알려줘", "C-arm 리스 업체 추천", "30평 인테리어 비용", "간호사 연봉 기준", "폐업 절차", "주차장 설계 기준"
 - **requiresSearch: true** → 검색 전략 작성 필수
 
 ---
@@ -285,7 +286,7 @@ ${userSpecialtyContext}${conversationContext}
 
     try {
         const models = [
-            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },  // 속도 최적화: 2.5 Flash 우선
+            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
             { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' }
         ];
 

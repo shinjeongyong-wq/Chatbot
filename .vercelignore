@@ -1,0 +1,122 @@
+# ============================================
+# Vercel 배포 제외 목록
+# 로컬에는 유지, 배포 서버에는 올라가지 않음
+# ============================================
+
+# === 보안: API 백업 파일 (엔드포인트 노출 방지) ===
+api/search.js.bak
+api/search_backup_v26.js
+
+# === 원본 데이터 (notion_split만 사용) ===
+data/notion/
+data/topics_backup.json
+data/topics_new.json
+
+# === 테스트 데이터 ===
+data_testing/
+
+# === 백업 폴더 ===
+backup_v1/
+backup_v2.1.0/
+backup_v2.2.0/
+backup_v2_before_intent_classifier/
+_backup_notion_split/
+
+# === 테스트 결과 파일 ===
+_scoring_test_*.txt
+_split_tuning_*.txt
+_split_v6_fulltest_result.txt
+_30q_test_result.txt
+_ab_test_result.txt
+_tp_test_*.txt
+filter-analysis-result.txt
+edge_case_results.csv
+
+# === 테스트/디버그 스크립트 ===
+_30q_test.js
+_ab_test_split.js
+_split_tuning.js
+_split_v6_fulltest.js
+_debug_stream.js
+_edge_test.js
+_feedback_test.js
+_scoring_test_runner.js
+test-*.js
+test_talking_points.js
+analyze-filter.js
+analyze-filter-all.js
+analyze-simple.js
+analyze-qa.js
+measure-speed.js
+show-results.js
+smart-split-test.js
+edge_case_test.py
+upload_to_sheet.py
+
+# === 일회성 유틸 스크립트 ===
+extract-kakao-qa*.js
+save-kakao-qa.js
+fix-*.js
+recover-splits.js
+process-*.js
+create-new-topics.js
+shorten-topics*.js
+fetch-notion-full.js
+notion-loader.js
+generate-embeddings.js
+build-shortened.js
+audit-data.js
+check-over15.js
+compare-qa.js
+scan-remaining.js
+sync-*.js
+execute-manual-split.js
+splitter-server.js
+fetch-feedback.js
+
+# === 보고서/문서 ===
+_edge_test_report.md
+_scoring_changelog.md
+qa-analysis-report.txt
+qa-comparison.md
+NOTION_BACKUP_PLAN.md
+SETUP_GUIDE.md
+PRD.md
+VERSION_LOG.txt
+
+# === 중간 산출물 ===
+extracted_kakao_qa*.json
+kakao_qa_*.json
+kakao_qa_*.tsv
+meeting_qa_for_excel.tsv
+카톡_QA_추출.tsv
+텍스트.txt
+692_topics.txt
+notion_full_content.json
+notion_page_raw.json
+notion_roadmap.md
+data-audit-result.json
+mapping-test-result.json
+test-paragraph-result.json
+gas_output.txt
+subsplit-scan-result.txt
+user_shortened_topics.txt
+_regression_questions.json
+feedback-auto.md.backup
+
+# === 루트 중복 토픽 파일 ===
+topics.json
+topics_shortened.json
+topics_to_shorten.json
+
+# === 기타 ===
+scripts/
+sql/
+supabase_schema.sql
+index-original.html
+styles_cleanup.css
+
+# === 에이전트/에디터 설정 ===
+.agent/
+.serena/
+.vscode/

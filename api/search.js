@@ -1,5 +1,5 @@
 // Vercel Serverless Function - 검색 API (보안 로직)
-// v17: v14기반 + EMR 동의어 강화
+// v26: 코어히트 0 필터에서 진료과보너스 제외 (쿼리 주제 무관 문서 통과 방지)
 
 const fs = require('fs');
 const path = require('path');
@@ -146,11 +146,18 @@ function loadServerData() {
     try {
         let allData = [];
 
-        // data 폴더의 모든 JSON 파일 로드 (notion, qa 등 하위 폴더 전체)
-        const dataPath = path.join(process.cwd(), 'data');
-        if (fs.existsSync(dataPath)) {
-            loadJsonFilesRecursively(dataPath, allData);
-            console.log(`📂 data 폴더 로드: ${allData.length}개`);
+        // notion_split 폴더만 로드 (notion 폴더 제외 - 중복 방지)
+        const splitPath = path.join(process.cwd(), 'data', 'notion_split');
+        if (fs.existsSync(splitPath)) {
+            loadJsonFilesRecursively(splitPath, allData);
+            console.log(`📂 notion_split 로드: ${allData.length}개`);
+        }
+
+        // qa 폴더 로드
+        const qaPath = path.join(process.cwd(), 'data', 'qa');
+        if (fs.existsSync(qaPath)) {
+            loadJsonFilesRecursively(qaPath, allData);
+            console.log(`📂 qa 로드: ${allData.length}개`);
         }
 
 
@@ -223,7 +230,14 @@ function expandQueryWithSynonyms(query) {
     return [...new Set(expandedWords)].filter(w => w.length >= 2);
 }
 
-// ========== Smart Score 계산 (v16) ==========
+// ========== Smart Score 계산 (v27 — split tuning v6) ==========
+// 도메인 불용어: 거의 모든 문서에 포함되어 변별력 없는 단어
+const DOMAIN_STOPWORDS = new Set([
+    '병원', '개원', '의료', '클리닉', '진료', '의원', '비용', '절차', '방법', '추천',
+    '어떻게', '얼마', '정도', '필요', '무엇', '어떤', '하나요', '되나요', '인가요',
+    '가입', '보험', '확인', '관련', '기준', '준비', '사항'
+]);
+
 function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strategy) {
     const question = (item.question || '').toLowerCase();
     const answer = (item.answer || '').toLowerCase();
@@ -235,8 +249,9 @@ function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strate
 
     let score = 0;
     let coreHitCount = 0;
+    let questionMatchCount = 0;
 
-    // 1. 핵심 키워드 매칭 (최대 +0.6)
+    // 1. 핵심 키워드 매칭 (최대 +0.8)
     if (coreKeywords && coreKeywords.length > 0) {
         let coreHits = 0;
         for (const keyword of coreKeywords) {
@@ -246,13 +261,31 @@ function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strate
 
             if (text.includes(kw) || textNoSpace.includes(kwNoSpace)) {
                 coreHits++;
-                coreHitCount++;
+                if (!DOMAIN_STOPWORDS.has(kw)) {
+                    coreHitCount++;
+                }
+                // question에 있으면 카운트 (별도 보너스용)
                 if (question.includes(kw) || question.replace(/\s/g, '').includes(kwNoSpace)) {
-                    coreHits += 0.5;
+                    questionMatchCount++;
                 }
             }
         }
-        score += Math.min((coreHits / coreKeywords.length) * 0.6, 0.6);
+        score += Math.min((coreHits / coreKeywords.length) * 0.8, 0.8);
+    }
+
+    // ★ Q_DIRECT_BONUS: 캡에 안 걸리는 별도 가산 (최대 +0.3)
+    if (coreKeywords && coreKeywords.length > 0 && questionMatchCount > 0) {
+        score += (questionMatchCount / coreKeywords.length) * 0.3;
+    }
+
+    // ★ SUBSECTION_BONUS: 스플릿 문서(> 포함)의 서브섹션에 핵심 키워드 매칭 시 가산 (최대 +0.5)
+    if (question.includes('>') && coreKeywords && coreKeywords.length > 0) {
+        const subsection = question.split('>').pop().trim().toLowerCase();
+        const nonStopKws = coreKeywords.filter(k => k && !DOMAIN_STOPWORDS.has(k.toLowerCase()));
+        if (nonStopKws.length > 0) {
+            const subHits = nonStopKws.filter(k => subsection.includes(k.toLowerCase())).length;
+            score += (subHits / nonStopKws.length) * 0.5;
+        }
     }
 
     // 2. 확장 키워드 매칭 (최대 +0.25)
@@ -284,7 +317,7 @@ function calculateSmartScore(item, coreKeywords, expandedKeywords, topic, strate
         }
     }
 
-    return score;
+    return { score, coreHitCount, questionMatchCount };
 }
 
 
@@ -355,19 +388,49 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
 
     // 3. 스코어링
     let results = candidates.map((item, idx) => {
-        let score = calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
+        const smartResult = calculateSmartScore(item, coreKeywords, expandedKeywords, topic, searchStrategy);
+        let score = smartResult.score;
+        const coreHitCount = smartResult.coreHitCount;
 
-        // ★ TF-IDF 코사인 유사도 (0~1) → 가중치 0.15 ★
+        // ★ TF-IDF 코사인 유사도 (0~1) → 가중치 0.4 (v27) ★
         let cosine = 0;
         if (queryVector && idfCache) {
             const docVec = buildDocVector(item, idfCache);
             cosine = cosineSimilarity(queryVector, docVec);
-            score += cosine * 0.15;
+            score += cosine * 0.4;
         }
 
-        const itemTopic = item.metadata?.topic || item.metadata?.category || '';
-        const itemField = (item.metadata?.field || '').toLowerCase();
+        // 스플릿 문서는 metadata가 없을 수 있음 → question에서 토픽 추론 (v27)
+        let itemTopic = item.metadata?.topic || item.metadata?.category || '';
+        let itemField = (item.metadata?.field || '').toLowerCase();
         const itemPath = item.metadata?.structuredCategory || '';
+
+        // ★ fallback: question 제목에서 토픽 추론 (스플릿 노션 문서용)
+        if (!itemTopic && item.question) {
+            const q = item.question;
+            const topicPatterns = [
+                { re: /인테리어/i, topic: '인테리어 (기본편)', field: '인테리어' },
+                { re: /의료기기/i, topic: '의료기기 (기본편)', field: '의료기기' },
+                { re: /의료폐기물/i, topic: '의료폐기물 관리', field: '의료폐기물' },
+                { re: /세무/i, topic: '세무', field: '세무·대출' },
+                { re: /행정/i, topic: '행정 업무', field: '행정' },
+                { re: /간판/i, topic: '간판 (기본편)', field: '간판' },
+                { re: /로드맵/i, topic: '병의원 개업의 전반적 로드맵', field: '개원로드맵' },
+                { re: /마케팅/i, topic: '마케팅 통합 가이드', field: '마케팅' },
+                { re: /EMR|CRM/i, topic: 'EMR & CRM', field: 'EMR·CRM' },
+                { re: /홈페이지/i, topic: '홈페이지', field: '홈페이지' },
+                { re: /가구/i, topic: '가구', field: '가구' },
+                { re: /체크리스트/i, topic: '체크리스트', field: '체크리스트' },
+                { re: /관리.*업체/i, topic: '관리 관련 업체', field: '관리업체' },
+            ];
+            for (const p of topicPatterns) {
+                if (p.re.test(q)) {
+                    itemTopic = p.topic;
+                    if (!itemField) itemField = p.field.toLowerCase();
+                    break;
+                }
+            }
+        }
 
         let hasTopicBonus = false;
         // 토픽 매칭 보너스 - 배열 지원
@@ -388,15 +451,28 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         // ★ 파트너사 가중치: subIntent에 '파트너사목록'이 포함될 때 적용 ★
         const subIntents = Array.isArray(queryPlan.subIntent) ? queryPlan.subIntent : [queryPlan.subIntent];
         const isPartnerIntent = subIntents.includes('파트너사목록');
+        let hasPartnerBonus = false;
         if (isPartnerIntent && itemPath.startsWith('partners')) {
             score = score + 2.0;
+            hasPartnerBonus = true;
+        }
+        // ★ 연관 파트너 보너스 (v27): 정보요청이지만 확장키워드가 파트너 문서와 매칭될 때
+        if (!hasPartnerBonus && itemPath.startsWith('partners') && expandedKeywords && expandedKeywords.length > 0) {
+            const partnerQ = (item.question || '').toLowerCase();
+            const expandMatch = expandedKeywords.some(ek => ek && partnerQ.includes(ek.toLowerCase()));
+            if (expandMatch) {
+                score += 0.8;
+                hasPartnerBonus = true;
+            }
         }
 
         // 진료과 보너스
+        let hasSpecialtyBonus = false;
         if (userSpecialty && userSpecialty.keywords) {
             const specialtyBonus = calculateSpecialtyBonus(item, userSpecialty);
             if (specialtyBonus > 0) {
                 score = score + specialtyBonus;
+                hasSpecialtyBonus = true;
             }
         }
 
@@ -415,7 +491,7 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
             }
         }
 
-        return { ...item, score, _cosine: cosine };
+        return { ...item, score, _cosine: cosine, _coreHitCount: coreHitCount, _hasTopicBonus: hasTopicBonus, _hasPartnerBonus: hasPartnerBonus, _hasSpecialtyBonus: hasSpecialtyBonus };
     })
         .filter(r => r.score > 0.05)
         .sort((a, b) => b.score - a.score);
@@ -430,7 +506,7 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
         const stdDev = Math.sqrt(scores.reduce((s, v) => s + (v - mean) ** 2, 0) / scores.length);
 
-        const baseCutoff = Math.min(topScore * 0.75, mean + 2.0 * stdDev);
+        const baseCutoff = Math.min(topScore * 0.65, mean + 2.0 * stdDev);
         const maxDocs = 15;
         const cutoffThreshold = scores.length > maxDocs
             ? Math.max(baseCutoff, scores[maxDocs - 1])
@@ -442,6 +518,23 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         filterInfo.stdDev = stdDev.toFixed(4);
 
         results = results.filter(r => r.score >= cutoffThreshold);
+    }
+
+    // ★ v21: 코어키워드 0히트 + 보너스 없는 문서 추가 필터 ★
+    // 코사인 유사도만으로 통과한 무관 문서 제거
+    const beforeCoreFilter = results.length;
+    results = results.filter(r => {
+        // 코어 키워드가 1개라도 매칭되면 유지
+        if (r._coreHitCount > 0) return true;
+        // 코어 키워드 0히트지만 토픽 보너스가 있으면 유지
+        if (r._hasTopicBonus) return true;
+        // 고유명사 부스트 문서 유지
+        if (r._entityBoosted) return true;
+        // 그 외: 코어 키워드 0히트 + 보너스 없음 → 제외
+        return false;
+    });
+    if (beforeCoreFilter !== results.length) {
+        console.log(`[Search] 코어키워드 0히트 필터: ${beforeCoreFilter}개 → ${results.length}개 (${beforeCoreFilter - results.length}개 제외)`);
     }
 
     filterInfo.passedCount = results.length;

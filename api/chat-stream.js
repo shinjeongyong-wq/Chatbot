@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     // 모델 목록 (fallback)
     const models = [
         'gemini-2.5-flash',
-        'gemini-1.5-flash'
+        'gemini-3-flash-preview'
     ];
 
     let streamSuccess = false;
