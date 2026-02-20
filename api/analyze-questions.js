@@ -2,7 +2,7 @@
  * 질문 분석 Cron Job (매일 자정 KST 자동 실행)
  * 
  * 1. Supabase에서 유저 질문 전체 조회
- * 2. Gemini 3 Flash로 인기 키워드 + 자주 묻는 질문 추출
+ * 2. Gemini 2.5 Flash로 인기 키워드 + 자주 묻는 질문 추출
  * 3. 결과를 daily_analytics 테이블에 저장
  */
 
@@ -61,7 +61,7 @@ module.exports = async function handler(req, res) {
             .map((m, i) => `${i + 1}. ${m.content}`)
             .join('\n');
 
-        // 4. Gemini 3 Flash 호출
+        // 4. Gemini 2.5 Flash 호출
         const prompt = `아래는 "병원 개원 상담 챗봇"에 들어온 사용자 질문 목록입니다.
 이 질문들을 분석해서 아래 2가지를 JSON으로 뽑아주세요.
 
@@ -114,15 +114,43 @@ ${questionList}`;
 
         if (!geminiResponse.ok) {
             const errText = await geminiResponse.text();
-            throw new Error(`Gemini API 오류 (${geminiResponse.status}): ${errText}`);
+            throw new Error(`Gemini API 오류 (${geminiResponse.status}): ${errText.substring(0, 500)}`);
         }
 
         const geminiData = await geminiResponse.json();
-        // Gemini 2.5 Flash는 thinking + output 파트가 분리됨 → 마지막 파트가 실제 출력
-        const parts = geminiData.candidates?.[0]?.content?.parts || [];
-        const rawText = parts.length > 0 ? parts[parts.length - 1].text || '' : '';
 
-        console.log('🤖 Gemini 응답 수신 완료');
+        // ★ 디버그: 응답 구조 상세 로깅
+        const allParts = geminiData.candidates?.[0]?.content?.parts || [];
+        console.log('🔍 [DEBUG] Gemini 응답 구조:', JSON.stringify({
+            hasCandidates: !!geminiData.candidates,
+            candidatesLength: geminiData.candidates?.length || 0,
+            partsLength: allParts.length,
+            partsTypes: allParts.map((p, i) => ({
+                index: i,
+                hasText: !!p.text,
+                textLength: p.text?.length || 0,
+                textPreview: p.text?.substring(0, 100) || '(empty)',
+                hasThought: !!p.thought
+            })),
+            finishReason: geminiData.candidates?.[0]?.finishReason,
+            promptFeedback: geminiData.promptFeedback || null
+        }, null, 2));
+
+        // Gemini 2.5 Flash는 thinking + output 파트가 분리됨 → thought가 아닌 파트 찾기
+        let rawText = '';
+        for (let i = allParts.length - 1; i >= 0; i--) {
+            if (!allParts[i].thought && allParts[i].text) {
+                rawText = allParts[i].text;
+                break;
+            }
+        }
+        // fallback: 아무것도 못 찾으면 마지막 파트
+        if (!rawText && allParts.length > 0) {
+            rawText = allParts[allParts.length - 1].text || '';
+        }
+
+        console.log('🤖 Gemini 응답 수신 완료, rawText 길이:', rawText.length);
+        console.log('🔍 [DEBUG] rawText 앞 300자:', rawText.substring(0, 300));
 
         // 5. JSON 파싱
         let analysisResult;
@@ -142,7 +170,8 @@ ${questionList}`;
                 }
             } catch {
                 console.error('❌ JSON 파싱 실패:', rawText.substring(0, 500));
-                throw new Error('Gemini 응답 JSON 파싱 실패');
+                // 디버그 정보를 에러 응답에 포함
+                throw new Error(`Gemini 응답 JSON 파싱 실패 | rawText길이: ${rawText.length} | 앞100자: ${rawText.substring(0, 100)} | parts수: ${allParts.length} | finishReason: ${geminiData.candidates?.[0]?.finishReason || 'N/A'}`);
             }
         }
 
