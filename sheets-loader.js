@@ -108,7 +108,7 @@ class GoogleSheetsLoader {
 
     // 📂 Notion 폴더 구조에서 데이터 로드
     async loadNotionData() {
-        const BASE_PATH = 'data/notion';
+        const BASE_PATH = 'data/notion_split';
         const notionItems = [];
 
         // 인덱스 파일 로드
@@ -484,14 +484,24 @@ class GoogleSheetsLoader {
                 // ★ R24 커트라인 정보 출력 ★
                 if (result.filterInfo) {
                     const fi = result.filterInfo;
-                    console.log(`   📊 커트라인: ${fi.cutoff} (top=${fi.topScore}, mean=${fi.mean}, σ=${fi.stdDev})`);
-                    console.log(`   📊 ${fi.passedCount}개 통과 / ${fi.scoredCount - fi.passedCount}개 제외`);
+                    console.log(`   📊 Primary 커트라인: ${fi.primaryCutoff || fi.cutoff} (top=${fi.topScore}, mean=${fi.mean}, σ=${fi.stdDev})`);
+                    console.log(`   📊 Secondary 커트라인: ${fi.secondaryCutoff || 'N/A'}`);
+                    console.log(`   📊 답변용 ${fi.passedCount}개 / RT용 ${fi.rtCount || 0}개 / 제외 ${fi.scoredCount - fi.passedCount - (fi.rtCount || 0)}개`);
                 }
                 console.log(`   🔎 최종 결과: ${result.count}개`);
                 result.results.forEach((doc, i) => {
                     console.log(`     [${i + 1}] ${doc.score?.toFixed(4)} | ${(doc.question || '').substring(0, 60)}`);
                 });
-                return result.results;
+                // ★ RT 문서 전달 (v6.5.2) ★
+                const searchResults = result.results;
+                searchResults._rtResults = result.rtResults || [];
+                if (searchResults._rtResults.length > 0) {
+                    console.log(`   🔗 RT 문서: ${searchResults._rtResults.length}개`);
+                    searchResults._rtResults.forEach((doc, i) => {
+                        console.log(`     [RT${i + 1}] ${doc.score?.toFixed(4)} | ${(doc.question || '').substring(0, 60)}`);
+                    });
+                }
+                return searchResults;
             } else {
                 console.warn('⚠️ 서버 검색 결과 없음');
                 return [];
