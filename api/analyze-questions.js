@@ -107,10 +107,7 @@ ${questionList}`;
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: {
-                        temperature: 0.1,
-                        maxOutputTokens: 4096
-                        // ⚠️ responseMimeType: 'application/json' 제거
-                        // Gemini 2.5 Flash에서 500 에러를 일으키는 known issue
+                        temperature: 0.1
                     }
                 })
             });
