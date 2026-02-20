@@ -372,6 +372,7 @@ async function createNewChat() {
         // 채팅 화면 초기화 및 웰컴 메시지 표시
         clearChatContainer();
         showWelcomeMessage();
+        if (typeof showSuggestedQuestions === 'function') showSuggestedQuestions();
 
         // ★ ChatMemory에 새 세션 설정 (맥락 분리) ★
         if (window.chatMemory) {
@@ -489,6 +490,7 @@ async function loadSessionMessages(sessionId) {
         if (!messages || messages.length === 0) {
             // 메시지가 없으면 웰컴 메시지 표시
             showWelcomeMessage();
+            if (typeof showSuggestedQuestions === 'function') showSuggestedQuestions();
             return;
         }
 
@@ -541,6 +543,9 @@ async function loadSessionMessages(sessionId) {
                 addBotMessageToUI(msg.content, lastUserQuestion, msg.context_prompt || '', msg.message_type || 'normal');
             }
         });
+
+        // 메시지가 있으면 추천 질문 버블 숨기기
+        if (typeof hideSuggestedQuestions === 'function') hideSuggestedQuestions();
 
         scrollToBottom();
 
@@ -646,6 +651,9 @@ function addUserMessageToUI(content) {
     // 웰컴 메시지 제거
     const welcomeMsg = chatContainer.querySelector('.welcome-message');
     if (welcomeMsg) welcomeMsg.remove();
+
+    // 추천 질문 숨김
+    if (typeof hideSuggestedQuestions === 'function') hideSuggestedQuestions();
 
     const div = document.createElement('div');
     div.className = 'message user';
