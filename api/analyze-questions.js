@@ -106,7 +106,8 @@ ${questionList}`;
                 contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
                     temperature: 0.1,
-                    maxOutputTokens: 4096
+                    maxOutputTokens: 4096,
+                    responseMimeType: 'application/json'
                 }
             })
         });
@@ -117,7 +118,9 @@ ${questionList}`;
         }
 
         const geminiData = await geminiResponse.json();
-        const rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        // Gemini 2.5 Flash는 thinking + output 파트가 분리됨 → 마지막 파트가 실제 출력
+        const parts = geminiData.candidates?.[0]?.content?.parts || [];
+        const rawText = parts.length > 0 ? parts[parts.length - 1].text || '' : '';
 
         console.log('🤖 Gemini 응답 수신 완료');
 
