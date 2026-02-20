@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "root": {
+    "id": "root",
+    "type": "frame",
+    "x": 0,
+    "y": 0,
+    "width": 1200,
+    "height": 800,
+    "fill": "#f8fafc",
+    "children": [
+      {
+        "id": "sidebar",
+        "type": "rectangle",
+        "x": 0,
+        "y": 0,
+        "width": 260,
+        "height": 800,
+        "fill": "#1e293b"
+      },
+      {
+        "id": "user_bubble",
+        "type": "rectangle",
+        "x": 300,
+        "y": 100,
+        "width": 400,
+        "height": 80,
+        "fill": "#536db1",
+        "cornerRadius": 16
+      }
+    ]
+  }
+}

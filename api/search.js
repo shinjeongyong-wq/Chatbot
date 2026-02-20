@@ -542,10 +542,10 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
             ? Math.max(primaryBase, scores[maxDocs - 1])
             : primaryBase;
 
-        // Secondary Cutoff: RT용 (β=0.45, maxDocs 클램핑 없음)
-        const secondaryBase = Math.min(topScore * 0.45, mean + 1.5 * stdDev);
-        const secondaryCutoff = secondaryBase; // RT용은 클램핑 없음 — Primary와 겹치면 안 됨
-        const rtMaxDocs = 10; // RT 후보 상한
+        // Secondary Cutoff: RT용 (β=0.40, σ계수=1.0 — R2 튜닝)
+        const secondaryBase = Math.min(topScore * 0.40, mean + 1.0 * stdDev);
+        const secondaryCutoff = secondaryBase; // RT용은 클램핑 없음
+        const rtMaxDocs = 5; // RT 후보 상한
 
         filterInfo.primaryCutoff = primaryCutoff.toFixed(4);
         filterInfo.secondaryCutoff = secondaryCutoff.toFixed(4);
@@ -555,11 +555,11 @@ function smartSearch(data, queryPlan, maxResults = 10, userSpecialty = null) {
         filterInfo.stdDev = stdDev.toFixed(4);
         // 수식 분해 정보
         filterInfo.primaryFormula = `min(top×0.65=${(topScore * 0.65).toFixed(4)}, μ+2σ=${(mean + 2.0 * stdDev).toFixed(4)})`;
-        filterInfo.secondaryFormula = `min(top×0.45=${(topScore * 0.45).toFixed(4)}, μ+1.5σ=${(mean + 1.5 * stdDev).toFixed(4)})`;
+        filterInfo.secondaryFormula = `min(top×0.40=${(topScore * 0.40).toFixed(4)}, μ+1.0σ=${(mean + 1.0 * stdDev).toFixed(4)})`;
 
         // Primary Zone: 답변에 사용
         const primaryResults = results.filter(r => r.score >= primaryCutoff);
-        // Secondary Zone: Primary 아래 ~ Secondary 이상 (RT용, 최대 rtMaxDocs개)
+        // Secondary Zone: Primary 아래 ~ Secondary 이상 (최대 rtMaxDocs개)
         rtResults = results.filter(r => r.score < primaryCutoff && r.score >= secondaryCutoff).slice(0, rtMaxDocs);
 
         results = primaryResults;

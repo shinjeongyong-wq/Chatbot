@@ -1,7 +1,7 @@
 {
   "category": "partners",
   "subCategory": "pre-construction/interior",
-  "itemCount": 12,
+  "itemCount": 13,
   "lastUpdated": "2026-01-22T01:19:22.915Z",
   "items": [
     {
@@ -368,6 +368,40 @@
         "parentTitle": "플래너 AI",
         "structuredCategory": "partners",
         "structuredSubCategory": "pre-construction/interior"
+      }
+    },
+    {
+      "id": "notion-2ed62aded336",
+      "source": "notion",
+      "pageId": "30c62ade-d336-8046-9242-eeef48cd15b5",
+      "question": "참신디자인",
+      "answer": "[이미지]\n\n### ⌛ 회사 소개\n• 2015년 설립(11년차)\n• 200건 이상의 병·의원 프로젝트 성공적으로 수행\n• 높은 재무 건전성 기반, 안정적인 실적 유지\n• 합리적인 비용 구조와 투명한 견적 시스템\n• 인허가 경험 풍부 (첨단재생의료, 우수내시경실, 클린룸, 인공신장실, 양압공사, 수술실공사 등)\n• 신속하고 책임감 있는 A/S 체계 (시공 이후 지원)\n\n### 💵 예상 견적(평당가)\n• 평당 180~200만 원 (디자인에 따라 상이)\n• 200평 이상: 160~180만 원\n• 30~40평대: 200만 원 이상\n\n### 📄 건설업등록증 보유 여부\n⭕",
+      "metadata": {
+        "field": "인테리어",
+        "topic": "참신디자인",
+        "category": "DB 레코드",
+        "icon": "",
+        "lastUpdated": "2026-02-19T04:53:00.000Z",
+        "parentType": "database_id",
+        "parentDbName": "인테리어 파트너사",
+        "structuredCategory": "partners",
+        "structuredSubCategory": "pre-construction/interior",
+        "specialties": [
+          "치과",
+          "미용",
+          "성형"
+        ],
+        "features": [
+          "많은포트폴리오",
+          "합리적비용",
+          "인허가도면구성",
+          "빠른A/S"
+        ],
+        "website": "http://charmshin.com/",
+        "winningRate": 0,
+        "totalContracts": 0,
+        "totalIntroductions": 0,
+        "tier": 1
       }
     }
   ]

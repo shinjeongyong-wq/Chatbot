@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>추가 세분화 후보 검토</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #0f1117;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 360px;
+            min-width: 360px;
+            background: #161822;
+            border-right: 1px solid #2a2d3a;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #2a2d3a;
+        }
+
+        .sidebar-header h2 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f59e0b;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.6;
+        }
+
+        .filter-bar {
+            padding: 10px 16px;
+            background: #1c1f2e;
+            border-bottom: 1px solid #2a2d3a;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            cursor: pointer;
+            border: 1px solid #333;
+            background: transparent;
+            color: #888;
+            transition: all .15s;
+        }
+
+        .filter-btn:hover {
+            border-color: #666;
+            color: #ccc;
+        }
+
+        .filter-btn.active {
+            background: #f59e0b22;
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .filter-btn .cnt {
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .file-item {
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #999;
+            transition: all .15s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .file-item:hover {
+            background: #1e2133;
+            color: #ccc;
+        }
+
+        .file-item.active {
+            background: #2a2a1a;
+            color: #fbbf24;
+        }
+
+        .file-item.hidden {
+            display: none;
+        }
+
+        .file-item .badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .file-item .badge.has-issues {
+            background: #f59e0b1a;
+            color: #f59e0b;
+        }
+
+        .file-item .badge.clean {
+            background: #22c55e1a;
+            color: #22c55e;
+        }
+
+        .main {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #0f1117ee;
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid #2a2d3a;
+        }
+
+        .main-header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f0f0f0;
+            margin-bottom: 4px;
+        }
+
+        .main-header .subtitle {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .legend-sw {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        .legend-sw.ok {
+            background: #1e2133;
+            border: 1px solid #3b82f644;
+        }
+
+        .legend-sw.subsplit-done {
+            background: #0d2818;
+            border: 1px solid #22c55e44;
+        }
+
+        .legend-sw.candidate {
+            background: #f59e0b12;
+            border: 1px solid #f59e0b55;
+        }
+
+        .legend-sw.planner {
+            background: #6366f10d;
+            border: 1px solid #6366f144;
+        }
+
+        .content-area {
+            padding: 20px 40px 100px;
+        }
+
+        .chunk {
+            position: relative;
+            margin-bottom: 0;
+        }
+
+        .chunk+.chunk {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .chunk-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .chunk-label .chunk-id {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+
+        .chunk-label .chunk-chars {
+            color: #666;
+            font-weight: 400;
+            margin-left: auto;
+        }
+
+        .chunk-body {
+            padding: 0 16px 20px;
+            font-size: 13px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #bbb;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Types */
+        .chunk.ok .chunk-label {
+            color: #3b82f6;
+        }
+
+        .chunk.ok .chunk-label .chunk-id {
+            background: #3b82f61a;
+            color: #3b82f6;
+        }
+
+        .chunk.done .chunk-label {
+            color: #22c55e;
+        }
+
+        .chunk.done .chunk-label .chunk-id {
+            background: #22c55e1a;
+            color: #22c55e;
+        }
+
+        .chunk.done {
+            background: #0d281808;
+            border-left: 3px solid #22c55e;
+        }
+
+        .chunk.candidate {
+            background: #f59e0b0a;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .chunk.candidate .chunk-label {
+            color: #f59e0b;
+        }
+
+        .chunk.candidate .chunk-label .chunk-id {
+            background: #f59e0b1a;
+            color: #f59e0b;
+        }
+
+        .chunk.planner {
+            background: #6366f108;
+            border-left: 3px solid #6366f155;
+        }
+
+        .chunk.planner .chunk-label {
+            color: #6366f1;
+        }
+
+        .chunk.planner .chunk-label .chunk-id {
+            background: #6366f11a;
+            color: #6366f1;
+        }
+
+        .issue-banner {
+            margin: 0 16px 12px;
+            padding: 10px 14px;
+            background: #f59e0b12;
+            border: 1px solid #f59e0b33;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #f59e0b;
+        }
+
+        .issue-banner strong {
+            color: #fbbf24;
+        }
+
+        .context-tag {
+            display: inline-block;
+            background: #a78bfa22;
+            color: #a78bfa;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        /* Sub-section preview within candidates */
+        .sub-preview {
+            margin: 4px 16px 8px;
+            padding: 8px 12px;
+            background: #1a1d2d;
+            border: 1px solid #2a2d3a;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .sub-preview+.sub-preview {
+            margin-top: 0;
+        }
+
+        .sub-preview::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: repeating-linear-gradient(90deg, #f59e0b 0, #f59e0b 6px, transparent 6px, transparent 12px);
+        }
+
+        .sub-preview:first-of-type::before {
+            display: none;
+        }
+
+        .sub-preview-label {
+            font-size: 10px;
+            color: #f59e0b;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .sub-preview-content {
+            font-size: 12px;
+            line-height: 1.6;
+            color: #999;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .no-selection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 60vh;
+            color: #555;
+            font-size: 15px;
+            gap: 8px;
+        }
+
+        .no-selection .icon {
+            font-size: 48px;
+            opacity: .3;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+
+        .md-h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #c4b5fd;
+            margin: 6px 0 4px;
+        }
+
+        .md-h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ddd;
+            margin: 8px 0 4px;
+        }
+
+        .md-bold {
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>🔍 추가 세분화 후보 검토</h2>
+                <p>이미 세분화 완료된 결과 위에, 추가로 세분화하거나 상위 태그를 달 수 있는 후보를 <strong style="color:#f59e0b">노란색</strong>으로 표시했습니다.
+                </p>
+            </div>
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">전체</button>
+                <button class="filter-btn" data-filter="issues">🟡 후보만</button>
+                <button class="filter-btn" data-filter="clean">✅ 깨끗한 파일</button>
+            </div>
+            <div class="file-list" id="fileList"></div>
+        </div>
+        <div class="main">
+            <div class="main-header">
+                <h1 id="mainTitle">파일을 선택하세요</h1>
+                <div class="subtitle" id="mainSubtitle">왼쪽에서 문서를 클릭하면 분할 현황이 나타납니다</div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-sw ok"></div>기존 청크
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-sw subsplit-done"></div>✂️ 이미 세분화 완료
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-sw candidate"></div>🟡 추가 세분화 후보
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-sw planner"></div>🔒 플래너 (제외)
+                    </div>
+                </div>
+            </div>
+            <div class="content-area" id="contentArea">
+                <div class="no-selection">
+                    <div class="icon">📄</div>
+                    <div>왼쪽 파일 목록에서 문서를 선택해주세요</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FILE_PATHS = [
+            'notion_split/advanced/interior.json',
+            'notion_split/advanced/medical-device-beauty.json',
+            'notion_split/advanced/medical-device-internal.json',
+            'notion_split/advanced/medical-device-pain.json',
+            'notion_split/advanced/signage.json',
+            'notion_split/hospital-basics/during-construction/furniture.json',
+            'notion_split/hospital-basics/during-construction/infrastructure.json',
+            'notion_split/hospital-basics/during-construction/textiles.json',
+            'notion_split/hospital-basics/during-construction/waste.json',
+            'notion_split/hospital-basics/post-opening/admin.json',
+            'notion_split/hospital-basics/post-opening/emr-crm.json',
+            'notion_split/hospital-basics/post-opening/management.json',
+            'notion_split/hospital-basics/post-opening/pharmacy.json',
+            'notion_split/hospital-basics/pre-construction/demolition.json',
+            'notion_split/hospital-basics/pre-construction/interior.json',
+            'notion_split/hospital-basics/pre-construction/marketing.json',
+            'notion_split/hospital-basics/pre-construction/medical-device.json',
+            'notion_split/hospital-basics/pre-construction/signage.json',
+            'notion_split/hospital-basics/pre-construction/tax-loan.json',
+            'notion_split/hospital-opening-roadmap.json'
+        ];
+
+        const PLANNER_KW = ['플래너의 역할', '플래너님께서 해주셔야 하는 일', '플래너님이 해주셔야 하는 일', '플래너님이 해주시면 좋은'];
+        let allData = {};
+
+        function isSubDone(item) { return item.id.includes('-sub-'); }
+        function isPlanner(q) { return PLANNER_KW.some(k => q.includes(k)); }
+
+        function analyzeCandidate(answer, question) {
+            if (isPlanner(question)) return null;
+
+            const ch = answer.length;
+            const nH3 = (answer.match(/### \d+[\.\s]/g) || []).length;
+            const arrows = (answer.match(/^  ▸ /gm) || []).length;
+            const allH3 = (answer.match(/^### /gm) || []).length;
+            const nonNumH3 = allH3 - nH3;
+
+            const issues = [];
+            if (nH3 >= 2 && ch > 400) issues.push(`${nH3}개 번호형 절차가 묶여있음 (${ch}자)`);
+            if (arrows >= 2 && ch > 400) issues.push(`${arrows}개 ▸ 항목 묶여있음 (${ch}자)`);
+            if (nonNumH3 >= 3 && ch > 800) issues.push(`${nonNumH3}개 비번호형 H3 섹션 묶여있음 (${ch}자)`);
+
+            return issues.length > 0 ? issues : null;
+        }
+
+        function extractH3Sections(answer) {
+            const matches = [...answer.matchAll(/^### ([^\n]+)/gm)];
+            if (matches.length < 2) return null;
+
+            // Get parent heading
+            let parent = '';
+            const firstIdx = matches[0].index;
+            const before = answer.substring(0, firstIdx);
+            const h2m = before.match(/## \**([^\n*]+)/);
+            if (h2m) parent = h2m[1].trim();
+
+            const sections = [];
+            for (let i = 0; i < matches.length; i++) {
+                const start = matches[i].index;
+                const end = (i + 1 < matches.length) ? matches[i + 1].index : answer.length;
+                sections.push({
+                    title: matches[i][1].replace(/\*+/g, '').trim(),
+                    content: answer.substring(start, end).trim()
+                });
+            }
+            return { parent, sections };
+        }
+
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+        function renderMd(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/^### (.+)$/gm, '<div class="md-h3">### $1</div>')
+                .replace(/^## (.+)$/gm, '<div class="md-h2">## $1</div>')
+                .replace(/!\[([^\]]*)\]\([^\)]+\)/g, '<span style="color:#555;font-size:11px">🖼 [$1]</span>')
+                .replace(/\*\*([^*]+)\*\*/g, '<span class="md-bold">$1</span>')
+                .replace(/^- (.+)$/gm, '<div style="padding-left:16px;color:#bbb">• $1</div>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function renderFile(fp) {
+            const data = allData[fp];
+            if (!data) return;
+
+            const shortName = fp.replace('notion_split/', '');
+            document.getElementById('mainTitle').textContent = shortName;
+            document.getElementById('mainSubtitle').textContent = `총 ${data.itemCount}개 아이템`;
+
+            let html = '';
+            data.items.forEach((item, idx) => {
+                const isSub = isSubDone(item);
+                const isPlan = isPlanner(item.question);
+                const candidateIssues = !isSub ? analyzeCandidate(item.answer, item.question) : null;
+                const hasContextTag = /^\[.+\]\n/.test(item.answer);
+
+                let chunkClass, icon;
+                if (candidateIssues) { chunkClass = 'chunk candidate'; icon = '🟡'; }
+                else if (isSub) { chunkClass = 'chunk done'; icon = '✂️'; }
+                else if (isPlan) { chunkClass = 'chunk planner'; icon = '🔒'; }
+                else { chunkClass = 'chunk ok'; icon = '📄'; }
+
+                const qShort = item.question.split(' - ').pop() || item.question;
+                const chars = item.answer.length;
+
+                html += `<div class="${chunkClass}">`;
+                html += `<div class="chunk-label">
+      <span class="chunk-id">${icon} #${idx}</span>
+      <span>${esc(qShort)}</span>
+      <span class="chunk-chars">${chars.toLocaleString()}자</span>
+    </div>`;
+
+                if (hasContextTag) {
+                    const m = item.answer.match(/^\[([^\]]+)\]\n/);
+                    if (m) html += `<div style="padding:0 16px 4px"><span class="context-tag">상위: ${esc(m[1])}</span></div>`;
+                }
+
+                if (candidateIssues) {
+                    html += `<div class="issue-banner">
+        <strong>⚠️ 추가 세분화 후보</strong><br>
+        ${candidateIssues.map(i => '• ' + esc(i)).join('<br>')}
+      </div>`;
+
+                    // Show how it would be split
+                    const h3s = extractH3Sections(item.answer);
+                    if (h3s && h3s.sections.length >= 2) {
+                        h3s.sections.forEach((sec, si) => {
+                            html += `<div class="sub-preview">
+            <div class="sub-preview-label">✂️ 분리 후보 #${idx}-sub-${si} ${h3s.parent ? '<span class="context-tag">[' + esc(h3s.parent) + ']</span>' : ''}</div>
+            <div class="sub-preview-content">${renderMd(sec.content)}</div>
+          </div>`;
+                        });
+                    } else {
+                        html += `<div class="chunk-body">${renderMd(item.answer)}</div>`;
+                    }
+                } else {
+                    html += `<div class="chunk-body">${renderMd(item.answer)}</div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            document.getElementById('contentArea').innerHTML = html;
+            document.getElementById('contentArea').scrollTop = 0;
+
+            document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
+            const ae = document.querySelector(`.file-item[data-path="${fp}"]`);
+            if (ae) ae.classList.add('active');
+        }
+
+        async function init() {
+            for (const fp of FILE_PATHS) {
+                try {
+                    const res = await fetch('/' + fp);
+                    if (res.ok) allData[fp] = await res.json();
+                } catch (e) { }
+            }
+
+            const fileList = document.getElementById('fileList');
+            const fileInfo = [];
+
+            for (const fp of FILE_PATHS) {
+                const data = allData[fp];
+                if (!data) continue;
+
+                let issueCount = 0;
+                data.items.forEach(it => {
+                    if (!isSubDone(it)) {
+                        const c = analyzeCandidate(it.answer, it.question);
+                        if (c) issueCount++;
+                    }
+                });
+
+                const shortName = fp.replace('notion_split/', '').replace('.json', '');
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.dataset.path = fp;
+                div.dataset.hasIssues = issueCount > 0 ? 'yes' : 'no';
+                div.innerHTML = `<span>${shortName}</span><span class="badge ${issueCount > 0 ? 'has-issues' : 'clean'}">${issueCount > 0 ? '🟡 ' + issueCount : '✅'}</span>`;
+                div.addEventListener('click', () => renderFile(fp));
+                fileList.appendChild(div);
+                fileInfo.push({ fp, issueCount });
+            }
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const f = btn.dataset.filter;
+                    document.querySelectorAll('.file-item').forEach(el => {
+                        if (f === 'all') el.classList.remove('hidden');
+                        else if (f === 'issues') el.classList.toggle('hidden', el.dataset.hasIssues !== 'yes');
+                        else if (f === 'clean') el.classList.toggle('hidden', el.dataset.hasIssues !== 'no');
+                    });
+                });
+            });
+
+            // Auto-select first file with issues
+            const first = fileInfo.find(f => f.issueCount > 0);
+            if (first) renderFile(first.fp);
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

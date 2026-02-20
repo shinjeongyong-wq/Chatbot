@@ -1,0 +1,787 @@
+﻿/* Design System - Matching opndoctor.com */
+:root {
+    /* Colors */
+    --primary-color: #536db1;
+    --primary-hover: #4a5f9d;
+    --primary-light: #f0f4ff;
+    --background: #f8f9fa;
+    --surface: #ffffff;
+    --surface-secondary: #f3f4f6;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --text-tertiary: #9ca3af;
+    --border-color: #e5e7eb;
+    --success: #10b981;
+    --warning: #f59e0b;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+    /* Typography */
+    --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background: var(--background);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Header */
+.header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.header-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-left: 48px;
+}
+
+/* Chat Container */
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-xl);
+    background: var(--background);
+    scroll-behavior: smooth;
+}
+
+.chat-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-full);
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* Welcome Message */
+.welcome-message {
+    max-width: 600px;
+    margin: 60px auto;
+    text-align: center;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.welcome-icon {
+    margin-bottom: var(--spacing-lg);
+    animation: float 3s ease-in-out infinite;
+}
+
+.welcome-message h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.welcome-message p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xl);
+    line-height: 1.8;
+}
+
+/* Suggested Questions */
+.suggested-questions {
+    margin-top: var(--spacing-xl);
+}
+
+.suggested-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+    text-align: left;
+}
+
+.suggestion-chip {
+    display: block;
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-size: 14px;
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.suggestion-chip:hover {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.suggestion-chip:active {
+    transform: translateY(0);
+}
+
+/* Chat Messages */
+.message {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.message.user {
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.message.bot .message-avatar {
+    background: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.message.user .message-avatar {
+    background: var(--primary-color);
+    color: white;
+}
+
+.message-content {
+    max-width: 70%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.message.bot .message-content {
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-top-left-radius: 4px;
+}
+
+.message.user .message-content {
+    background: var(--primary-color);
+    color: white;
+    border-top-right-radius: 4px;
+}
+
+.message-time {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: var(--spacing-xs);
+    padding: 0 var(--spacing-sm);
+}
+
+.message.user .message-time {
+    text-align: right;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.typing-indicator .message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: var(--primary-light);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.typing-dots {
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    border-top-left-radius: 4px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.typing-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-tertiary);
+    animation: typing 1.4s infinite;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* Source Badge */
+.source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: var(--primary-light);
+    color: var(--primary-color);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: var(--spacing-sm);
+}
+
+.source-badge.gemini {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* Input Container */
+.input-container {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--surface);
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: flex-end;
+    background: var(--surface-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm);
+    transition: all 0.2s ease;
+}
+
+.input-wrapper:focus-within {
+    border-color: var(--primary-color);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.chat-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: var(--font-family);
+    font-size: 15px;
+    color: var(--text-primary);
+    resize: none;
+    outline: none;
+    padding: var(--spacing-sm);
+    max-height: 120px;
+    line-height: 1.5;
+}
+
+.chat-input::placeholder {
+    color: var(--text-tertiary);
+}
+
+.send-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--primary-color);
+    color: white;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.send-button:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.send-button:active {
+    transform: scale(0.95);
+}
+
+.send-button:disabled {
+    background: var(--border-color);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.input-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: var(--spacing-sm);
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes typing {
+
+    0%,
+    60%,
+    100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+
+    30% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        max-width: 100%;
+    }
+
+    .header {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .chat-container {
+        padding: var(--spacing-lg);
+    }
+
+    .welcome-message {
+        margin: var(--spacing-xl) auto;
+    }
+
+    .welcome-message h2 {
+        font-size: 24px;
+    }
+
+    .message-content {
+        max-width: 85%;
+    }
+
+    .input-container {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+}
+
+/* ========================================
+   ?�릭 가?�한 주제 링크 ?��???
+   ======================================== */
+
+.clickable-topic {
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+}
+
+.clickable-topic:hover {
+    color: var(--primary-hover);
+    border-bottom-color: var(--primary-hover);
+}
+
+.clickable-topic:active {
+    opacity: 0.7;
+    transform: translateY(1px);
+}
+
+/* AI 생성 중 중단 버튼 스타일 */
+.send-button.stop-mode {
+    background: var(--text-primary);
+    animation: pulse 2s infinite;
+}
+
+.send-button.stop-mode:hover {
+    background: #000;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+/* ========================================
+   ��Ʈ���� �޽��� ��Ÿ��
+   ======================================== */
+
+.message.streaming .streaming-content {
+    min-height: 30px;
+}
+
+/* ��Ʈ���� �� Ŀ�� �ִϸ��̼� */
+.message.streaming .streaming-content::after {
+    content: '';
+    animation: blink 1s step-end infinite;
+    color: var(--primary-color);
+    margin-left: 2px;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* ��Ʈ���� �Ϸ� �� Ŀ�� ���� */
+.message:not(.streaming) .streaming-content::after {
+    content: none;
+}
+
+/* �� ���� ǥ�� */
+.model-info {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+/* ========================================
+   모바일 최적화 (v2.4.1)
+   ======================================== */
+
+/* 터치 최적화 기본 설정 */
+@media (hover: none) and (pointer: coarse) {
+
+    /* 터치 디바이스에서 호버 효과 제거 */
+    .suggestion-chip:hover,
+    .send-button:hover,
+    .clickable-topic:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* 터치 하이라이트 색상 */
+    * {
+        -webkit-tap-highlight-color: rgba(83, 109, 177, 0.2);
+    }
+}
+
+/* 768px 이하 - 태블릿/모바일 */
+@media (max-width: 768px) {
+
+    /* 입력창 터치 최적화 */
+    .send-button {
+        width: 44px;
+        height: 44px;
+    }
+
+    .chat-input {
+        font-size: 16px;
+        /* iOS 확대 방지 */
+    }
+
+    /* 메시지 영역 */
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .message-content {
+        font-size: 14px;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    /* 피드백 버튼 터치 영역 확대 */
+    .feedback-btn {
+        min-height: 44px;
+        padding: 10px 16px;
+    }
+
+    /* 플래너 버튼 터치 영역 확대 */
+    .contact-planner-btn {
+        min-height: 48px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* 웰컴 메시지 */
+    .welcome-message {
+        padding: 0 var(--spacing-md);
+    }
+
+    .welcome-message p {
+        font-size: 14px;
+    }
+
+    /* 제안 칩 터치 영역 */
+    .suggestion-chip {
+        min-height: 48px;
+        padding: var(--spacing-md);
+    }
+}
+
+/* 480px 이하 - 소형 모바일 */
+@media (max-width: 480px) {
+
+    /* 헤더 축소 */
+    .header {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .logo-text {
+        font-size: 16px;
+    }
+
+    .header-subtitle {
+        display: none;
+    }
+
+    /* 채팅 영역 */
+    .chat-container {
+        padding: var(--spacing-md);
+    }
+
+    .message {
+        gap: var(--spacing-sm);
+    }
+
+    .message-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+
+    .message-content {
+        max-width: 88%;
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+
+    /* 입력 영역 */
+    .input-container {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .input-wrapper {
+        padding: 6px;
+    }
+}
+
+/* ==========================================================================
+   MOBILE UI FINAL FIX (v6.0.0)
+   ========================================================================== */
+
+/* --- 1. Mobile Avatar Hidden (Gemini Style) --- */
+@media (max-width: 768px) {
+    .message-avatar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .message {
+        gap: 0 !important;
+        margin-bottom: 12px !important;
+    }
+
+    .message.user .message-content {
+        margin-right: 8px !important;
+        max-width: 82% !important;
+        border-radius: 18px 18px 4px 18px !important;
+    }
+
+    .message.bot .message-content {
+        margin-left: 8px !important;
+        max-width: 88% !important;
+        border-radius: 18px 18px 18px 4px !important;
+    }
+
+    /* --- 2. Mobile Header Buttons --- */
+    .mobile-menu-btn,
+    .header-planner-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #536db1 !important;
+        padding: 8px !important;
+    }
+
+    .hamburger-btn {
+        display: flex !important;
+        color: #536db1 !important;
+        padding: 6px !important;
+    }
+
+    .header-faq-btn,
+    .desktop-only {
+        display: none !important;
+    }
+
+    .header {
+        padding: 8px 12px !important;
+        padding-top: max(8px, env(safe-area-inset-top)) !important;
+    }
+
+    .sidebar-top-controls {
+        padding: 8px !important;
+        padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
+    }
+
+    /* --- 3. Mobile Sidebar Overlay --- */
+    .history-sidebar {
+        position: fixed !important;
+        left: -100% !important;
+        top: 0 !important;
+        height: 100vh !important;
+        width: 80% !important;
+        max-width: 300px !important;
+        z-index: 10001 !important;
+        transition: left 0.3s ease-out !important;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .history-sidebar.mobile-open {
+        left: 0 !important;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+    }
+
+    .sidebar-overlay.active {
+        display: block !important;
+    }
+
+    /* --- 4. Mobile Bottom Input Safe Area Fix --- */
+    .input-container {
+        padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
+    }
+}
+
+/* --- 5. PC Avatar Visible (Default) --- */
+@media (min-width: 769px) {
+    .message-avatar {
+        display: flex !important;
+    }
+
+    .mobile-menu-btn,
+    .header-planner-btn,
+    .mobile-only {
+        display: none !important;
+    }
+}

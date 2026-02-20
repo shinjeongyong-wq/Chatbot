@@ -37,9 +37,9 @@
   {
     "id": 6,
     "original": "먹미팅이 뭔가요?",
-    "shortened": "먹미팅이 뭔가요?",
+    "shortened": "먹미팅",
     "originalLen": 9,
-    "shortenedLen": 9
+    "shortenedLen": 3
   },
   {
     "id": 7,
@@ -58,16 +58,16 @@
   {
     "id": 9,
     "original": "하자 점검 어떻게 하나요?",
-    "shortened": "하자 점검 어떻게 하나요?",
+    "shortened": "하자 점검",
     "originalLen": 14,
-    "shortenedLen": 14
+    "shortenedLen": 6
   },
   {
     "id": 10,
     "original": "실내건축공사업면허가 뭔가요?",
-    "shortened": "실내건축공사업면허가 뭔가요?",
+    "shortened": "실내건축공사업면허",
     "originalLen": 15,
-    "shortenedLen": 15
+    "shortenedLen": 10
   },
   {
     "id": 11,
@@ -86,7 +86,7 @@
   {
     "id": 13,
     "original": "우수내시경실 인증이 뭔가요?",
-    "shortened": "우수내시경실 인증이 뭔가요?",
+    "shortened": "우수내시경실 인증",
     "originalLen": 15,
     "shortenedLen": 15
   },

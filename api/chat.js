@@ -209,11 +209,11 @@ ${userSpecialtyContext}${conversationContext}
 2. **Google Sheets FAQ** - 자주 묻는 질문
 3. **Notion 데이터** - 파트너사, 프로세스, 체크리스트 등 상세 정보
 
-[Notion 폴더 구조]
-1. **partners/** - 파트너사 명단
-2. **hospital-basics/** - 개원 시 필요 영역 [기본편]
-3. **advanced/** - 심화 콘텐츠 (의료기기 미용/통증/내과/치과)
-4. **checklist/** - 체크리스트/점검표
+[Notion 폴더 구조] (참고용 — 검색엔진이 자동으로 전체 검색)
+1. partners/ - 파트너사 명단
+2. hospital-basics/ - 개원 시 필요 영역 [기본편]
+3. advanced/ - 심화 콘텐츠 (의료기기 미용/통증/내과/치과)
+4. checklist/ - 체크리스트/점검표
 
 [SPECIFIC의 세부 intent]
 - 파트너사목록: 업체 리스트 요청
@@ -239,8 +239,8 @@ ${userSpecialtyContext}${conversationContext}
   "requiresSearch": true,
   "subIntent": ["질문에 해당하는 의도들 - 파트너사목록/절차안내/비용/체크리스트/정보요청/고객사례 중 해당되는 것 모두"],
   "topic": ["질문에 해당하는 주제들 - 인테리어/간판/의료기기/마케팅/홈페이지/PC&네트워크/가구/세무·대출/노무/EMR·CRM/의료폐기물/체크리스트/고객사례/개원로드맵/파트너사정보/기타 중 해당되는 것 모두"],
-  "targetCategory": ["검색할 데이터 영역들 - qa/partners/hospital-basics/advanced/checklist/portfolio/hospital-opening-roadmap 중 해당되는 것 모두"],
-  "targetSubCategory": ["검색할 세부 영역들 - 해당되는 것 모두 선택"],
+  // "targetCategory": [], // (현재 미사용 — 검색엔진이 전체 데이터 대상 검색)
+  // "targetSubCategory": [], // (현재 미사용)
   "specialtyRelevant": true/false,
   "coreKeywords": ["핵심 키워드들"],
   "expandedKeywords": ["관련 확장 키워드들"],
@@ -248,18 +248,11 @@ ${userSpecialtyContext}${conversationContext}
   "searchStrategy": "semantic|broad|exact"
 }
 
-**중요: 복합 질문의 경우 subIntent, topic, targetCategory, targetSubCategory는 반드시 배열로 여러 값을 포함하세요.**
+**중요: 복합 질문의 경우 subIntent, topic은 반드시 배열로 여러 값을 포함하세요.**
 
-[targetSubCategory 옵션 목록]
-- qa (Q&A 데이터)
-- pre-construction/interior, pre-construction/signage, pre-construction/homepage, pre-construction/bank, pre-construction/pc-network, pre-construction/medical-device, pre-construction/marketing, pre-construction/tax-loan, pre-construction/demolition
-- during-construction/furniture, during-construction/infrastructure, during-construction/textiles, during-construction/waste
-- post-construction/furniture, post-construction/emr-crm, post-construction/marketing
-- post-opening/admin, post-opening/emr-crm, post-opening/management, post-opening/pharmacy
-- checklist/general, checklist/facilities, checklist/regulations
-- portfolio/customers
-- advanced/interior, advanced/signage, advanced/medical-device-beauty, advanced/medical-device-dental, advanced/medical-device-internal, advanced/medical-device-pain
-- roadmap
+// [targetSubCategory 옵션 목록] — 현재 미사용
+// - qa, pre-construction/*, during-construction/*, post-construction/*
+// - post-opening/*, checklist/*, portfolio/*, advanced/*, roadmap
 
 ---
 

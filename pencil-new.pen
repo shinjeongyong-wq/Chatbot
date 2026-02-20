@@ -1,0 +1,425 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "premium_ui",
+      "name": "Chatbot Premium Redesign",
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 800,
+      "fill": "#F8FAFC",
+      "clip": true,
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "sidebar_bg",
+          "name": "Sidebar BG",
+          "x": 0,
+          "y": 0,
+          "width": 240,
+          "height": 800,
+          "fill": "#F8FAFC",
+          "stroke": "#E2E8F0",
+          "strokeWidth": 1
+        },
+        {
+          "type": "rectangle",
+          "id": "new_chat_btn",
+          "name": "+ 새 채팅 Button",
+          "x": 16,
+          "y": 72,
+          "width": 208,
+          "height": 44,
+          "fill": "#FFFFFF",
+          "cornerRadius": 10,
+          "stroke": "#CBD5E1",
+          "strokeWidth": 1
+        },
+        {
+          "type": "text",
+          "id": "new_chat_txt",
+          "x": 60,
+          "y": 84,
+          "text": "+ 새 채팅",
+          "fill": "#475569",
+          "fontSize": 14,
+          "fontWeight": 600
+        },
+        {
+          "type": "rectangle",
+          "id": "history_active",
+          "name": "Active History Item",
+          "x": 8,
+          "y": 132,
+          "width": 224,
+          "height": 52,
+          "fill": "rgba(83, 109, 177, 0.08)",
+          "cornerRadius": 8
+        },
+        {
+          "type": "rectangle",
+          "id": "active_accent_bar",
+          "x": 8,
+          "y": 132,
+          "width": 3,
+          "height": 52,
+          "fill": "#536DB1",
+          "cornerRadius": 2
+        },
+        {
+          "type": "text",
+          "id": "history_active_txt",
+          "x": 40,
+          "y": 140,
+          "text": "새로운 채팅",
+          "fill": "#536DB1",
+          "fontSize": 13,
+          "fontWeight": 600
+        },
+        {
+          "type": "text",
+          "id": "history_active_date",
+          "x": 40,
+          "y": 160,
+          "text": "2026/02/20",
+          "fill": "#536DB1",
+          "fontSize": 11
+        },
+        {
+          "type": "rectangle",
+          "id": "history_item_2",
+          "x": 8,
+          "y": 192,
+          "width": 224,
+          "height": 52,
+          "fill": "transparent",
+          "cornerRadius": 8
+        },
+        {
+          "type": "text",
+          "id": "history_2_txt",
+          "x": 40,
+          "y": 200,
+          "text": "싸이지 가격 얼마나",
+          "fill": "#64748B",
+          "fontSize": 13
+        },
+        {
+          "type": "text",
+          "id": "history_2_date",
+          "x": 40,
+          "y": 220,
+          "text": "2026/02/20",
+          "fill": "#94A3B8",
+          "fontSize": 11
+        },
+        {
+          "type": "rectangle",
+          "id": "history_item_3",
+          "x": 8,
+          "y": 252,
+          "width": 224,
+          "height": 52,
+          "fill": "transparent",
+          "cornerRadius": 8
+        },
+        {
+          "type": "text",
+          "id": "history_3_txt",
+          "x": 40,
+          "y": 260,
+          "text": "대출은 얼마정도 가능해?",
+          "fill": "#64748B",
+          "fontSize": 13
+        },
+        {
+          "type": "text",
+          "id": "history_3_date",
+          "x": 40,
+          "y": 280,
+          "text": "2026/02/20",
+          "fill": "#94A3B8",
+          "fontSize": 11
+        },
+        {
+          "type": "rectangle",
+          "id": "profile_box",
+          "name": "Profile Box",
+          "x": 8,
+          "y": 728,
+          "width": 224,
+          "height": 56,
+          "fill": "#E0F2FE",
+          "cornerRadius": 12
+        },
+        {
+          "type": "rectangle",
+          "id": "profile_avatar",
+          "x": 20,
+          "y": 736,
+          "width": 40,
+          "height": 40,
+          "fill": "#536DB1",
+          "cornerRadius": 20
+        },
+        {
+          "type": "text",
+          "id": "profile_name",
+          "x": 68,
+          "y": 744,
+          "text": "신정용",
+          "fill": "#1E293B",
+          "fontSize": 14,
+          "fontWeight": 600
+        },
+        {
+          "type": "text",
+          "id": "profile_role",
+          "x": 68,
+          "y": 762,
+          "text": "마용",
+          "fill": "#64748B",
+          "fontSize": 12
+        },
+        {
+          "type": "rectangle",
+          "id": "header_bar",
+          "name": "Top Header",
+          "x": 240,
+          "y": 0,
+          "width": 1040,
+          "height": 56,
+          "fill": "#FFFFFF",
+          "stroke": "#E2E8F0",
+          "strokeWidth": 1
+        },
+        {
+          "type": "text",
+          "id": "header_logo",
+          "x": 264,
+          "y": 18,
+          "text": "🏥 개원 상담 챗봇",
+          "fill": "#1E293B",
+          "fontSize": 16,
+          "fontWeight": 700
+        },
+        {
+          "type": "rectangle",
+          "id": "faq_btn",
+          "name": "FAQ Button",
+          "x": 1200,
+          "y": 12,
+          "width": 64,
+          "height": 32,
+          "fill": "transparent",
+          "stroke": "#536DB1",
+          "strokeWidth": 1.5,
+          "cornerRadius": 16
+        },
+        {
+          "type": "text",
+          "id": "faq_txt",
+          "x": 1216,
+          "y": 20,
+          "text": "FAQ",
+          "fill": "#536DB1",
+          "fontSize": 13,
+          "fontWeight": 600
+        },
+        {
+          "type": "rectangle",
+          "id": "main_chat_area",
+          "name": "Chat Area",
+          "x": 240,
+          "y": 56,
+          "width": 1040,
+          "height": 640,
+          "fill": "#FFFFFF"
+        },
+        {
+          "type": "rectangle",
+          "id": "welcome_avatar",
+          "x": 720,
+          "y": 140,
+          "width": 56,
+          "height": 56,
+          "fill": "#E0F2FE",
+          "cornerRadius": 28
+        },
+        {
+          "type": "text",
+          "id": "welcome_title",
+          "x": 620,
+          "y": 220,
+          "text": "무엇을 도와드릴까요?",
+          "fill": "#0F172A",
+          "fontSize": 28,
+          "fontWeight": 800
+        },
+        {
+          "type": "text",
+          "id": "welcome_desc_1",
+          "x": 560,
+          "y": 264,
+          "text": "AI 컨설턴트가 병원 개원의 모든 것을 답변해 드립니다.",
+          "fill": "#64748B",
+          "fontSize": 14
+        },
+        {
+          "type": "text",
+          "id": "welcome_desc_2",
+          "x": 530,
+          "y": 284,
+          "text": "우측 상단에서 자주 묻는 질문을 확인하거나, 직접 물어보세요.",
+          "fill": "#64748B",
+          "fontSize": 14
+        },
+        {
+          "type": "rectangle",
+          "id": "suggest_bubble_1",
+          "name": "Suggestion 1",
+          "x": 860,
+          "y": 430,
+          "width": 240,
+          "height": 40,
+          "fill": "#FFFFFF",
+          "cornerRadius": 20,
+          "stroke": "#E2E8F0",
+          "strokeWidth": 1
+        },
+        {
+          "type": "text",
+          "id": "suggest_txt_1",
+          "x": 876,
+          "y": 442,
+          "text": "인테리어 파트너사 추천해주세요.",
+          "fill": "#475569",
+          "fontSize": 13
+        },
+        {
+          "type": "rectangle",
+          "id": "suggest_bubble_2",
+          "name": "Suggestion 2",
+          "x": 820,
+          "y": 480,
+          "width": 280,
+          "height": 40,
+          "fill": "#FFFFFF",
+          "cornerRadius": 20,
+          "stroke": "#E2E8F0",
+          "strokeWidth": 1
+        },
+        {
+          "type": "text",
+          "id": "suggest_txt_2",
+          "x": 836,
+          "y": 492,
+          "text": "의료기기 장비 어떤 걸 구매해야되나요?",
+          "fill": "#475569",
+          "fontSize": 13
+        },
+        {
+          "type": "rectangle",
+          "id": "suggest_bubble_3",
+          "name": "Suggestion 3",
+          "x": 830,
+          "y": 530,
+          "width": 270,
+          "height": 40,
+          "fill": "#FFFFFF",
+          "cornerRadius": 20,
+          "stroke": "#E2E8F0",
+          "strokeWidth": 1
+        },
+        {
+          "type": "text",
+          "id": "suggest_txt_3",
+          "x": 846,
+          "y": 542,
+          "text": "개원 전반적인 프로세스가 궁금해요.",
+          "fill": "#475569",
+          "fontSize": 13
+        },
+        {
+          "type": "rectangle",
+          "id": "input_bg",
+          "name": "Input Container",
+          "x": 240,
+          "y": 696,
+          "width": 1040,
+          "height": 104,
+          "fill": "#FFFFFF",
+          "stroke": "#E2E8F0",
+          "strokeWidth": 1
+        },
+        {
+          "type": "rectangle",
+          "id": "input_field",
+          "name": "Input Field",
+          "x": 280,
+          "y": 714,
+          "width": 900,
+          "height": 48,
+          "fill": "#F8FAFC",
+          "cornerRadius": 24,
+          "stroke": "#E2E8F0",
+          "strokeWidth": 1
+        },
+        {
+          "type": "text",
+          "id": "input_placeholder",
+          "x": 308,
+          "y": 730,
+          "text": "궁금하신 내용을 입력해주세요...",
+          "fill": "#94A3B8",
+          "fontSize": 14
+        },
+        {
+          "type": "rectangle",
+          "id": "send_button",
+          "name": "Send Button",
+          "x": 1140,
+          "y": 718,
+          "width": 40,
+          "height": 40,
+          "fill": "#536DB1",
+          "cornerRadius": 20
+        },
+        {
+          "type": "text",
+          "id": "disclaimer_txt",
+          "x": 480,
+          "y": 772,
+          "text": "AI 답변은 참고용이며, 정확한 판단을 위해 전문 플래너와 상담하세요.",
+          "fill": "#94A3B8",
+          "fontSize": 11
+        },
+        {
+          "type": "rectangle",
+          "id": "planner_btn",
+          "name": "Planner Button",
+          "x": 870,
+          "y": 768,
+          "width": 88,
+          "height": 28,
+          "fill": "transparent",
+          "stroke": "#536DB1",
+          "strokeWidth": 1.5,
+          "cornerRadius": 14
+        },
+        {
+          "type": "text",
+          "id": "planner_txt",
+          "x": 882,
+          "y": 775,
+          "text": "플래너 상담",
+          "fill": "#536DB1",
+          "fontSize": 11,
+          "fontWeight": 600
+        }
+      ]
+    }
+  ]
+}
