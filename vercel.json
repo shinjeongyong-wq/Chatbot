@@ -10,6 +10,12 @@
         "api/chat.js": {
             "memory": 1024,
             "maxDuration": 30
+        },
+        "api/search.js": {
+            "maxDuration": 30
+        },
+        "api/analyze-questions.js": {
+            "maxDuration": 60
         }
     },
     "crons": [

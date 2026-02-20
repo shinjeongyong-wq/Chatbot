@@ -99,27 +99,43 @@ module.exports = async function handler(req, res) {
 ## 질문 목록 (총 ${messages.length}개 중 상위 ${Math.min(messages.length, 200)}개)
 ${questionList}`;
 
-        const geminiResponse = await fetch(GEMINI_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature: 0.1,
-                    maxOutputTokens: 4096,
-                    responseMimeType: 'application/json'
-                }
-            })
-        });
+        let geminiResponse;
+        try {
+            geminiResponse = await fetch(GEMINI_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        maxOutputTokens: 4096
+                        // ⚠️ responseMimeType: 'application/json' 제거
+                        // Gemini 2.5 Flash에서 500 에러를 일으키는 known issue
+                    }
+                })
+            });
+        } catch (fetchErr) {
+            console.error('❌ [DEBUG] Gemini fetch 자체 실패:', fetchErr.message);
+            throw new Error(`Gemini API fetch 실패: ${fetchErr.message}`);
+        }
 
         if (!geminiResponse.ok) {
             const errText = await geminiResponse.text();
             throw new Error(`Gemini API 오류 (${geminiResponse.status}): ${errText.substring(0, 500)}`);
         }
 
-        const geminiData = await geminiResponse.json();
+        let geminiData;
+        try {
+            geminiData = await geminiResponse.json();
+        } catch (jsonErr) {
+            const rawBody = await geminiResponse.text().catch(() => '(text도 실패)');
+            console.error('❌ [DEBUG] Gemini 응답 JSON 파싱 실패:', rawBody.substring(0, 500));
+            throw new Error(`Gemini 응답 body JSON 파싱 실패: ${rawBody.substring(0, 200)}`);
+        }
 
-        // ★ 디버그: 응답 구조 상세 로깅
+        // ★ 디버그: 전체 응답 top-level 키 로깅
+        console.log('🔍 [DEBUG] Gemini top-level keys:', Object.keys(geminiData));
+
         const allParts = geminiData.candidates?.[0]?.content?.parts || [];
         console.log('🔍 [DEBUG] Gemini 응답 구조:', JSON.stringify({
             hasCandidates: !!geminiData.candidates,
