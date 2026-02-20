@@ -475,9 +475,9 @@
 
         .planner-consult-btn {
             padding: 6px 14px;
-            background: var(--accent-color);
-            color: white;
-            border: none;
+            background: transparent;
+            color: var(--primary-color);
+            border: 1.5px solid var(--primary-color);
             border-radius: 16px;
             font-size: 12px;
             font-weight: 600;
@@ -486,7 +486,8 @@
         }
 
         .planner-consult-btn:hover {
-            background: #0060d0;
+            background: var(--primary-color);
+            color: white;
             transform: scale(1.02);
         }
 
@@ -692,7 +693,7 @@
 
 
         .message.user .message-content {
-            background: var(--accent-color);
+            background: linear-gradient(135deg, #536db1 0%, #6b82c4 100%);
             color: white;
             border: none;
             border-radius: 12px;
@@ -1994,8 +1995,8 @@
         }
 
         .history-item.active {
-            background: var(--accent-color);
-            color: white;
+            background: rgba(83, 109, 177, 0.1);
+            border-left: 3px solid var(--primary-color);
         }
 
         .history-item-icon {
@@ -2006,7 +2007,7 @@
         }
 
         .history-item.active .history-item-icon {
-            color: white;
+            color: var(--primary-color);
         }
 
         .history-item-content {
@@ -2032,11 +2033,13 @@
         }
 
         .history-item.active .history-item-text {
-            color: white;
+            color: var(--primary-color);
+            font-weight: 600;
         }
 
         .history-item.active .history-item-date {
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--primary-color);
+            opacity: 0.7;
         }
 
         .history-item-delete {
