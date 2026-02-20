@@ -241,6 +241,33 @@
             console.error('사용 통계 로드 오류:', err);
         }
     }
+    // ============================================================
+    // ★ 수동 분석 실행 (Vercel Hobby에서 Cron 대체)
+    // ============================================================
+    window.runManualAnalysis = async function () {
+        var btn = document.getElementById('btnRunAnalysis');
+        var status = document.getElementById('analysisStatus');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ 분석 중...'; }
+        if (status) status.textContent = 'Gemini로 질문 분석 중... (30초~1분 소요)';
+
+        try {
+            var response = await fetch('/api/analyze-questions', { method: 'GET' });
+            var result = await response.json();
+
+            if (result.success) {
+                if (status) status.textContent = '✅ 분석 완료! (' + result.total_questions + '개 질문, ' + result.popular_keywords_count + '개 키워드)';
+                // 분석 완료 후 대시보드 데이터 새로고침
+                await loadAnalyticsData();
+            } else {
+                if (status) status.textContent = '❌ 분석 실패: ' + (result.error || '알 수 없는 오류');
+            }
+        } catch (err) {
+            console.error('수동 분석 오류:', err);
+            if (status) status.textContent = '❌ 오류: ' + err.message;
+        } finally {
+            if (btn) { btn.disabled = false; btn.textContent = '🔄 분석 실행'; }
+        }
+    };
 
     // ============================================================
     // ★ 인기 키워드 바 차트 렌더링
@@ -329,31 +356,28 @@ const CONFIG = {
     CHAT_ENDPOINT: '/api/chat'
 };
 
-// ★ 앵커 주제 (topics_shortened.json에서 로드) ★
-let anchorTopics = [];
-
-// topics_shortened.json 로드 (축약된 주제 사용)
-async function loadAnchorTopics() {
-    try {
-        const response = await fetch('/data/topics_shortened.json');
-        if (response.ok) {
-            const data = await response.json();
-            // shortened 필드를 question으로 매핑하여 기존 코드 호환성 유지
-            anchorTopics = data.map(item => ({
-                id: item.id,
-                question: item.shortened || '',  // 축약된 주제 사용
-                category: '',     // 호환성용 빈 값
-                subCategory: ''   // 호환성용 빈 값
-            }));
-            console.log(`✅ 앵커 주제 ${anchorTopics.length}개 로드 완료 (축약됨)`);
-        }
-    } catch (error) {
-        console.error('앵커 주제 로드 실패:', error);
-    }
-}
-
-// 페이지 로드 시 앵커 주제 로드
-loadAnchorTopics();
+// ★ [v6.5.2] 기존 anchorTopics 로직 주석 처리 — 신규 RT 시스템으로 대체 ★
+// let anchorTopics = [];
+//
+// async function loadAnchorTopics() {
+//     try {
+//         const response = await fetch('/data/topics_shortened.json');
+//         if (response.ok) {
+//             const data = await response.json();
+//             anchorTopics = data.map(item => ({
+//                 id: item.id,
+//                 question: item.shortened || '',
+//                 category: '',
+//                 subCategory: ''
+//             }));
+//             console.log(`✅ 앵커 주제 ${anchorTopics.length}개 로드 완료 (축약됨)`);
+//         }
+//     } catch (error) {
+//         console.error('앵커 주제 로드 실패:', error);
+//     }
+// }
+//
+// loadAnchorTopics();
 
 
 // ★ Phase 4: 진료과별 키워드 확장 ★
@@ -676,58 +700,30 @@ function extractMentionedKeywords() {
     return result;
 }
 
-// ★ 사용자 질문과 관련된 앵커 주제 찾기 ★
-// includeUsed: true면 이미 질문한 주제도 포함 (기록용), false면 제외 (추천용)
-function findRelatedAnchorTopics(userMessage, count = 3, includeUsed = false) {
-    if (!anchorTopics || anchorTopics.length === 0) {
-        return [];
-    }
-
-    const message = userMessage.toLowerCase();
-
-    // 이미 사용자가 질문한 주제 가져오기
-    const usedTopics = chatMemory.usedTopics || [];
-
-    // 각 주제별 관련도 점수 계산
-    const scored = anchorTopics
-        .filter(topic => includeUsed || !usedTopics.includes(topic.question))  // ★ 옵션에 따라 필터링 ★
-        .map(topic => {
-            let score = 0;
-            const question = topic.question.toLowerCase();
-            const category = topic.category.toLowerCase();
-            const subCategory = (topic.subCategory || '').toLowerCase();
-
-            // 카테고리 매칭
-            if (message.includes(category)) score += 3;
-            if (message.includes(subCategory)) score += 2;
-
-            // 질문 키워드 매칭
-            const questionWords = question.split(/[\s/]+/).filter(w => w.length > 1);
-            questionWords.forEach(word => {
-                if (message.includes(word)) score += 1;
-            });
-
-            // 메시지 키워드가 질문에 있는지
-            const messageWords = message.split(/[\s/]+/).filter(w => w.length > 1);
-            messageWords.forEach(word => {
-                if (question.includes(word)) score += 1;
-            });
-
-            return { question: topic.question, score };
-        });
-
-    // 점수순 정렬 후 상위 N개 선택
-    const result = scored
-        .filter(t => t.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, count)
-        .map(t => t.question);
-
-    if (!includeUsed) {
-        console.log(`🎯 [RT] 추천 후보: ${result.length}개 (제외된 주제: ${usedTopics.length}개)`);
-    }
-    return result;
-}
+// ★ [v6.5.2] findRelatedAnchorTopics 주석 처리 — 신규 RT 시스템으로 대체 ★
+// function findRelatedAnchorTopics(userMessage, count = 3, includeUsed = false) {
+//     if (!anchorTopics || anchorTopics.length === 0) return [];
+//     const message = userMessage.toLowerCase();
+//     const usedTopics = chatMemory.usedTopics || [];
+//     const scored = anchorTopics
+//         .filter(topic => includeUsed || !usedTopics.includes(topic.question))
+//         .map(topic => {
+//             let score = 0;
+//             const question = topic.question.toLowerCase();
+//             const category = topic.category.toLowerCase();
+//             const subCategory = (topic.subCategory || '').toLowerCase();
+//             if (message.includes(category)) score += 3;
+//             if (message.includes(subCategory)) score += 2;
+//             const questionWords = question.split(/[\s/]+/).filter(w => w.length > 1);
+//             questionWords.forEach(word => { if (message.includes(word)) score += 1; });
+//             const messageWords = message.split(/[\s/]+/).filter(w => w.length > 1);
+//             messageWords.forEach(word => { if (question.includes(word)) score += 1; });
+//             return { question: topic.question, score };
+//         });
+//     const result = scored.filter(t => t.score > 0).sort((a, b) => b.score - a.score).slice(0, count).map(t => t.question);
+//     if (!includeUsed) console.log(`🎯 [RT] 추천 후보: ${result.length}개 (제외된 주제: ${usedTopics.length}개)`);
+//     return result;
+// }
 
 // ★★★ 고유명사(업체명/엔티티) 강제 포함 함수 ★★★
 // 질문에 특정 고유명사가 언급되면 해당 문서를 강제로 포함시킴
@@ -1094,6 +1090,7 @@ async function sendUserMessage(message) {
     userInput.style.height = 'auto';
     const welcome = document.querySelector('.welcome-message');
     if (welcome) welcome.style.display = 'none';
+    hideSuggestedQuestions();
 
     // ★ 세션이 없으면 먼저 생성 후 대기 ★
     if (window.chatHistory) {
@@ -1118,6 +1115,35 @@ async function sendUserMessage(message) {
     getBotResponse(message);
 }
 
+// ========== 추천 질문 (말풍선) 관련 함수 ==========
+
+/**
+ * 추천 질문 클릭 시 해당 질문을 전송
+ */
+function sendSuggestedQuestion(btn) {
+    const text = btn.textContent.trim();
+    if (!text) return;
+    const userInput = document.getElementById('userInput');
+    if (userInput) userInput.value = text;
+    sendUserMessage(text);
+}
+
+/**
+ * 추천 질문 버블 숨기기
+ */
+function hideSuggestedQuestions() {
+    const sq = document.getElementById('suggestedQuestions');
+    if (sq) sq.style.display = 'none';
+}
+
+/**
+ * 추천 질문 버블 표시하기
+ */
+function showSuggestedQuestions() {
+    const sq = document.getElementById('suggestedQuestions');
+    if (sq) sq.style.display = 'flex';
+}
+
 async function getBotResponse(userMessage) {
     // 0. AbortController 초기화 (이전 작업이 있으면 중단시키지는 않고 새로 생성)
     currentAbortController = new AbortController();
@@ -1125,12 +1151,11 @@ async function getBotResponse(userMessage) {
     // 피드백용으로 현재 질문 저장
     window.currentQuestion = userMessage;
 
-    // ★ 사용자 질문과 매칭되는 RT 주제 기록 (중복 추천 방지) ★
-    // 기록할 때는 이미 사용된 주제라도 다시 매칭하여 정확히 기록함 (includeUsed = true)
-    const matchedTopics = findRelatedAnchorTopics(userMessage, 1, true);
-    if (matchedTopics.length > 0) {
-        chatMemory.addUsedTopic(matchedTopics[0]);
-    }
+    // ★ [v6.5.2] 기존 matchedTopics 기록 주석 처리 — 신규 RT 시스템으로 대체 ★
+    // const matchedTopics = findRelatedAnchorTopics(userMessage, 1, true);
+    // if (matchedTopics.length > 0) {
+    //     chatMemory.addUsedTopic(matchedTopics[0]);
+    // }
 
     // 사용자 질문을 Google Sheets에 수집 (비동기, 에러 무시)
     try {
@@ -1211,17 +1236,17 @@ async function getBotResponse(userMessage) {
                             if (!finalAnswer.includes('[NO_DATA]')) {
                                 finalAnswer = '[NO_DATA]' + finalAnswer;
                             }
-                            // ★ OUT_OF_SCOPE에도 RT 추가 (DB 저장 + 리로드 시 복원용) ★
-                            const rtTopics = findRelatedAnchorTopics(userMessage, 3);
-                            if (rtTopics.length > 0) {
-                                finalAnswer += '\n\n[RELATED_TOPICS]' + rtTopics.join('|') + '[/RELATED_TOPICS]';
-                            }
+                            // ★ [v6.5.2] OUT_OF_SCOPE/AMBIGUOUS RT 주석 처리 — 신규 RT 시스템으로 대체 ★
+                            // const rtTopics = findRelatedAnchorTopics(userMessage, 3);
+                            // if (rtTopics.length > 0) {
+                            //     finalAnswer += '\n\n[RELATED_TOPICS]' + rtTopics.join('|') + '[/RELATED_TOPICS]';
+                            // }
                         } else if (queryPlan.intent === 'AMBIGUOUS') {
-                            // 관련 주제 추천 추가
-                            const relatedTopics = findRelatedAnchorTopics(userMessage, 5);
-                            if (relatedTopics.length > 0) {
-                                finalAnswer += '\n\n[RELATED_TOPICS]' + relatedTopics.join('|') + '[/RELATED_TOPICS]';
-                            }
+                            // ★ [v6.5.2] AMBIGUOUS RT 주석 처리 ★
+                            // const relatedTopics = findRelatedAnchorTopics(userMessage, 5);
+                            // if (relatedTopics.length > 0) {
+                            //     finalAnswer += '\n\n[RELATED_TOPICS]' + relatedTopics.join('|') + '[/RELATED_TOPICS]';
+                            // }
                         }
 
                         // ★ 타이핑 효과 적용 ★
@@ -1287,6 +1312,16 @@ async function getBotResponse(userMessage) {
 
         console.log(`📚 최종 문서: ${relatedContexts.length}개 (Notion: ${sourceCounts.notion || 0}, Q&A: ${sourceCounts.qa || 0}, FAQ: ${sourceCounts.faq || 0})`);
 
+        // ★ [v6.5.2] RT 문서 추출 ★
+        const rtDocuments = relatedContexts._rtResults || [];
+        if (rtDocuments.length > 0) {
+            console.log(`🔗 RT 문서: ${rtDocuments.length}개`);
+            rtDocuments.forEach((doc, i) => {
+                console.log(`   [RT${i + 1}] ${doc.score?.toFixed(4)} | ${(doc.question || '').substring(0, 60)}`);
+            });
+        } else {
+            console.log('🔗 RT 문서: 0개 (추천 생략)');
+        }
 
         // ========== Stage 3: Answer Generation (Streaming) ==========
         startTypingMessageRolling('stage3');
@@ -1302,7 +1337,8 @@ async function getBotResponse(userMessage) {
                 userMessage,
                 relatedContexts,
                 streamingContent,
-                currentAbortController.signal
+                currentAbortController.signal,
+                rtDocuments  // ★ [v6.5.2] RT 문서 전달 ★
             );
 
             // 스트리밍 완료 후 최종 포맷팅 적용
@@ -1694,16 +1730,8 @@ function addFormattedMessage(text, contexts, modelName = null) {
     // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
 }
 
-// 관련 주제 버튼 클릭 시 해당 질문 자동 전송
+// ★ [v6.5.2] 관련 주제 클릭 시 질문 전송 (간소화 — anchorTopics 검증 제거) ★
 function sendRelatedTopic(topic) {
-    // topics.json에 있는 질문인지 확인
-    const isValidTopic = anchorTopics.some(t => t.question === topic);
-    if (!isValidTopic) {
-        console.warn('유효하지 않은 앵커 주제:', topic);
-        return;
-    }
-
-    // 입력창에 질문 넣고 전송
     userInput.value = topic;
     sendUserMessage(topic);
 }
@@ -1714,43 +1742,25 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// ★ RT 폴백: 본문에 주제가 없을 때 자연스러운 추천 문장 생성 ★
-function generateRTFallbackHTML(topics) {
-    if (!topics || topics.length === 0) return '';
-    const top3 = topics.slice(0, 3);
-    const links = top3.map(topic => {
-        return `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\'"))}')">${escapeHtml(topic)}</strong>`;
-    });
-
-    // 다양한 추천 문장 템플릿
-    const templates1 = [
-        (l) => `혹시 ${l[0]}에 대해서도 궁금하시면 물어보세요 😊`,
-        (l) => `${l[0]}에 대해서도 안내해 드릴 수 있어요!`,
-        (l) => `추가로 ${l[0]}도 확인해 보시겠어요?`,
-        (l) => `참고로 ${l[0]}도 많이 물어보시는 주제예요 💡`,
-    ];
-    const templates2 = [
-        (l) => `혹시 ${l[0]}이나 ${l[1]}에 대해서도 궁금하시면 물어보세요 😊`,
-        (l) => `${l[0]}이나 ${l[1]}에 대해서도 안내해 드릴 수 있어요!`,
-        (l) => `추가로 ${l[0]}이나 ${l[1]}도 확인해 보시겠어요?`,
-        (l) => `참고로 ${l[0]}, ${l[1]}도 많이 물어보시는 주제예요 💡`,
-    ];
-    const templates3 = [
-        (l) => `혹시 ${l[0]}, ${l[1]}, ${l[2]} 등에 대해서도 궁금하시면 물어보세요 😊`,
-        (l) => `${l[0]}, ${l[1]}, ${l[2]} 등에 대해서도 안내해 드릴 수 있어요!`,
-        (l) => `추가로 ${l[0]}, ${l[1]}, ${l[2]} 등도 확인해 보시겠어요?`,
-        (l) => `참고로 ${l[0]}, ${l[1]}, ${l[2]} 등도 많이 물어보시는 주제예요 💡`,
-    ];
-
-    const pool = links.length === 1 ? templates1 : links.length === 2 ? templates2 : templates3;
-    const sentence = pool[Math.floor(Math.random() * pool.length)](links);
-    return `<br><br><p>${sentence}</p>`;
-}
+// ★ [v6.5.2] generateRTFallbackHTML 주석 처리 — 신규 RT 시스템으로 대체 ★
+// function generateRTFallbackHTML(topics) {
+//     if (!topics || topics.length === 0) return '';
+//     const top3 = topics.slice(0, 3);
+//     const links = top3.map(topic => {
+//         return `<strong class="clickable-topic" onclick="sendRelatedTopic('${escapeHtml(topic.replace(/'/g, "\\\\'"))}')">${escapeHtml(topic)}</strong>`;
+//     });
+//     const templates1 = [(l) => `혹시 ${l[0]}에 대해서도 궁금하시면 물어보세요 😊`];
+//     const templates2 = [(l) => `혹시 ${l[0]}이나 ${l[1]}에 대해서도 궁금하시면 물어보세요 😊`];
+//     const templates3 = [(l) => `혹시 ${l[0]}, ${l[1]}, ${l[2]} 등에 대해서도 궁금하시면 물어보세요 😊`];
+//     const pool = links.length === 1 ? templates1 : links.length === 2 ? templates2 : templates3;
+//     const sentence = pool[Math.floor(Math.random() * pool.length)](links);
+//     return `<br><br><p>${sentence}</p>`;
+// }
 
 // ★★★ 통합 시스템 프롬프트 빌더 (v2.0) ★★★
 // 일반 답변(getBotResponse)과 스트리밍(callOpenRouterAPIWithStreaming) 모두 이 함수를 호출합니다.
 // 수정은 이 함수 한 곳에서만 하면 됩니다.
-function buildSystemPrompt({ historyText, contextText, specialtyInfo, deduplicationRule, topicGenerationRule }) {
+function buildSystemPrompt({ historyText, contextText, specialtyInfo, deduplicationRule, topicGenerationRule, rtTopicText }) {
     return `당신은 병원 개원 전문 AI 컨설턴트입니다. 친절하고 전문적인 어조로 답변하되, **잘 구조화된 보고서 형식**으로 출력하세요.
 
 ${specialtyInfo ? '# 사용자 진료과\n' + specialtyInfo + '\n' : ''}
@@ -1825,24 +1835,26 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **고정 안내 문구**: "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
 
 
-# 관련 주제 추천 (필수)
-답변의 마무리 부분에서 다음 대화를 위한 관련 주제를 자연스럽게 제안하세요.
+# 관련 주제 추천
+${rtTopicText ? `아래는 현재 질문과 관련도가 높은 추가 참고문서입니다.
+이 문서들의 내용을 바탕으로 사용자에게 관련 주제를 자연스럽게 추천하세요.
 
-[추천 가능한 주제 목록 - 아래 주제들을 대화에 활용하세요]
-${anchorTopics.filter(t => !chatMemory.usedTopics.includes(t.question)).map(t => '- ' + t.question).join('\n')}
+${rtTopicText}
 
 **규칙:**
-1. 위 목록에서 현재 답변과 가장 관련 깊은 주제 2~3개를 선택하세요.
-2. **[자연스러운 추천]**: "혹시 **[주제]**에 대해서도 궁금하신가요?" 혹은 "추가로 **[주제]** 관련 정보도 안내해 드릴 수 있습니다."와 같이 대화 맥락에 맞춰 자연스럽게 제안하세요. 
-3. 제안하는 핵심 주제 키워드는 반드시 **굵게(bold)** 표시하세요.
-4. 방금 답변한 내용이나 이미 추천했던 주제는 제외하세요.
-5. 답변의 맨 마지막에는 시스템 버튼 생성을 위해 \`[RELATED_TOPICS]질문1|질문2[/RELATED_TOPICS]\` 형식을 반드시 포함하세요. (이때 질문1, 2는 목록의 원본 질문 텍스트를 사용하세요.)
+1. 위 문서에서 현재 답변과 관련 깊은 주제를 **최대 3개** 선택.
+2. "혹시 **[주제]**에 대해서도 궁금하신가요?" 형태로 자연스럽게 추천.
+3. 핵심 키워드는 **굵게(bold)** 표시.
+4. 방금 답변한 내용과 동일한 주제는 제외.
+5. 답변 맨 마지막에 \`[RELATED_TOPICS]질문1|질문2|질문3[/RELATED_TOPICS]\` 포함.
+   ⚠️ RT 문서의 Q를 그대로 쓰지 말고, 사용자에게 자연스러운 질문 형태로 다듬어서 작성.
 
 **형식 예시:**
 ... 답변 본문 마침표로 끝.
-추가로 원장님, **인공신장실 시설 기준**이나 **의료기기 리스 조건**에 대해서도 더 궁금한 점이 있으시면 언제든 말씀해 주세요.
+추가로 원장님, **인공신장실 시설 기준**이나 **의료기기 리스 조건**에 대해서도 궁금하신 점 있으시면 말씀해 주세요.
 
-[RELATED_TOPICS]인공신장실 시설 관련 기준은?|의료기기 리스 및 렌탈 비용은?[/RELATED_TOPICS]`;
+[RELATED_TOPICS]인공신장실 시설 기준이 궁금해요|의료기기 리스 조건 알려주세요[/RELATED_TOPICS]` : `관련 추가 주제가 없습니다. [RELATED_TOPICS] 태그를 포함하지 마세요.`}
+`;
 }
 
 function showTypingIndicator() {
@@ -2540,16 +2552,16 @@ function selectSpecialty(specialty) {
         chatMemory.reset();
         console.log('🔄 진료과 변경으로 대화 히스토리 초기화됨');
 
-        // 채팅창 초기화 (환영 메시지만 유지)
+        // 채팅창 초기화 및 환영 메시지 재생성
         if (chatContainer) {
             chatContainer.innerHTML = '';
         }
 
-        // 환영 메시지 표시
-        const welcomeMessage = document.querySelector('.welcome-message');
-        if (welcomeMessage) {
-            welcomeMessage.style.display = 'block';
+        // 환영 메시지 표시 (chat-history.js의 showWelcomeMessage 사용)
+        if (typeof showWelcomeMessage === 'function') {
+            showWelcomeMessage();
         }
+        showSuggestedQuestions();
 
         // 알림 팝업 표시
         showSuccessModal('진료과가 변경되어 새로운 대화가 시작됩니다.');
@@ -3011,7 +3023,7 @@ function toggleFaqPanel() {
  * @param {AbortSignal} signal - 취소 시그널
  * @returns {Promise<{text: string, modelName: string, filteredContexts: Array}>}
  */
-async function callOpenRouterAPIWithStreaming(userQuery, contexts, contentDiv, signal) {
+async function callOpenRouterAPIWithStreaming(userQuery, contexts, contentDiv, signal, rtDocuments = []) {
     // ★ 기존 callOpenRouterAPI에서 systemPrompt 생성 로직 재사용 ★
     const userSpec = getUserSpecialty();
     let contextText = '';
@@ -3088,7 +3100,16 @@ ${alreadyMentioned.slice(0, 15).join(', ')}
 - 토픽 태그 다음 줄부터 실제 답변을 시작하세요.
 ` : '';
 
-    const systemPrompt = buildSystemPrompt({ historyText, contextText, specialtyInfo, deduplicationRule, topicGenerationRule });
+    // ★ [v6.5.2] RT 문서 → 프롬프트용 텍스트 변환 ★
+    let rtTopicText = '';
+    if (rtDocuments.length > 0) {
+        rtTopicText = rtDocuments.map((doc, i) =>
+            `[RT${i + 1}] Q: ${doc.question}\nA: ${doc.answer}`
+        ).join('\n\n');
+        console.log(`📝 RT 프롬프트 텍스트 생성: ${rtDocuments.length}개 문서, ${rtTopicText.length}자`);
+    }
+
+    const systemPrompt = buildSystemPrompt({ historyText, contextText, specialtyInfo, deduplicationRule, topicGenerationRule, rtTopicText });
 
     // 타이핑 효과를 위한 변수
     let receivedBuffer = '';  // API에서 받은 전체 텍스트
@@ -3543,15 +3564,15 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName, opt
 
     // ★ RT 처리 (skipRT 옵션이 없을 때만) ★
     if (!options.skipRT) {
-        // 코드 레벨 보장: AI가 RELATED_TOPICS를 누락해도 자동 삽입
-        if (relatedTopics.length === 0 && typeof findRelatedAnchorTopics === 'function') {
-            const currentQ = window.currentQuestion || '';
-            const autoTopics = findRelatedAnchorTopics(currentQ, 3);
-            if (autoTopics.length > 0) {
-                relatedTopics = autoTopics;
-                console.log('🔄 RT 자동 삽입:', relatedTopics);
-            }
-        }
+        // ★ [v6.5.2] 기존 RT 자동 삽입 폴백 주석 처리 — 신규 RT 시스템에서는 LLM이 직접 생성 ★
+        // if (relatedTopics.length === 0 && typeof findRelatedAnchorTopics === 'function') {
+        //     const currentQ = window.currentQuestion || '';
+        //     const autoTopics = findRelatedAnchorTopics(currentQ, 3);
+        //     if (autoTopics.length > 0) {
+        //         relatedTopics = autoTopics;
+        //         console.log('🔄 RT 자동 삽입:', relatedTopics);
+        //     }
+        // }
 
         // 시스템용 버튼 생성 데이터만 추출 (관련 주제 버튼 클릭 시 사용)
         if (relatedTopics.length > 0) {

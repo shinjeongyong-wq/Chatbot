@@ -13,9 +13,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --primary-color: #ffffff;
-            --primary-hover: #e5e5e5;
-            --primary-light: rgba(255, 255, 255, 0.05);
+            --primary-color: #536db1;
+            --primary-hover: #4a5f9d;
+            --primary-light: rgba(83, 109, 177, 0.08);
             --background: #ffffff;
             --surface: #fafafa;
             --surface-secondary: #f5f5f5;
@@ -613,28 +613,36 @@
 
 
         .suggested-questions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            padding: 8px calc(max(20px, (100% - 800px) / 2 + 12px)) 12px;
+            width: 100%;
+            box-sizing: border-box;
+            background: #ffffff;
         }
 
         .suggestion-chip {
-            padding: 16px;
-            background: transparent;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 10px 18px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 500;
-            color: var(--text-secondary);
+            color: #475569;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .suggestion-chip:hover {
-            border-color: var(--text-tertiary);
-            background: var(--surface-secondary);
-            color: var(--text-primary);
+            border-color: #536db1;
+            background: #f0f4ff;
+            color: #536db1;
+            box-shadow: 0 2px 6px rgba(83, 109, 177, 0.15);
+            transform: translateY(-1px);
         }
 
 
@@ -717,63 +725,6 @@
         }
 
 
-        .feedback-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .feedback-btn {
-            padding: 6px 12px;
-            background: transparent;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.15s ease;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .feedback-btn:hover {
-            background: var(--surface-secondary);
-            border-color: var(--text-tertiary);
-            color: var(--text-primary);
-        }
-
-        .feedback-btn.selected {
-            background: var(--accent-color);
-            color: white;
-            border-color: var(--accent-color);
-        }
-
-        .feedback-btn.good:hover {
-            background: rgba(34, 197, 94, 0.1);
-            border-color: rgba(34, 197, 94, 0.3);
-            color: #22c55e;
-        }
-
-        .feedback-btn.bad:hover {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-        }
-
-        .feedback-btn.copy:hover {
-            background: rgba(0, 112, 243, 0.1);
-            border-color: rgba(0, 112, 243, 0.3);
-            color: var(--accent-color);
-        }
-
-        .feedback-btn.copy.copied {
-            background: rgba(34, 197, 94, 0.1);
-            border-color: rgba(34, 197, 94, 0.3);
-            color: #22c55e;
-        }
 
         .toast-message {
             position: fixed;
@@ -876,7 +827,12 @@
             }
 
             .suggested-questions {
-                grid-template-columns: 1fr;
+                padding: 0 12px 8px;
+            }
+
+            .suggestion-chip {
+                font-size: 12px;
+                padding: 8px 14px;
             }
 
             .header {
@@ -1297,6 +1253,18 @@
             background: #fee2e2;
             border-color: #ef4444;
             color: #ef4444;
+        }
+
+        .feedback-btn.copy:hover {
+            background: rgba(0, 112, 243, 0.1);
+            border-color: rgba(0, 112, 243, 0.3);
+            color: var(--accent-color);
+        }
+
+        .feedback-btn.copy.copied {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #22c55e;
         }
 
 
@@ -2598,6 +2566,21 @@
                 </div>
             </div>
 
+            <!-- 수동 분석 실행 버튼 -->
+            <div style="text-align:right;margin:12px 0 8px;">
+                <button id="btnRunAnalysis" onclick="runManualAnalysis()" style="
+                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                    color: #fff;
+                    border: none;
+                    padding: 8px 18px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                ">🔄 분석 실행</button>
+                <span id="analysisStatus" style="margin-left:8px;font-size:12px;color:#94a3b8;"></span>
+            </div>
 
             <div class="analytics-grid">
                 <!-- 인기 키워드 -->
@@ -2816,10 +2799,14 @@
                     <h2>무엇을 도와드릴까요?</h2>
                     <p>AI 컨설턴트가 병원 개원의 모든 것을 답변해 드립니다.<br>우측 상단에서 자주 묻는 질문을 확인하거나, 직접 물어보세요.</p>
 
-                    <div class="suggested-questions" style="display: none;">
 
-                    </div>
                 </div>
+            </div>
+
+            <div class="suggested-questions" id="suggestedQuestions">
+                <button class="suggestion-chip" onclick="sendSuggestedQuestion(this)">인테리어 파트너사 추천해주세요.</button>
+                <button class="suggestion-chip" onclick="sendSuggestedQuestion(this)">의료기기 장비 어떤 걸 구매해야되나요?</button>
+                <button class="suggestion-chip" onclick="sendSuggestedQuestion(this)">개원 전반적인 프로세스가 궁금해요.</button>
             </div>
 
             <div class="input-container">
