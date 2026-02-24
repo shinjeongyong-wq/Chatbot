@@ -1231,21 +1231,9 @@ async function getBotResponse(userMessage) {
                         let messageType = 'normal';
 
                         if (queryPlan.intent === 'PLANNER_CONNECT') {
-                            // ★ 플래너 연결 요청 — 전용 메시지 렌더링 ★
-                            hideTypingIndicator();
-                            // 스트리밍 컨테이너 제거 (addPlannerConnectMessage에서 자체 생성)
-                            if (streamingContainer && streamingContainer.parentNode) {
-                                streamingContainer.parentNode.removeChild(streamingContainer);
-                            }
-                            addPlannerConnectMessage(finalAnswer);
-
-                            // ChatMemory에 저장
-                            await chatMemory.addTurn(userMessage, finalAnswer);
-                            // Supabase 저장
-                            if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
-                                window.chatHistory.saveMessage('assistant', finalAnswer, chatMemory.getContextPrompt(), 'planner_connect').catch(() => { });
-                            }
-                            return;
+                            // ★ 플래너 연결 — 스트리밍 후 버튼 표시 ★
+                            messageType = 'planner_connect';
+                            window._forceNoData = true; // finalizeStreamingMessage에서 플래너 버튼 추가
                         } else if (queryPlan.intent === 'OUT_OF_SCOPE') {
                             messageType = 'out_of_scope';
                             // [NO_DATA] 태그 추가 (플래너 버튼 표시용)
