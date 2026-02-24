@@ -1231,9 +1231,8 @@ async function getBotResponse(userMessage) {
                         let messageType = 'normal';
 
                         if (queryPlan.intent === 'PLANNER_CONNECT') {
-                            // ★ 플래너 연결 — 스트리밍 후 버튼 표시 ★
+                            // ★ 플래너 연결 — 버튼 없이 답변만 스트리밍 ★
                             messageType = 'planner_connect';
-                            window._forceNoData = true; // finalizeStreamingMessage에서 플래너 버튼 추가
                         } else if (queryPlan.intent === 'OUT_OF_SCOPE') {
                             messageType = 'out_of_scope';
                             // [NO_DATA] 태그 추가 (플래너 버튼 표시용)

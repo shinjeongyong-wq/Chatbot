@@ -721,9 +721,9 @@ function addBotMessageToUI(content, question = '', contextPrompt = '', messageTy
         }
     }
 
-    // ★ 플래너 버튼 추가 (no_data, out_of_scope, planner_connect 타입인 경우) ★
+    // ★ 플래너 버튼 추가 (no_data, out_of_scope 타입인 경우) ★
     let plannerButton = '';
-    if (messageType === 'no_data' || messageType === 'out_of_scope' || messageType === 'planner_connect') {
+    if (messageType === 'no_data' || messageType === 'out_of_scope') {
         plannerButton = `
             <p style="margin-top: 20px; margin-bottom: 12px; color: #64748b; font-size: 14px;">
                 질문하신 내용에 대해 문의 사항이 있으시면 담당 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
