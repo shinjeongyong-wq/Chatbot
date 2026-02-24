@@ -1328,17 +1328,6 @@ async function getBotResponse(userMessage) {
 
         console.log(`📚 최종 문서: ${relatedContexts.length}개 (Notion: ${sourceCounts.notion || 0}, Q&A: ${sourceCounts.qa || 0}, FAQ: ${sourceCounts.faq || 0})`);
 
-        // ★ [v6.6] 검색 결과 없거나 전부 저점수면 NO_DATA 강제 플래그 ★
-        const MIN_SCORE_THRESHOLD = 0.3;
-        const hasUsableResults = relatedContexts.length > 0 &&
-            relatedContexts.some(doc => (doc.score || 0) >= MIN_SCORE_THRESHOLD);
-        if (!hasUsableResults) {
-            console.log('⚠️ 검색 결과 없음/전부 저점수 → _forceNoData=true');
-            window._forceNoData = true;
-        } else {
-            window._forceNoData = false;
-        }
-
         // ★ [v6.5.2] RT 문서 추출 ★
         const rtDocuments = relatedContexts._rtResults || [];
         if (rtDocuments.length > 0) {
@@ -1680,10 +1669,9 @@ function addFormattedMessage(text, contexts, modelName = null) {
     const div = document.createElement('div');
     div.className = 'message bot';
 
-    // ★ 방어적 조치: 일반 답변에서 플래너 관련 문구가 포함되면 제거 ★
-    // (플래너 안내는 createPlannerButton()에서 통합 처리)
+    // ★ 방어적 조치: 일반 답변에서 플래너 멘트가 포함되면 제거 ★
+    // (이 멘트는 NO_DATA 전용이므로, 일반 답변에서 AI가 실수로 넣었다면 제거)
     text = text.replace(/질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다\.?/g, '').trim();
-    text = text.replace(/문의 사항이 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다\.?/g, '').trim();
 
     // 0. [RELATED_TOPICS] 블록 추출 및 제거 (파이프 + 불렛 둘 다 지원)
     let relatedTopics = [];
@@ -1857,9 +1845,11 @@ ${contextText ? contextText : '(관련 데이터 없음)'}
    - **(A)** 참고문서에 정확한 정보가 없는 경우
    - **(B)** 유사 정보로 대체 답변하는 경우
    - **(C)** 사용자가 파트너사 미팅, 의료기기 구매, 플래너 연결 등 **AI가 직접 수행할 수 없는 행동을 요청**하는 경우
-   - [NO_DATA] 태그가 있으면 시스템이 자동으로 플래너 연결 버튼을 표시합니다.
-   - **형식**: [NO_DATA] → 감사/사과 → 관련 내용 → [RELATED_TOPICS]
-   - ⚠️ "플래너에게 연락" 같은 안내 문구는 **절대 직접 작성하지 마세요** (시스템이 자동 처리합니다).
+   - [NO_DATA] 태그있으면 고정 안내 문구 다음에 플래너 연락 버튼을 표시합니다.
+   - 일반 답변에서는 "플래너에게 연락" 문구를 사용하지 마세요.
+   - **형식**: [NO_DATA] → 감사/사과 → 관련 내용 → 고정 안내 문구 → 플래너 연락 버튼 → [RELATED_TOPICS]
+   - **고정 안내 문구**: "질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다."
+
 
 # 관련 주제 추천
 ${rtTopicText ? `아래는 현재 질문과 관련도가 높은 추가 참고문서입니다.
@@ -2026,11 +2016,11 @@ function scrollToMessageTop(messageElement) {
     }
 }
 
-// ========== 플래너 연결 버튼 (공통 헬퍼) ==========
+// ========== 플래너 버튼 공통 헬퍼 ==========
 function createPlannerButton() {
     return `
-        <p style="margin: 20px 0 16px 0; color: #64748b; font-size: 14px;">
-            문의 사항이 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
+        <p style="margin-top: 20px; margin-bottom: 12px; color: #64748b; font-size: 14px;">
+            질문하신 내용에 대해 문의 사항이 있으시면 담당 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
         </p>
         <button class="contact-planner-btn" onclick="openContactModal()" style="
             background-color: #536db1;
@@ -2106,20 +2096,9 @@ function addPlannerConnectMessage(text) {
         contextPrompt: chatMemory.getContextPrompt()
     };
 
-    // 고정 메시지 (플래너 연결 안내)
-    const fixedMessage = `
-        <p style="margin-bottom: 12px; line-height: 1.7;">
-            플래너와 상담을 원하시는군요! 😊
-        </p>
-        <p style="margin-bottom: 16px; line-height: 1.7;">
-            화면 하단의 <strong>플래너 상담</strong> 버튼을 클릭하시면 담당 플래너를 선택하여 빠르게 연결해 드리겠습니다.
-        </p>
-    `;
-
     div.innerHTML = `
         <div class="message-avatar">AI</div>
         <div class="message-content formatted-response">
-            ${fixedMessage}
             ${createPlannerButton()}
             ${feedbackButtons}
         </div>
@@ -2128,7 +2107,8 @@ function addPlannerConnectMessage(text) {
     scrollToMessageTop(div);
 }
 
-// (addOutOfScopeMessage 삭제됨 — 데드코드, createPlannerButton()으로 통합)
+// [데드코드 제거됨] addOutOfScopeMessage — OUT_OF_SCOPE는 finalizeStreamingMessage에서 [NO_DATA] 태그로 처리
+
 
 // NO_DATA 응답 렌더링 (볼드체, 불렛 포인트 지원 + 플래너 연락 버튼)
 function addNoDataMessage(text) {
@@ -2257,7 +2237,25 @@ function addNoDataMessage(text) {
         <div class="message-avatar">AI</div>
         <div class="message-content formatted-response">
             <div class="no-data-text" style="line-height: 1.7;">${html}</div>
-            ${createPlannerButton()}
+            <p style="margin: 20px 0 16px 0; color: #64748b; font-size: 14px;">
+                질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
+            </p>
+            <button class="contact-planner-btn" onclick="openContactModal()" style="
+                background-color: #536db1;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.2s;
+                margin-bottom: 16px;
+            ">
+                <span style="font-size: 16px;">☎️</span> 플래너에게 연락하기
+            </button>
             ${feedbackButtons}
         </div>
     `;
@@ -3540,9 +3538,12 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName, opt
     }
     let processedText = finalText;
 
-    // ★ NO_DATA / OFF_TOPIC 감지 (태그 기반만 — 문구 기반 감지 제거됨) ★
+    // ★ NO_DATA / OFF_TOPIC 감지 ★
     let messageType = 'normal';
-    let isNoData = processedText.includes('[NO_DATA]') || window._forceNoData === true;
+    // [NO_DATA] 태그 또는 "플래너에게 연락" 문구가 포함되면 NO_DATA로 처리
+    let isNoData = processedText.includes('[NO_DATA]') ||
+        processedText.includes('플래너에게 연락') ||
+        processedText.includes('플래너에게 문의');
     let isOffTopic = processedText.includes('[OFF_TOPIC]');
 
     if (isOffTopic) {
@@ -3619,12 +3620,28 @@ function finalizeStreamingMessage(container, finalText, contexts, modelName, opt
         </div>
     `;
 
-    // ★ NO_DATA일 경우 플래너 버튼 추가 (createPlannerButton 통합 헬퍼 사용) ★
+    // ★ NO_DATA일 경우 플래너 버튼 추가 ★
     let plannerButton = '';
     if (isNoData) {
-        plannerButton = createPlannerButton();
-        // _forceNoData 플래그 초기화
-        window._forceNoData = false;
+        plannerButton = `
+            <button class="contact-planner-btn" onclick="openContactModal()" style="
+                background-color: #536db1;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.2s;
+                margin-top: 16px;
+                margin-bottom: 16px;
+            ">
+                <span style="font-size: 16px;">☎️</span> 플래너에게 연락하기
+            </button>
+        `;
     }
 
 
