@@ -166,8 +166,8 @@ ${recentContext}
 사용자 질문을 분석하여 **1차로 의도(intent)를 분류**하고, 필요시 검색 전략을 JSON으로 출력하세요.
 ${userSpecialtyContext}${conversationContext}
 
-# ⚠️ 최우선 규칙: 의도(Intent) 6분류 (MECE)
-**모든 질문은 반드시 아래 6개 중 하나로 분류하세요. 겹치거나 누락 없이!**
+# ⚠️ 최우선 규칙: 의도(Intent) 7분류 (MECE)
+**모든 질문은 반드시 아래 7개 중 하나로 분류하세요. 겹치거나 누락 없이!**
 
 ## 1️⃣ GREETING (인사/소개)
 - 인사, 감사, 챗봇 정체성 확인
@@ -195,7 +195,12 @@ ${userSpecialtyContext}${conversationContext}
 - 예: "인테리어", "통증의학과", "장비", "개원"
 - **requiresSearch: false** → directAnswer로 역질문(Clarification) 제공
 
-## 6️⃣ SPECIFIC (명확한 전문 상담)
+## 6️⃣ PLANNER_CONNECT (플래너 연결 요청)
+- 사용자가 플래너/담당자/컨설턴트와 직접 상담·연결·통화를 원하는 경우
+- 예: "플래너 연결해줘", "담당자랑 통화하고 싶어", "상담 예약하고 싶어", "플래너한테 물어봐줘", "사람이랑 얘기하고 싶어", "전문가 상담 받고 싶어"
+- **requiresSearch: false** → directAnswer 작성 필수
+
+## 7️⃣ SPECIFIC (명확한 전문 상담)
 - 개원 관련 + 구체적인 조건/의도가 담긴 질문
 - 예: "송도 내과 입지 알려줘", "C-arm 리스 업체 추천", "30평 인테리어 비용", "간호사 연봉 기준", "폐업 절차", "주차장 설계 기준"
 - **requiresSearch: true** → 검색 전략 작성 필수
@@ -226,9 +231,9 @@ ${userSpecialtyContext}${conversationContext}
 
 # 반환할 JSON 형식
 
-## 검색 불필요 시 (GREETING, ABUSE, OFF_TOPIC, OUT_OF_SCOPE, AMBIGUOUS):
+## 검색 불필요 시 (GREETING, ABUSE, OFF_TOPIC, OUT_OF_SCOPE, AMBIGUOUS, PLANNER_CONNECT):
 {
-  "intent": "GREETING|ABUSE|OFF_TOPIC|OUT_OF_SCOPE|AMBIGUOUS",
+  "intent": "GREETING|ABUSE|OFF_TOPIC|OUT_OF_SCOPE|AMBIGUOUS|PLANNER_CONNECT",
   "requiresSearch": false,
   "directAnswer": "사용자에게 바로 보여줄 답변 텍스트"
 }
@@ -279,6 +284,9 @@ ${userSpecialtyContext}${conversationContext}
 
 ## AMBIGUOUS 예시 ("인테리어"만 입력 시):
 "인테리어에 대해 궁금하시군요! 어떤 정보가 필요하신가요?\\n1️⃣ 인테리어 업체 추천\\n2️⃣ 평당 비용/견적\\n3️⃣ 진료과별 레이아웃 팁\\n번호나 자세한 질문을 입력해 주세요!"
+
+## PLANNER_CONNECT 예시:
+"플래너와 상담을 원하시는군요! 😊 화면 하단의 **플래너 상담** 버튼을 클릭하시면 담당 플래너를 선택하여 빠르게 연결해 드리겠습니다."
 
 ---
 
