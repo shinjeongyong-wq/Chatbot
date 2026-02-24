@@ -721,13 +721,12 @@ function addBotMessageToUI(content, question = '', contextPrompt = '', messageTy
         }
     }
 
-    // ★ 플래너 버튼 추가 (no_data, out_of_scope 타입인 경우) ★
+    // ★ 플래너 버튼 추가 (no_data, out_of_scope, planner_connect 타입인 경우) ★
     let plannerButton = '';
-    if (messageType === 'no_data' || messageType === 'out_of_scope') {
-        const buttonText = messageType === 'out_of_scope' ? '📞 플래너에게 연결하기' : '☎️ 플래너에게 연락하기';
+    if (messageType === 'no_data' || messageType === 'out_of_scope' || messageType === 'planner_connect') {
         plannerButton = `
-            <p style="margin: 20px 0 16px 0; color: #64748b; font-size: 14px;">
-                질문하신 내용에 대해 문의 사항 있으시면 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
+            <p style="margin-top: 20px; margin-bottom: 12px; color: #64748b; font-size: 14px;">
+                질문하신 내용에 대해 문의 사항이 있으시면 담당 플래너에게 연락 주시면 빠른 시일 내에 연락드리겠습니다.
             </p>
             <button class="contact-planner-btn" onclick="openContactModal()" style="
                 background-color: #536db1;
@@ -735,19 +734,19 @@ function addBotMessageToUI(content, question = '', contextPrompt = '', messageTy
                 border: none;
                 padding: 12px 24px;
                 border-radius: 8px;
-                font-size: 14px;
                 font-weight: 600;
                 cursor: pointer;
-                transition: background 0.2s;
-                margin-bottom: 16px;
-                display: inline-flex;
+                display: flex;
                 align-items: center;
                 gap: 8px;
+                transition: background 0.2s;
+                margin-bottom: 16px;
             ">
-                ${buttonText}
+                <span style="font-size: 16px;">📞</span> 플래너에게 연결하기
             </button>
         `;
     }
+
 
     // 피드백 버튼 + 복사 버튼 추가
     const messageId = Date.now() + Math.random();
