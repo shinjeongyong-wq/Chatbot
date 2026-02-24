@@ -1226,11 +1226,27 @@ async function getBotResponse(userMessage) {
                         // 스트리밍 메시지 컨테이너 생성
                         const { container: streamingContainer, contentDiv: streamingContent } = createStreamingMessageContainer();
 
-                        // OUT_OF_SCOPE, AMBIGUOUS 처리
+                        // PLANNER_CONNECT, OUT_OF_SCOPE, AMBIGUOUS 처리
                         let finalAnswer = queryPlan.directAnswer;
                         let messageType = 'normal';
 
-                        if (queryPlan.intent === 'OUT_OF_SCOPE') {
+                        if (queryPlan.intent === 'PLANNER_CONNECT') {
+                            // ★ 플래너 연결 요청 — 전용 메시지 렌더링 ★
+                            hideTypingIndicator();
+                            // 스트리밍 컨테이너 제거 (addPlannerConnectMessage에서 자체 생성)
+                            if (streamingContainer && streamingContainer.parentNode) {
+                                streamingContainer.parentNode.removeChild(streamingContainer);
+                            }
+                            addPlannerConnectMessage(finalAnswer);
+
+                            // ChatMemory에 저장
+                            await chatMemory.addTurn(userMessage, finalAnswer);
+                            // Supabase 저장
+                            if (window.chatHistory && typeof window.chatHistory.saveMessage === 'function') {
+                                window.chatHistory.saveMessage('assistant', finalAnswer, chatMemory.getContextPrompt(), 'planner_connect').catch(() => { });
+                            }
+                            return;
+                        } else if (queryPlan.intent === 'OUT_OF_SCOPE') {
                             messageType = 'out_of_scope';
                             // [NO_DATA] 태그 추가 (플래너 버튼 표시용)
                             if (!finalAnswer.includes('[NO_DATA]')) {
@@ -1849,9 +1865,21 @@ ${rtTopicText}
 5. 답변 맨 마지막에 \`[RELATED_TOPICS]질문1|질문2|질문3[/RELATED_TOPICS]\` 포함.
    ⚠️ RT 문서의 Q를 그대로 쓰지 말고, 사용자에게 자연스러운 질문 형태로 다듬어서 작성.
 
-**형식 예시:**
+**형식 예시 (3가지 중 하나처럼, 매번 다른 표현으로):**
+
+예시A)
 ... 답변 본문 마침표로 끝.
-추가로 원장님, **인공신장실 시설 기준**이나 **의료기기 리스 조건**에 대해서도 궁금하신 점 있으시면 말씀해 주세요.
+혹시 **인공신장실 시설 기준**이나 **의료기기 리스 조건**도 궁금하시면 편하게 물어봐 주세요! 😊
+
+예시B)
+... 답변 본문 마침표로 끝.
+참고로 **간판 디자인 가이드**나 **마케팅 초기 전략**에 대해서도 안내해 드릴 수 있어요.
+
+예시C)
+... 답변 본문 마침표로 끝.
+이 외에도 **의료폐기물 처리 절차**가 궁금하시다면 말씀해 주세요!
+
+⚠️ 매번 같은 도입 표현을 반복하지 마세요. 다양한 표현을 사용하세요.
 
 [RELATED_TOPICS]인공신장실 시설 기준이 궁금해요|의료기기 리스 조건 알려주세요[/RELATED_TOPICS]` : `관련 추가 주제가 없습니다. [RELATED_TOPICS] 태그를 포함하지 마세요.`}
 `;
@@ -2020,6 +2048,64 @@ function addOffTopicMessage(text) {
     scrollToMessageTop(div);
 
     // Note: Supabase 저장은 호출측(getBotResponse 등)에서 처리
+}
+
+// PLANNER_CONNECT 응답 렌더링 (플래너 연결 요청 시 전용 안내)
+function addPlannerConnectMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'message bot';
+
+    // 피드백 버튼용 ID 생성 및 데이터 저장
+    const messageId = Date.now();
+    const feedbackButtons = `
+        <div class="feedback-buttons" data-message-id="${messageId}">
+            <button class="feedback-btn good" onclick="openFeedbackModal('good', ${messageId})">👍 Good</button>
+            <button class="feedback-btn bad" onclick="openFeedbackModal('bad', ${messageId})">👎 Bad</button>
+        </div>
+    `;
+
+    window.lastMessages = window.lastMessages || {};
+    window.lastMessages[messageId] = {
+        question: window.currentQuestion || '',
+        answer: text,
+        contextPrompt: chatMemory.getContextPrompt()
+    };
+
+    // 고정 메시지 (플래너 연결 안내)
+    const fixedMessage = `
+        <p style="margin-bottom: 12px; line-height: 1.7;">
+            플래너와 상담을 원하시는군요! 😊
+        </p>
+        <p style="margin-bottom: 16px; line-height: 1.7;">
+            화면 하단의 <strong>플래너 상담</strong> 버튼을 클릭하시면 담당 플래너를 선택하여 빠르게 연결해 드리겠습니다.
+        </p>
+    `;
+
+    div.innerHTML = `
+        <div class="message-avatar">AI</div>
+        <div class="message-content formatted-response">
+            ${fixedMessage}
+            <button class="contact-planner-btn" onclick="openContactModal()" style="
+                background-color: #536db1;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.2s;
+                margin-bottom: 16px;
+            ">
+                <span style="font-size: 16px;">📞</span> 플래너에게 연결하기
+            </button>
+            ${feedbackButtons}
+        </div>
+    `;
+    chatContainer.appendChild(div);
+    scrollToMessageTop(div);
 }
 
 // OUT_OF_SCOPE 응답 렌더링 (플래너 연결 버튼 포함)
